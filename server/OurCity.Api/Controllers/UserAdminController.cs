@@ -24,22 +24,6 @@ public class UserAdminController : ControllerBase
         _logger = logger;
     }
 
-    /*
-    /// <summary>
-    /// note: had a createadminuser.. but thinking about my WTs i feel like they usually just make an account and u have to switch your password lollll.
-    /// </summary>
-    [HttpPost]
-    //Authorize by admins?
-    [EndpointSummary("Create a new user")]
-    [EndpointDescription("Creates a new user with the provided data")]
-    [ProducesResponseType(typeof(UserDto), StatusCodes.Status201Created)]
-    public async Task<IActionResult> CreateAdminUser(
-        [FromBody] UserCreateRequestDto userCreateRequestDto
-    )
-    {
-        throw new NotImplementedException();
-    }*/
-
     [HttpPost]
     [Route("Ban/{id}")]
     [EndpointSummary("Ban a user")]
@@ -81,8 +65,8 @@ public class UserAdminController : ControllerBase
     [HttpPost]
     //Authorized by admin
     [Route("Unban/{id}")]
-    [EndpointSummary("Ban a user")]
-    [EndpointDescription("Ban the user with the specified ID")]
+    [EndpointSummary("Unban a user")]
+    [EndpointDescription("Unban the user with the specified ID")]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status200OK)]

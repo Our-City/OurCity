@@ -1,9 +1,9 @@
 namespace OurCity.Api.Contracts.v1.Dtos;
 
-public class UserDto
+public record UserDto
 {
-    public int Id { get; set; }
-    public required string Username { get; set; }
-    public string? DisplayName { get; set; }
-    public required bool IsDeleted { get; set; }
+    public required int Id { get; init; }
+    public required string Username { get; init; }
+    public required string? DisplayName { get; init; }
+    public required bool IsDeleted { get; init; }
 }
