@@ -1,0 +1,15 @@
+/* Generative AI - CoPilot was used to assist in the creation of this file.
+  CoPilot was asked to provide help with CSS styling and for help with syntax */
+
+.smooth-transition-enter-active,
+.smooth-transition-leave-active {
+  transition: opacity 0.2s;
+}
+.smooth-transition-enter-from,
+.smooth-transition-leave-to {
+  opacity: 0;
+}
+.smooth-transition-enter-to,
+.smooth-transition-leave-from {
+  opacity: 1;
+}

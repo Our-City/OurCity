@@ -11,12 +11,13 @@
 <style>
 * {
   margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
 body {
-  margin: 0;
+  background: var(--secondary-background-color);
+  padding: 1rem;
+  min-height: 100vh;
 }
 
 main {
