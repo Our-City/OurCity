@@ -21,7 +21,11 @@ const isLoggedIn = ref(false);
 function handleLogout(): void {
   // Currently logout is not yet implemented.
   isLoggedIn.value = false;
-  router.push("/login");
+}
+
+function handleLogin(): void {
+  // Currently login is not yet implemented.
+  isLoggedIn.value = true;
 }
 
 const items = computed<MenuItem[]>(() => [
@@ -31,7 +35,7 @@ const items = computed<MenuItem[]>(() => [
           label: "Log In",
           icon: "pi pi-sign-in",
           command: () => {
-            router.push("/login");
+            handleLogin();
           },
         },
       ]
