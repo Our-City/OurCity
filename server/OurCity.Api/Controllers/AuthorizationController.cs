@@ -7,19 +7,16 @@ namespace OurCity.Api.Controllers;
 /// AuthorizationController has endpoints that lets end users check what policies they have for OurCity
 /// </summary>
 [ApiController]
-[Route("[controller]")]
+[Route("authorization")]
 public class AuthorizationController : ControllerBase
 {
     private readonly ILogger<AuthorizationController> _logger;
-    private readonly IPolicyService _policyService;
 
     public AuthorizationController(
-        ILogger<AuthorizationController> logger,
-        IPolicyService policyService
+        ILogger<AuthorizationController> logger
     )
     {
         _logger = logger;
-        _policyService = policyService;
     }
 
     [HttpGet]
@@ -29,9 +26,10 @@ public class AuthorizationController : ControllerBase
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     public async Task<IActionResult> CanCreatePosts()
     {
-        var isAllowed = await _policyService.CheckPolicy(HttpContext.User, Policy.CanCreatePosts);
-
-        return Ok(isAllowed);
+        return Ok(new CanDoPolicy
+        {
+            Authorized = true
+        });
     }
 
     [HttpGet]
@@ -42,12 +40,14 @@ public class AuthorizationController : ControllerBase
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     public async Task<IActionResult> CanMutateThisPost([FromRoute] int postId)
     {
-        var isAllowed = await _policyService.CheckResourcePolicy(
-            HttpContext.User,
-            Policy.CanMutateThisPost,
-            postId
-        );
-
-        return Ok(isAllowed);
+        return Ok(new CanDoPolicy
+        {
+            Authorized = true
+        });
     }
+}
+
+public class CanDoPolicy
+{
+    public bool Authorized { get; set; } = false;
 }

@@ -88,7 +88,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 if (app.Environment.IsDevelopment())
-{
+{lcimas
     app.MapOpenApi();
 
     //Multiple API documentation tools

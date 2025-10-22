@@ -6,7 +6,7 @@ using OurCity.Api.Services;
 namespace OurCity.Api.Controllers;
 
 [ApiController]
-[Route("[controller]s")]
+[Route("posts")]
 public class PostController : ControllerBase
 {
     private readonly ILogger<PostController> _logger;
@@ -24,9 +24,7 @@ public class PostController : ControllerBase
     [ProducesResponseType(typeof(List<PostResponseDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetPosts()
     {
-        var posts = await _postService.GetPosts();
-
-        return Ok(posts);
+        throw new NotImplementedException();
     }
 
     [HttpGet]
@@ -37,14 +35,7 @@ public class PostController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetPostById([FromRoute] int postId)
     {
-        var post = await _postService.GetPostById(postId);
-
-        if (!post.IsSuccess)
-        {
-            return NotFound(post.Error);
-        }
-
-        return Ok(post.Data);
+        throw new NotImplementedException();
     }
 
     [HttpGet]
@@ -52,39 +43,12 @@ public class PostController : ControllerBase
     [EndpointSummary("Get a user's upvote status for a post")]
     [ProducesResponseType(typeof(PostUpvoteResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetUserUpvoteStatus(
+    public async Task<IActionResult> GetUserVoteStatus(
         [FromRoute] int postId,
         [FromRoute] int userId
     )
     {
-        var voteStatus = await _postService.GetUserUpvoteStatus(postId, userId);
-
-        if (!voteStatus.IsSuccess)
-        {
-            return NotFound(voteStatus.Error);
-        }
-
-        return Ok(voteStatus.Data);
-    }
-
-    [HttpGet]
-    [Route("{postId}/downvote/{userId}")]
-    [EndpointSummary("Get a user's downvote status for a post")]
-    [ProducesResponseType(typeof(PostDownvoteResponseDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetUserDownvoteStatus(
-        [FromRoute] int postId,
-        [FromRoute] int userId
-    )
-    {
-        var voteStatus = await _postService.GetUserDownvoteStatus(postId, userId);
-
-        if (!voteStatus.IsSuccess)
-        {
-            return NotFound(voteStatus.Error);
-        }
-
-        return Ok(voteStatus.Data);
+        throw new NotImplementedException();
     }
 
     [HttpPost]
@@ -95,9 +59,7 @@ public class PostController : ControllerBase
         [FromBody] PostCreateRequestDto postCreateRequestDto
     )
     {
-        var post = await _postService.CreatePost(postCreateRequestDto);
-
-        return CreatedAtAction(nameof(GetPosts), new { id = post.Data?.Id }, post.Data);
+        throw new NotImplementedException();
     }
 
     [HttpPut]
@@ -111,14 +73,7 @@ public class PostController : ControllerBase
         [FromBody] PostUpdateRequestDto postUpdateRequestDto
     )
     {
-        var post = await _postService.UpdatePost(postId, postUpdateRequestDto);
-
-        if (!post.IsSuccess)
-        {
-            return NotFound(post.Error);
-        }
-
-        return Ok(post.Data);
+        throw new NotImplementedException();
     }
 
     [HttpPut]
@@ -132,20 +87,9 @@ public class PostController : ControllerBase
         [FromBody] PostVoteRequestDto postVoteRequestDto
     )
     {
-        var post = await _postService.VotePost(
-            postId,
-            postVoteRequestDto.UserId,
-            postVoteRequestDto.VoteType
-        );
-
-        if (!post.IsSuccess)
-        {
-            return NotFound(post.Error);
-        }
-
-        return Ok(post.Data);
+        throw new NotImplementedException();
     }
-
+    
     [HttpDelete]
     [Route("{postId}")]
     [EndpointSummary("Delete a post")]
@@ -154,13 +98,6 @@ public class PostController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeletePost([FromRoute] int postId)
     {
-        var post = await _postService.DeletePost(postId);
-
-        if (!post.IsSuccess)
-        {
-            return NotFound(post.Error);
-        }
-
-        return Ok(post.Data);
+        throw new NotImplementedException();
     }
 }
