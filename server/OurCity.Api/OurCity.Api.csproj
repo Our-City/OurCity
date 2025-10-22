@@ -26,7 +26,4 @@
       <Link>.dockerignore</Link>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Contracts\v1\" />
-  </ItemGroup>
 </Project>

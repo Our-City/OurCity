@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
-using OurCity.Api.Services.Authorization;
 
 namespace OurCity.Api.Controllers;
 
 /// <summary>
 /// AuthorizationController has endpoints that lets end users check what policies they have for OurCity
 /// </summary>
+///
+/// For contract -> still on the fence about what i wanna do
 [ApiController]
 [Route("authorization")]
 public class AuthorizationController : ControllerBase

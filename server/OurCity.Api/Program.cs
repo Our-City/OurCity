@@ -1,13 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
-using OurCity.Api.Infrastructure;
-using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Middlewares;
-using OurCity.Api.Services;
-using OurCity.Api.Services.Authorization;
-using OurCity.Api.Services.Authorization.CanCreatePosts;
-using OurCity.Api.Services.Authorization.CanMutateThisPost;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -19,22 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 //Logging
 builder.Host.UseSerilog((ctx, config) => config.ReadFrom.Configuration(builder.Configuration));
-
-//Database
-builder.Services.AddDbContextPool<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres"))
-);
-
-//Repository
-builder.Services.AddScoped<IPostRepository, PostRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<ICommentRepository, CommentRepository>();
-
-//Service
-builder.Services.AddScoped<IPostService, PostService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<ICommentService, CommentService>();
-builder.Services.AddScoped<IPolicyService, PolicyService>();
 
 //Controller
 builder.Services.AddControllers();
@@ -61,11 +38,8 @@ builder
     });
 
 //Authorization
-builder.Services.AddSingleton<IAuthorizationHandler, CanCreatePostsHandler>();
-builder.Services.AddSingleton<IAuthorizationHandler, CanMutateThisPostHandler>();
 builder.Services.AddAuthorization(options =>
 {
-    options.AddOurCityPolicies();
 });
 
 var app = builder.Build();
@@ -88,7 +62,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 if (app.Environment.IsDevelopment())
-{lcimas
+{
     app.MapOpenApi();
 
     //Multiple API documentation tools

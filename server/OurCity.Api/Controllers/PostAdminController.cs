@@ -1,12 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OurCity.Api.Common.Dtos;
-using OurCity.Api.Common.Dtos.Post;
-using OurCity.Api.Services;
 
 namespace OurCity.Api.Controllers;
 
 [ApiController]
 [Route("admin/posts")]
+[Authorize]
 public class PostAdminController : ControllerBase
 {
     private readonly ILogger<PostAdminController> _logger;

@@ -1,12 +1,15 @@
 /// Generative AI - CoPilot was used to assist in the creation of this file.
 ///  CoPilot assisted by generating boilerplate code for standard CRUD operations
 ///  and routing attributes based on common patterns in ASP.NET API development
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace OurCity.Api.Controllers;
 
 [ApiController]
-[Route("admin/posts/{postId}/comments")] // comments are sub-resource of posts
+[Route("admin/posts/{postId}/comments")]
+[Authorize]
 public class PostCommentAdminController : ControllerBase
 {
     private readonly ILogger<PostCommentAdminController> _logger;
@@ -19,6 +22,8 @@ public class PostCommentAdminController : ControllerBase
     [HttpPut("{commentId}")]
     [EndpointSummary("Delete a comment")]
     [EndpointDescription("Deletes a comment associated with a specific post")]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> HideComment(
         [FromRoute] int postId,

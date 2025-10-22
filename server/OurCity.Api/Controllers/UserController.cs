@@ -1,7 +1,10 @@
 /// Generative AI - CoPilot was used to assist in the creation of this file.
 ///  CoPilot assisted by generating boilerplate code for standard CRUD operations
 ///  and routing attributes based on common patterns in ASP.NET API developmeent.
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OurCity.Api.Contracts.v1.Dtos;
 
 namespace OurCity.Api.Controllers;
 
@@ -16,71 +19,54 @@ public class UserController : ControllerBase
         _logger = logger;
     }
 
-    class GetUsersRequest
-    {
-        //
-    }
-
-    class GetUsersResponse
-    {
-        
-    }
-
-    class UserResponseDto
-    {
-        
-    }
-    
     [HttpGet]
-    [Route("me")]
-    [EndpointSummary("Get my user")]
-    [EndpointDescription("Get ma user")]
-    //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    //[ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetMe()
-    {
-        throw new NotImplementedException();
-    }
-    
-    [HttpPut]
-    [Route("me")]
-    [EndpointSummary("Get my user")]
-    [EndpointDescription("Get ma user")]
-    //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    //[ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> UpdateMe()
-    {
-        throw new NotImplementedException();
-    }
-    
-    [HttpDelete]
-    //Authorized by admin
-    [Route("{id}")]
-    [EndpointSummary("Delete a user")]
-    [EndpointDescription("Deletes the user with the specified ID")]
-    [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> DeleteMe([FromRoute] int id)
-    {
-        throw new NotImplementedException();
-    }
-
-    [HttpGet]
-    [Route("{id}")]
+    [Route("{id:int}")]
     [EndpointSummary("Get user by ID")]
     [EndpointDescription("Gets a user with the specified ID")]
-    [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetUserById([FromRoute] int id)
     {
-        throw new NotImplementedException();
+        int number = new Random().Next(0, 2); // 0 inclusive, 2 exclusive
+        
+        //user does not exist
+        if (number == 0)
+        {
+            return Problem(statusCode: StatusCodes.Status404NotFound);
+        }
+        
+        //was successful
+        return Ok(new UserDto
+        {
+            Id = 1,
+            Username = "",
+            DisplayName = "",
+            IsDeleted = false
+        });
     }
     
     [HttpGet]
-    [Route("{id}")]
-    [EndpointSummary("Get user by ID")]
-    [EndpointDescription("Gets a user with the specified ID")]
-    [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetUserByUsername([FromRoute] int id)
+    [Route("{username}")]
+    [EndpointSummary("Get user by username")]
+    [EndpointDescription("Gets a user with the specified username")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetUserByUsername([FromRoute] string username)
     {
-        throw new NotImplementedException();
+        int number = new Random().Next(0, 2); // 0 inclusive, 2 exclusive
+        
+        //user does not exist
+        if (number == 0)
+        {
+            return Problem(statusCode: StatusCodes.Status404NotFound);
+        }
+        
+        //was successful
+        return Ok(new UserDto
+        {
+            Id = 1,
+            Username = "",
+            DisplayName = "",
+            IsDeleted = false
+        });
     }
 }
