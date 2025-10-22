@@ -16,7 +16,7 @@ const router = useRouter();
 const searchQuery = ref("");
 // Currently keeping this here as our login authentication is
 // not yet fully implemented.
-const isLoggedIn = ref(false);
+const isLoggedIn = ref(true);
 
 function handleLogout(): void {
   // Currently logout is not yet implemented.
@@ -26,6 +26,7 @@ function handleLogout(): void {
 function handleLogin(): void {
   // Currently login is not yet implemented.
   isLoggedIn.value = true;
+  router.push("/login");
 }
 
 const items = computed<MenuItem[]>(() => [
