@@ -6,6 +6,7 @@ import PrimeVue from "primevue/config";
 import "primeicons/primeicons.css";
 
 import "./assets/styles/theme.css";
+import "./assets/styles/base.css";
 
 const app = createApp(App);
 
