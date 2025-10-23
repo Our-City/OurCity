@@ -30,10 +30,16 @@ function handleSignUp(): void {
 function handleLogout(): void {
   // router.push("/logout");
   loggedIn.value = false;
+  isDropdownVisible.value = false;
 }
 
 function handleViewProfile(): void {
   router.push("/profile");
+  isDropdownVisible.value = false;
+}
+
+function toggleAccountMenu(event: Event): void {
+  isDropdownVisible.value = !isDropdownVisible.value;
 }
 </script>
 
