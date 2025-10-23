@@ -37,7 +37,7 @@ const posts = ref(mockPosts);
         <div class="home-page-content-layout">
           <div class="post-list">
 
-            <PostList />
+            <PostList :posts="mockPosts"/>
           </div>
           <div class="map-overview">
             Map Overview Coming Soon
