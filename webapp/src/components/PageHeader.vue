@@ -3,9 +3,27 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import InputText from "primevue/inputtext";
 import ToolBar from "primevue/toolbar";
+import SplitButton from "primevue/splitbutton";
 
 const router = useRouter();
 const searchQuery = ref("");
+
+const account_dropdown = [
+  {
+      label: 'View Profile',
+      icon: 'pi pi-user',
+      command: () => {
+          handleViewProfile();
+      }
+  },
+  {
+      label: 'Log Out',
+      icon: 'pi pi-sign-out',
+      command: () => {
+          handleLogout();
+      }
+  }
+];
 
 const loggedIn = ref(false);
 
@@ -19,6 +37,7 @@ function goToHome(): void {
 
 function handleLogin(): void {
   // router.push("/login");
+  loggedIn.value = true;
 }
 
 function handleSignUp(): void {
@@ -27,24 +46,12 @@ function handleSignUp(): void {
 
 function handleLogout(): void {
   // router.push("/logout");
+  loggedIn.value = false;
 }
 
-function handleAccount(): void {
-  // router.push("/account");
+function handleViewProfile(): void {
+  router.push("/profile");
 }
-
-const items = ref([
-  {
-    label: "Log In",
-    icon: "pi pi-sign-in",
-    command: handleLogin,
-  },
-  {
-    label: "Sign Up",
-    icon: "pi pi-user-plus",
-    command: handleSignUp,
-  },
-]);
 
 </script>
 
@@ -55,26 +62,31 @@ const items = ref([
         <h1 class="app-title" @click="goToHome">
           OurCity
         </h1>
+        <button class="home-button" @click="goToHome">Home</button>
+        <div class="search-container w-full">
+          <span class="p-input-icon-left">
+            <i class="pi pi-search" />
+            <InputText
+              v-model="searchQuery"
+              placeholder="Search..."
+              class="search-input"
+            />
+          </span>
+        </div>
       </template>
       <template #center>
-        <div class="center-bar">
-          <button class="home-button" @click="goToHome">Home</button>
-          <div class="search-container">
-            <span class="p-input-icon-left">
-              <i class="pi pi-search" />
-              <InputText
-                v-model="searchQuery"
-                placeholder="Search..."
-                class="search-input"
-              />
-            </span>
-          </div>
-        </div>
       </template>
       <template #end>
         <button v-if="!isLoggedIn()" class="login-button" @click="handleLogin">Login</button>
         <button v-if="!isLoggedIn()" class="signup-button" @click="handleSignUp">Sign Up</button>
-        <button v-if="isLoggedIn()" class="logout-button" @click="handleLogout">Logout</button>
+        <SplitButton
+          v-if="isLoggedIn()"
+          class="account-button"
+          icon="pi pi-user"
+          @click="handleViewProfile"
+          :model="account_dropdown"
+          :pt="{ menu: { class: 'account-menu' } }"
+        />
       </template>
     </ToolBar>
   </div>
@@ -103,25 +115,13 @@ const items = ref([
   cursor: pointer;
 }
 
-.center-bar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  min-width: 35rem;
-  max-width: 50rem;
-  gap: 0.5rem;
-  z-index: 1;
-  transform: translate(-20%, 0);
-}
-
 .home-button {
   align-items: center;
   justify-content: center;
   background: var(--primary-background-color);
   color: var(--primary-text-color);
   font-size: 1.25rem;
-  padding: 0.5rem 1rem;
+  padding: 1rem 0.5rem;
   border: none;
   border-radius: 0.75rem;
   transition: background 0.2s, color 0.2s;
@@ -138,6 +138,7 @@ const items = ref([
   background: var(--secondary-background-color);
   height: 2rem;
   border-radius: 3rem;
+  margin-left: 5rem;
   padding-left: 1rem;
   padding-right: 1rem;
   flex: 1;
@@ -158,7 +159,7 @@ const items = ref([
   width: 100%;
 }
 
-.login-button, .logout-button {
+.login-button {
   align-items: center;
   justify-content: center;
   background: var(--primary-background-color);
@@ -171,9 +172,13 @@ const items = ref([
   transition: background 0.2s, color 0.2s;
 }
 
-.login-button:hover, .logout-button:hover {
+.login-button:hover {
   background: var(--primary-background-color-hover);
   cursor: pointer;
+}
+
+.account-button {
+  margin-right: 1rem;
 }
 
 .signup-button{
@@ -191,5 +196,43 @@ const items = ref([
 .signup-button:hover {
   background: var(--neutral-color-hover);
   cursor: pointer;
+}
+
+/* Dropdown menu styling */
+.account-button :deep(.p-menu) {
+  background: var(--primary-background-color);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  padding: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  min-width: 12rem;
+}
+
+/* Menu items */
+.account-button :deep(.p-menuitem-link) {
+  color: var(--primary-text-color);
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  transition: background 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.account-button :deep(.p-menuitem-link:hover) {
+  background: var(--primary-background-color-hover);
+  cursor: pointer;
+}
+
+/* Menu item icons */
+.account-button :deep(.p-menuitem-icon) {
+  color: var(--primary-text-color);
+  font-size: 1rem;
+}
+
+/* Menu item text */
+.account-button :deep(.p-menuitem-text) {
+  color: var(--primary-text-color);
+  font-size: 1rem;
 }
 </style>
