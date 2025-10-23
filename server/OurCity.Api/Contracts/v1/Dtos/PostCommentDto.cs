@@ -1,4 +1,4 @@
-namespace OurCity.Api.Contracts.v1.Dtos;
+﻿namespace OurCity.Api.Contracts.v1.Dtos;
 
 public record PostCommentDto
 {
