@@ -30,12 +30,10 @@ function handleSignUp(): void {
 function handleLogout(): void {
   // router.push("/logout");
   loggedIn.value = false;
-  isDropdownVisible.value = false;
 }
 
 function handleViewProfile(): void {
   router.push("/profile");
-  isDropdownVisible.value = false;
 }
 
 function toggleAccountMenu(event: Event): void {
@@ -131,7 +129,6 @@ function toggleAccountMenu(event: Event): void {
 .account-button {
   display: flex;
   gap: 0.25rem;
-  align-items: center;
 }
 
 .signup-button {
