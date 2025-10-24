@@ -129,6 +129,7 @@ function toggleAccountMenu(event: Event): void {
 .account-button {
   display: flex;
   gap: 0.25rem;
+  align-items: center;
 }
 
 .signup-button {
