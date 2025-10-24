@@ -2,7 +2,8 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import InputText from "primevue/inputtext";
-import Dropdown from "./Dropdown.vue";
+import Dropdown from "./utils/Dropdown.vue";
+import Toolbar from "./utils/Toolbar.vue";
 
 const router = useRouter();
 const searchQuery = ref("");
@@ -37,14 +38,15 @@ function handleViewProfile(): void {
 </script>
 
 <template>
-  <div class="page-header">
-    <div class="header-start">
+  <Toolbar variant="header">
+    <template #start>
       <h1 class="app-title" @click="goToHome">
         OurCity
       </h1>
       <button class="home-button" @click="goToHome">Home</button>
-    </div>
-    <div class="header-center">
+    </template>
+    
+    <template #center>
       <div class="search-container w-full">
         <span class="p-input-icon-left">
           <i class="pi pi-search" />
@@ -55,8 +57,9 @@ function handleViewProfile(): void {
           />
         </span>
       </div>
-    </div>
-    <div class="header-end">
+    </template>
+    
+    <template #end>
       <button v-if="!isLoggedIn()" class="login-button" @click="handleLogin">Login</button>
       <button v-if="!isLoggedIn()" class="signup-button" @click="handleSignUp">Sign Up</button>
       <Dropdown 
@@ -78,46 +81,17 @@ function handleViewProfile(): void {
           </ul>
         </template>
       </Dropdown>
-    </div>
-  </div>
+    </template>
+  </Toolbar>
 </template>
 
 <style scoped>
-.page-header {
-  background: var(--primary-background-color);
-  color: var(--primary-text-color);
-  padding: 0.5rem 0.5rem;
-  width: 100%;
-  height: 100%;
-  border-top-left-radius: 1rem;
-  border-top-right-radius: 1rem;
-  display: flex;
-  gap: 1rem;
-}
-
-.header-start, .header-end {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-grow: 0;
-}
-
-.header-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-grow: 1;
-}
-
 .app-title {
   height: 100%;
   display: flex;
   align-items: center;
   font-size: 2.5rem;
   padding: 0rem 1rem 0rem 3rem;
-}
-
-.app-title:hover {
   cursor: pointer;
 }
 
@@ -151,14 +125,15 @@ function handleViewProfile(): void {
 .account-button {
   display: flex;
   gap: 0.25rem;
+  align-items: center;
 }
 
-
-.signup-button{
+.signup-button {
   background: var(--neutral-color);
   color: var(--secondary-text-color);
 }
+
 .signup-button:hover {
   background: var(--neutral-color-hover);
-} 
+}
 </style>
