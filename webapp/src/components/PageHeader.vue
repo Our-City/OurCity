@@ -2,12 +2,10 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import InputText from "primevue/inputtext";
-import Menu from "primevue/menu";
+import Dropdown from "./Dropdown.vue";
 
 const router = useRouter();
 const searchQuery = ref("");
-const menu = ref();
-const isDropdownVisible = ref(false);
 
 const loggedIn = ref(false);
 
@@ -31,18 +29,11 @@ function handleSignUp(): void {
 function handleLogout(): void {
   // router.push("/logout");
   loggedIn.value = false;
-  isDropdownVisible.value = false;
 }
 
 function handleViewProfile(): void {
   router.push("/profile");
-  isDropdownVisible.value = false;
 }
-
-function toggleAccountMenu(event: Event): void {
-  isDropdownVisible.value = !isDropdownVisible.value;
-}
-
 </script>
 
 <template>
@@ -68,25 +59,25 @@ function toggleAccountMenu(event: Event): void {
     <div class="header-end">
       <button v-if="!isLoggedIn()" class="login-button" @click="handleLogin">Login</button>
       <button v-if="!isLoggedIn()" class="signup-button" @click="handleSignUp">Sign Up</button>
-      <div v-if="isLoggedIn()" class="account-dropdown-container">
-        <button 
-          class="account-button" 
-          @click="toggleAccountMenu"
-        >
+      <Dropdown 
+        v-if="isLoggedIn()"
+        button-class="account-button"
+      >
+        <template #button>
           <i class="pi pi-user" />
           <i class="pi pi-angle-down" />
-        </button>
-        <div v-show="isDropdownVisible" class="dropdown-menu account-dropdown-menu"> 
+        </template>
+        <template #dropdown="{ close }">
           <ul>
-            <li @click="handleViewProfile">
+            <li @click="handleViewProfile(); close()">
               <i class="pi pi-user"></i> View Profile
             </li>
-            <li @click="handleLogout">
+            <li @click="handleLogout(); close()">
               <i class="pi pi-sign-out"></i> Log Out
             </li>
           </ul>
-        </div>
-      </div>
+        </template>
+      </Dropdown>
     </div>
   </div>
 </template>
@@ -157,15 +148,11 @@ function toggleAccountMenu(event: Event): void {
   width: 100%;
 }
 
-.account-dropdown-container {
-  position: relative;
-}
-
 .account-button {
   display: flex;
   gap: 0.25rem;
-  align-items: center;
 }
+
 
 .signup-button{
   background: var(--neutral-color);
