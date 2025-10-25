@@ -4,6 +4,7 @@ import PageHeader from "@/components/PageHeader.vue";
 import PostList from "@/components/PostList.vue";
 import { mockPosts } from "@/data/mockData.ts";
 import ProfileHeader from "@/components/profile/ProfileHeader.vue";
+import ProfileToolbar from "@/components/profile/ProfileToolbar.vue";
 
 const posts = ref(mockPosts);
 
@@ -19,7 +20,8 @@ const posts = ref(mockPosts);
         Temporary Sidebar Placeholder 
       </div>
       <div class="profile-page-body">
-        <ProfileHeader />
+        <ProfileHeader username="JohnDoe" />
+        <ProfileToolbar />
         <div class="profile-page-content-layout">
           <div class="post-list">
             <PostList />
