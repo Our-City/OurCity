@@ -27,6 +27,7 @@ const props = withDefaults(defineProps<Props>(), {
   display: flex;
   gap: 1rem;
   width: 100%;
+  height: fit-content;
 }
 
 .toolbar--header {

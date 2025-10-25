@@ -24,7 +24,7 @@ const posts = ref(mockPosts);
         <ProfileToolbar />
         <div class="profile-page-content-layout">
           <div class="post-list">
-            <PostList />
+            <PostList :posts="mockPosts"/>
           </div>
         </div>
       </div>
