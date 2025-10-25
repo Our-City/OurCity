@@ -60,8 +60,9 @@ const posts = ref(mockPosts);
   justify-content: center;
   align-items: center; 
   width: 20rem; 
-  height: 100vw; 
-  background: var(--test-color); 
+  height: 100%; 
+  background: var(--primary-background-color); 
+  border: 0.1rem solid var(--border-color);
 }
 
 .home-page-body {
@@ -123,9 +124,10 @@ const posts = ref(mockPosts);
   justify-content: center;
   align-items: center; 
   gap: 0.5rem;
-  width: 20rem; 
-  height: 56.5vh; 
-  background: var(--test-color); 
+  width: 30rem; 
+  height: 65rem; 
+  background: var(--primary-background-color); 
+  border: 0.1rem solid var(--border-color);
 }
 
 .spinner {
