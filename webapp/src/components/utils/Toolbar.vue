@@ -27,7 +27,6 @@ const props = withDefaults(defineProps<Props>(), {
   display: flex;
   gap: 1rem;
   width: 100%;
-  height: 100%;
 }
 
 .toolbar--header {
@@ -58,5 +57,28 @@ const props = withDefaults(defineProps<Props>(), {
   align-items: center;
   justify-content: center;
   flex-grow: 1;
+}
+
+/* Button styles for standard toolbar */
+.toolbar--standard :deep(button) {
+  background: var(--primary-background-color);
+  color: var(--primary-text-color);
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.toolbar--standard :deep(button:hover) {
+  background: var(--primary-background-color-hover);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.toolbar--standard :deep(button:active) {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 </style>
