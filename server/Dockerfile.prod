@@ -8,7 +8,6 @@ WORKDIR /app
 COPY *.sln .
 COPY OurCity.Api/*.csproj ./OurCity.Api/
 COPY OurCity.Api.Test/*.csproj ./OurCity.Api.Test/
-COPY OurCity.MigrationsRunner/*.csproj ./OurCity.MigrationsRunner/
 RUN dotnet restore
 
 COPY . .

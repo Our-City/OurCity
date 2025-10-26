@@ -1,5 +1,9 @@
 # OurCity Server
 
+## General stuff
+
+look at readme for OurCity.Api
+
 ## Required Setup
 
 - Ensure you have [Docker Desktop](https://www.docker.com/products/docker-desktop/).

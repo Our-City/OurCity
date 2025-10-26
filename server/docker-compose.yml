@@ -28,24 +28,6 @@ services:
       - "8100:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-  ourcity.migrate.dev:
-    container_name: ourcity.migrate.dev
-    profiles: ["migrate"]
-    build:
-      context: .
-      dockerfile: Dockerfile.migrate
-    depends_on:
-      ourcity.postgres.dev:
-        condition: service_healthy
-    environment:
-      #TODO: I dont like this
-      CONNECTION_STRING: "Host=ourcity.postgres.dev;Port=5432;Username=postgres;Password=postgres;Database=ourcity"
-    restart: no
 
 volumes:
   postgres_data:

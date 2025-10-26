@@ -1,8 +1,9 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
 using OurCity.Api.Middlewares;
+using Scalar.AspNetCore;
+using Serilog;
 
 /*
- * Lots of code setup from ChatGPT, asking for various things at various points (e.g. how to set up cookie auth, how to setup serilog, etc)
+ * Lots of code setup from ChatGPT, asking for various things at various points (e.g. how to setup Serilog)
  */
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,9 +11,20 @@ var builder = WebApplication.CreateBuilder(args);
 //Logging
 builder.Host.UseSerilog((ctx, config) => config.ReadFrom.Configuration(builder.Configuration));
 
-//Controller
-builder.Services.AddControllers();
+//CORS
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins(allowedOrigins).AllowAnyMethod().AllowAnyHeader().AllowCredentials();
+    });
+});
+
+//OpenAPI
 builder.Services.AddOpenApi();
+
+//HTTP request/response
 builder.Services.AddProblemDetails(options =>
 {
     options.CustomizeProblemDetails = (context) =>
@@ -21,23 +33,6 @@ builder.Services.AddProblemDetails(options =>
     };
 });
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-
-//Authentication
-//NOTE: Stubbed, implementation not fully there
-builder
-    .Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.Cookie.Name = "OurCityAuthToken";
-        options.Cookie.HttpOnly = true;
-        options.Cookie.SameSite = SameSiteMode.Strict;
-        options.ExpireTimeSpan = TimeSpan.FromDays(1);
-    });
-
-//Authorization
-builder.Services.AddAuthorization(options =>
-{
-});
 
 var app = builder.Build();
 
@@ -51,12 +46,9 @@ else
 }
 
 app.UseHttpsRedirection();
-app.UseCors();
 app.UseCorrelationId();
+app.UseCors();
 app.UseSecurityHeaders();
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapControllers();
 
 if (app.Environment.IsDevelopment())
 {
@@ -71,8 +63,3 @@ if (app.Environment.IsDevelopment())
 }
 
 app.Run();
-
-namespace OurCity.Api
-{
-    public partial class Program { }
-}
