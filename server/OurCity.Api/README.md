@@ -5,6 +5,6 @@ The API layer uses a Vertical Slice Architecture design. Use cases are per file,
 - some of the reasons for splitting into individula usecases/endpoints 
   - work on features in isolation (want to add a CreatePost usecase -> just add that)
   - Only ADDING code -> how could you break existing code?
-  - see practically everything related to that endpoint in one file. far easier mental load
+  - see practically everything related to that endpoint in one file. far easier mental load over jumping around files im in the olmypics for a triple jump contest in the name of "separate things!!!!!!"
 
 all in all we wanna do this and we thought about it and we think its better to work in so dont dock marks lololol
