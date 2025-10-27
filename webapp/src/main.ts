@@ -10,6 +10,7 @@ import "./assets/styles/theme.css";
 const app = createApp(App);
 
 app.use(router);
+
 app.use(PrimeVue);
 
 app.mount("#app");

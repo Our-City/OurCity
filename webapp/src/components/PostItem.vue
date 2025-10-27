@@ -23,14 +23,14 @@ function downvote() {
 <template>
   <div class="post-card">
     <div class="post-card-left">
-      <div class="post-author-date">
-        @a_real_prof • 6 days ago
+      <div class="post-tags">
+        Tags Placeholder
       </div>
       <h1 class="post-title">
         Exploring the City Streets
       </h1>
-      <div class="post-tags">
-        Tags Placeholder
+      <div class="post-author-date">
+        @a_real_prof • 6 days ago
       </div>
       <div class="post-votes-comments">
         <i class="pi pi-sort-alt"></i>
