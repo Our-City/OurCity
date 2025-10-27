@@ -62,10 +62,6 @@ public static class CreatePost
     /// <summary>
     /// Request/Response Contract
     /// </summary>
-    /// <param name="Title"></param>
-    /// <param name="Description"></param>
-    /// <param name="Location"></param>
-    /// <param name="IsDraft"></param>
     public record CreatePostRequest(string Title, string Description, string? Location, bool IsDraft);
 
     public class CreatePostRequestValidator : AbstractValidator<CreatePostRequest>
