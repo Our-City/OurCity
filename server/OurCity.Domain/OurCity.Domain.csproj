@@ -5,4 +5,7 @@
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors Condition="'$(lint)' == 'true'">true</TreatWarningsAsErrors>
   </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="ValueObjects\" />
+  </ItemGroup>
 </Project>

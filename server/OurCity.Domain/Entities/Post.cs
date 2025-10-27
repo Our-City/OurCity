@@ -1,4 +1,4 @@
-namespace OurCity.Domain.DomainEntities;
+namespace OurCity.Domain.Entities;
 
 public class Post
 {
