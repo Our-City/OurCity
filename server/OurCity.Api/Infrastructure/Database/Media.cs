@@ -3,6 +3,7 @@ namespace OurCity.Api.Infrastructure.Database;
 public class Media
 {
     public int Id { get; set; }
+    public int PostId { get; set; }                     //foreign key property
     public required string Url { get; set; }
     public int Order { get; set; }
     public DateTime CreatedAt { get; set; }
