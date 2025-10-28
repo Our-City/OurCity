@@ -38,6 +38,10 @@ function handleLogout(): void {
 function handleViewProfile(): void {
   router.push("/profile");
 }
+
+function handleCreatePost(): void {
+  router.push("/create-post");
+}
 </script>
 
 <template>
@@ -64,6 +68,7 @@ function handleViewProfile(): void {
     <template #end>
       <button v-if="!isLoggedIn()" class="login-button" @click="handleLogin">Login</button>
       <button v-if="!isLoggedIn()" class="signup-button" @click="handleSignUp">Sign Up</button>
+      <button v-if="isLoggedIn()" class="create-post-button" @click="handleCreatePost"><i class="pi pi-plus"></i> Create Post</button>
       <Dropdown 
         v-if="isLoggedIn()"
         button-class="account-button"
