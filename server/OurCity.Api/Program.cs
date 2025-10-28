@@ -1,4 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using OurCity.Api.Features.CommunityForum.Posts;
 using OurCity.Api.Middlewares;
+using OurCity.Infrastructure.Database;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -23,6 +26,11 @@ builder.Services.AddCors(options =>
 
 //OpenAPI
 builder.Services.AddOpenApi();
+
+//Database
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres"))
+);
 
 //HTTP request/response
 builder.Services.AddProblemDetails(options =>
@@ -49,6 +57,7 @@ app.UseHttpsRedirection();
 app.UseCorrelationId();
 app.UseCors();
 app.UseSecurityHeaders();
+app.MapPostsEndpoints();
 
 if (app.Environment.IsDevelopment())
 {
@@ -63,3 +72,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.Run();
+
+//Needed for .Api.Test WebApplicationFactory to discover the Program
+namespace OurCity.Api
+{
+    public partial class Program { }
+}

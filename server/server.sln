@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OurCity.Infrastructure", "O
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OurCity.Domain.Test", "OurCity.Domain.Test\OurCity.Domain.Test.csproj", "{EC15899B-3DEB-4994-9EFA-164343D9CAFA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OurCity.Api.Test", "OurCity.Api.Test\OurCity.Api.Test.csproj", "{DA1011CF-47E6-46EC-A002-28BBA8DF5839}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,18 @@ Global
 		{EC15899B-3DEB-4994-9EFA-164343D9CAFA}.Release|x64.Build.0 = Release|Any CPU
 		{EC15899B-3DEB-4994-9EFA-164343D9CAFA}.Release|x86.ActiveCfg = Release|Any CPU
 		{EC15899B-3DEB-4994-9EFA-164343D9CAFA}.Release|x86.Build.0 = Release|Any CPU
+		{DA1011CF-47E6-46EC-A002-28BBA8DF5839}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA1011CF-47E6-46EC-A002-28BBA8DF5839}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA1011CF-47E6-46EC-A002-28BBA8DF5839}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DA1011CF-47E6-46EC-A002-28BBA8DF5839}.Debug|x64.Build.0 = Debug|Any CPU
+		{DA1011CF-47E6-46EC-A002-28BBA8DF5839}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DA1011CF-47E6-46EC-A002-28BBA8DF5839}.Debug|x86.Build.0 = Debug|Any CPU
+		{DA1011CF-47E6-46EC-A002-28BBA8DF5839}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA1011CF-47E6-46EC-A002-28BBA8DF5839}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA1011CF-47E6-46EC-A002-28BBA8DF5839}.Release|x64.ActiveCfg = Release|Any CPU
+		{DA1011CF-47E6-46EC-A002-28BBA8DF5839}.Release|x64.Build.0 = Release|Any CPU
+		{DA1011CF-47E6-46EC-A002-28BBA8DF5839}.Release|x86.ActiveCfg = Release|Any CPU
+		{DA1011CF-47E6-46EC-A002-28BBA8DF5839}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

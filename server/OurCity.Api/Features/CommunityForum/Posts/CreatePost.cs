@@ -1,23 +1,27 @@
 ﻿using System.Security.Claims;
 using FluentValidation;
+using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
+using OurCity.Api.Extensions;
+using OurCity.Domain.Enums;
+using OurCity.Domain.Models;
+using OurCity.Domain.ValueObjects;
 
 namespace OurCity.Api.Features.CommunityForum.Posts;
 
 public static class CreatePost
 {
-    /// <summary>
-    /// HTTP request handling
-    /// </summary>
-    /// <param name="app"></param>
-    /// <param name="route"></param>
+    #region HTTP
     public static void MapEndpoint(IEndpointRouteBuilder app, string route)
     {
-        app.MapPost(route, Execute)
+        app.MapPost(route, ExecuteHttpRequest)
             .WithSummary("Create post")
             .WithDescription("Create a new post");
     }
 
-    public static IResult Execute(
+    public static IResult ExecuteHttpRequest(
         CreatePostRequest request,
         IValidator<CreatePostRequest> requestValidator,
         ClaimsPrincipal user
@@ -30,62 +34,70 @@ public static class CreatePost
         var response = HandleCreatePostRequest(request, user);
         return TypedResults.Ok(response);
     }
+    #endregion
 
-    /// <summary>
-    /// Use case handler
-    /// </summary>
+    #region Business
     public static CreatePostResponse? HandleCreatePostRequest(
         CreatePostRequest request,
         ClaimsPrincipal user
     )
     {
-        bool isUserAuthenticated = !user.Identity?.IsAuthenticated ?? false;
-        if (!isUserAuthenticated)
-            return null;
+        //TODO: have to put actual user id here
+        Post post = new Post(Guid.NewGuid(), request.Title, request.Description, PostVisibility.Published);
 
-        return new CreatePostResponse(
-            Id: 1,
-            AuthorId: 1,
-            Title: request.Title,
-            Description: request.Description,
-            Location: request.Location,
-            UpvoteNum: 1,
-            DownvoteNum: 1,
-            PostVisibility: null,
-            PostStatus: "Status",
-            PostTag: [],
-            CreatedAt: DateTime.Now,
-            UpdatedAt: DateTime.Now
+        return new CreatePostResponse
+        (
+            Id: post.Guid,
+            AuthorId: post.AuthorId,
+            Title: post.Title,
+            Description: post.Description,
+            Location: post.Location,
+            UpvoteNum: post.Votes.Count(vote => vote.VoteType == VoteType.UpVote),
+            DownvoteNum: post.Votes.Count(vote => vote.VoteType == VoteType.DownVote),
+            ReportCount: post.ReportedUsers.Count(),
+            CommentCount: post.Comments.Count(),
+            PostVisibility: post.PostVisibility,
+            PostTags: post.Tags,
+            CreatedAt: post.CreatedAt,
+            UpdatedAt: post.UpdatedAt
         );
     }
-    
-    /// <summary>
-    /// Request/Response Contract
-    /// </summary>
-    public record CreatePostRequest(string Title, string Description, string? Location, bool IsDraft);
+    #endregion
+
+    #region Contract
+    public record CreatePostRequest(
+        string Title,
+        string Description,
+        string? Location,
+        IEnumerable<PostTag>? Tags
+    );
 
     public class CreatePostRequestValidator : AbstractValidator<CreatePostRequest>
     {
         public CreatePostRequestValidator()
         {
             RuleFor(req => req.Title).NotEmpty().WithMessage("Title is required");
+            RuleFor(req => req.Title).MaximumLength(50).WithMessage("Title must not exceed 50 characters.");
+
             RuleFor(req => req.Description).NotEmpty().WithMessage("Description is required");
-            RuleFor(req => req.IsDraft).NotEmpty().WithMessage("IsDraft is required");
+            RuleFor(req => req.Description).MaximumLength(500).WithMessage("Description must not exceed 500 characters.");
         }
     }
-    
+
     public record CreatePostResponse(
-        int Id,
-        int AuthorId,
+        Guid Id,
+        Guid AuthorId,
         string Title,
         string Description,
         string? Location,
         int UpvoteNum,
-        int DownvoteNum,
-        string? PostVisibility,
-        string PostStatus,
-        string[] PostTag,
+        int DownvoteNum, 
+        int ReportCount,
+        int CommentCount,
+        PostVisibility PostVisibility,
+        IEnumerable<PostTag> PostTags,
         DateTime CreatedAt,
-        DateTime UpdatedAt
+        DateTime? UpdatedAt
     );
+    #endregion
 }

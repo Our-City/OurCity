@@ -15,4 +15,8 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="9.0.6" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OurCity.Domain\OurCity.Domain.csproj" />
+    <ProjectReference Include="..\OurCity.Infrastructure\OurCity.Infrastructure.csproj" />
+  </ItemGroup>
 </Project>
