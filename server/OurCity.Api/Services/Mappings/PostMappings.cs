@@ -1,7 +1,7 @@
 /// Generative AI - CoPilot was used to assist in the creation of this file.
 /// CoPilot assisted by generating boilerplate code for standard mapping functions
 /// based on common patterns in C# for mapping between entities and DTOs
-using OurCity.Api.Common.Dtos.Image;
+using OurCity.Api.Common.Dtos.Media;
 using OurCity.Api.Common.Dtos.Post;
 using OurCity.Api.Infrastructure.Database;
 
@@ -24,7 +24,7 @@ public static class PostMappings
             Description = post.Description,
             Votes = post.UpvotedUserIds.Count - post.DownvotedUserIds.Count,
             Location = post.Location,
-            Images = post.Images.Select(image => new ImageDto { Url = image.Url }).ToList(),
+            Media = post.Media.Select(media => new MediaDto { Url = media.Url }).ToList(),
             CommentIds = post.Comments?.Select(c => c.Id).ToList() ?? new List<int>(),
         };
     }
@@ -37,8 +37,8 @@ public static class PostMappings
             Description = postCreateRequestDto.Description,
             Location = postCreateRequestDto.Location,
             AuthorId = postCreateRequestDto.AuthorId,
-            Images = postCreateRequestDto
-                .Images.Select(imgDto => new Image { Url = imgDto.Url })
+            Media = postCreateRequestDto
+                .Media.Select(mediaDto => new Media { Url = mediaDto.Url })
                 .ToList(),
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
@@ -53,12 +53,12 @@ public static class PostMappings
         existingPost.Title = postUpdateRequestDto.Title ?? existingPost.Title;
         existingPost.Description = postUpdateRequestDto.Description ?? existingPost.Description;
         existingPost.Location = postUpdateRequestDto.Location ?? existingPost.Location;
-        existingPost.Images =
-            postUpdateRequestDto.Images.Count != 0
+        existingPost.Media =
+            postUpdateRequestDto.Media.Count != 0
                 ? postUpdateRequestDto
-                    .Images.Select(imgDto => new Image { Url = imgDto.Url })
+                    .Media.Select(mediaDto => new Media { Url = mediaDto.Url })
                     .ToList()
-                : existingPost.Images;
+                : existingPost.Media;
         existingPost.UpdatedAt = DateTime.UtcNow;
 
         return existingPost;

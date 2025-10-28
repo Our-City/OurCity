@@ -24,7 +24,7 @@ public class PostRepository : IPostRepository
     public async Task<IEnumerable<Post>> GetAllPosts()
     {
         return await _appDbContext
-            .Posts.Include(p => p.Images)
+            .Posts.Include(p => p.Media)
             .Include(p => p.Comments)
             .ToListAsync();
     }
@@ -32,7 +32,7 @@ public class PostRepository : IPostRepository
     public async Task<Post?> GetPostById(Guid postId)
     {
         return await _appDbContext
-            .Posts.Include(p => p.Images)
+            .Posts.Include(p => p.Media)
             .Include(p => p.Comments)
             .FirstOrDefaultAsync(p => p.Id == postId);
     }

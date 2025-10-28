@@ -170,7 +170,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Image", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Media", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -195,7 +195,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
 
                     b.HasIndex("PostId");
 
-                    b.ToTable("Image");
+                    b.ToTable("Media");
                 });
 
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Post", b =>
@@ -206,6 +206,10 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
 
                     b.Property<Guid>("AuthorId")
                         .HasColumnType("uuid");
+
+                    b.PrimitiveCollection<List<int>>("CommentIds")
+                        .IsRequired()
+                        .HasColumnType("integer[]");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -218,8 +222,15 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasColumnType("uuid[]");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Location")
                         .HasColumnType("text");
+
+                    b.PrimitiveCollection<List<int>>("MediaAttachments")
+                        .IsRequired()
+                        .HasColumnType("integer[]");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -232,11 +243,31 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasColumnType("uuid[]");
 
+                    b.Property<int>("Visibility")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AuthorId");
 
                     b.ToTable("Posts");
+                });
+
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tags", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.User", b =>
@@ -397,6 +428,21 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("PostTags", b =>
+                {
+                    b.Property<int>("PostsId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TagsId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("PostsId", "TagsId");
+
+                    b.HasIndex("TagsId");
+
+                    b.ToTable("PostTags");
+                });
+
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Comment", b =>
                 {
                     b.HasOne("OurCity.Api.Infrastructure.Database.User", "Author")
@@ -416,10 +462,10 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Navigation("Post");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Image", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Media", b =>
                 {
                     b.HasOne("OurCity.Api.Infrastructure.Database.Post", "Post")
-                        .WithMany("Images")
+                        .WithMany("Media")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -438,11 +484,26 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Navigation("Author");
                 });
 
+            modelBuilder.Entity("PostTags", b =>
+                {
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Post", null)
+                        .WithMany()
+                        .HasForeignKey("PostsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tags", null)
+                        .WithMany()
+                        .HasForeignKey("TagsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Post", b =>
                 {
                     b.Navigation("Comments");
 
-                    b.Navigation("Images");
+                    b.Navigation("Media");
                 });
 
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.User", b =>
