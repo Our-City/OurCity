@@ -22,7 +22,7 @@ function isLoggedIn(): boolean {
 }
 
 function handleLogin(): void {
-  // router.push("/login");
+  router.push("/login");
   loggedIn.value = true;
 }
 
@@ -31,7 +31,7 @@ function handleSignUp(): void {
 }
 
 function handleLogout(): void {
-  // router.push("/logout");
+  router.push("/");
   loggedIn.value = false;
 }
 
