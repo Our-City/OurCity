@@ -4,6 +4,7 @@ import Card from "primevue/card";
 import PageHeader from "@/components/PageHeader.vue";
 import PostList from "@/components/PostList.vue";
 import { mockPosts } from "@/data/mockData.ts";
+import SideBar from "@/components/SideBar.vue";
 
 const posts = ref(mockPosts);
 
@@ -16,7 +17,7 @@ const posts = ref(mockPosts);
     </div>
     <div class="home-page-layout">
       <div class="side-bar">
-        Temporary Sidebar Placeholder 
+        <SideBar view="home"/>
       </div>
       <div class="home-page-body">
         <Card class="create-post-card">
@@ -37,7 +38,7 @@ const posts = ref(mockPosts);
         <div class="home-page-content-layout">
           <div class="post-list">
 
-            <PostList :posts="mockPosts"/>
+            <PostList :posts="posts"/>
           </div>
           <div class="map-overview">
             Map Overview Coming Soon
@@ -53,16 +54,6 @@ const posts = ref(mockPosts);
 .home-page-layout {
   display: flex; 
   height: 100vh;
-}
-
-.side-bar {
-  display: flex; 
-  justify-content: center;
-  align-items: center; 
-  width: 20rem; 
-  height: 100%; 
-  background: var(--primary-background-color); 
-  border: 0.1rem solid var(--border-color);
 }
 
 .home-page-body {
