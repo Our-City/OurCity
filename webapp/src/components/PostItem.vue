@@ -116,11 +116,12 @@ const postImage = computed(() => {
   font-weight: 800;
   color: var(--primary-text-color);
   white-space: nowrap;
-  overflow: hidden;
+  overflow: visible;
   text-overflow: ellipsis;
   max-width: 100%;
   min-width: 0;
   margin: 0;
+  line-height: 1.2;
 }
 
 .post-tags {
