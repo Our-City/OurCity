@@ -4,18 +4,21 @@ import { useRouter } from "vue-router";
 import InputText from "primevue/inputtext";
 import Dropdown from "./utils/Dropdown.vue";
 import Toolbar from "./utils/Toolbar.vue";
+import { usePostFilters } from "@/composables/usePostFilters";
 
 const router = useRouter();
 const searchQuery = ref("");
 
 const loggedIn = ref(false);
+const { reset } = usePostFilters();
+
+function goToHome(): void {
+    reset();
+    router.push("/");
+}
 
 function isLoggedIn(): boolean {
   return loggedIn.value;
-}
-
-function goToHome(): void {
-  router.push("/");
 }
 
 function handleLogin(): void {
@@ -35,10 +38,6 @@ function handleLogout(): void {
 function handleViewProfile(): void {
   router.push("/profile");
 }
-
-function toggleAccountMenu(event: Event): void {
-  isDropdownVisible.value = !isDropdownVisible.value;
-}
 </script>
 
 <template>
@@ -47,7 +46,6 @@ function toggleAccountMenu(event: Event): void {
       <h1 class="app-title" @click="goToHome">
         OurCity
       </h1>
-      <button class="home-button" @click="goToHome">Home</button>
     </template>
     
     <template #center>

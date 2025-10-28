@@ -99,6 +99,7 @@ onUnmounted(() => {
 
 .dropdown-menu {
   position: absolute;
+  box-sizing: border-box;
   top: 100%;
   right: 0;
   background: var(--primary-background-color);

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import Card from "primevue/card";
-import { defineProps, defineEmits } from "vue";
+import { defineProps, defineEmits, computed } from "vue";
 import type { PostResponseDto } from "@/types/posts";
+import { mockUsers } from "@/data/mockData";
 
-defineProps<{post: PostResponseDto}>();
+const props = defineProps<{post: PostResponseDto}>();
 
 const emit = defineEmits<{
   (e: "upvote"): void;
@@ -18,30 +19,56 @@ function downvote() {
   emit("downvote");
 }
 
+// Get the username from the author ID
+const authorUsername = computed(() => {
+  const author = mockUsers.find(user => user.id === props.post.authorId);
+  if (!author) {
+    return `User #${props.post.authorId}`;
+  }
+  // Use displayName if available, otherwise username, otherwise ID
+  if (author.displayName && author.displayName.trim()) {
+    return author.displayName;
+  }
+  if (author.username) {
+    return `@${author.username}`;
+  }
+  return `User #${props.post.authorId}`;
+});
+
+// Compute the number of comments
+const commentCount = computed(() => {
+  return props.post.commentIds?.length || 0;
+});
+
+// Get the first image if available
+const postImage = computed(() => {
+  return props.post.images?.[0]?.url || null;
+});
+
 </script>
 
 <template>
   <div class="post-card">
     <div class="post-card-left">
       <div class="post-author-date">
-        @a_real_prof • 6 days ago
+        {{ authorUsername }}
       </div>
       <h1 class="post-title">
-        Exploring the City Streets
+        {{ post.title }}
       </h1>
       <div class="post-tags">
-        Tags Placeholder
+        {{ post.location }}
       </div>
       <div class="post-votes-comments">
         <i class="pi pi-sort-alt"></i>
-        <div class="post-number-stats">420</div>
+        <div class="post-number-stats">{{ post.votes }}</div>
         <i class="pi pi-comments"></i>
-        <div class="post-number-stats">69</div> 
+        <div class="post-number-stats">{{ commentCount }}</div> 
       </div>
     </div>
-    <div class="post-card-right">
+    <div v-if="postImage" class="post-card-right">
       <img 
-        src="https://images.unsplash.com/photo-1591658522986-9eb791d2a89a?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1952" 
+        :src="postImage" 
         alt="Post Image" 
         class="post-image"
       />
@@ -53,35 +80,58 @@ function downvote() {
 .post-card {
   display: flex;
   width: 100%;
+  max-width: 100%;
   height: 9.5rem;
   background: var(--primary-background-color);
   border: 0.1rem solid var(--border-color);
   border-radius: 1rem;
   padding: 1.25rem;
   box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+  overflow: hidden;
+  gap: 1rem;
 }
 
 .post-card-left {
   display: flex;
   flex-direction: column;
   width: 83%;
+  min-width: 0;
   justify-content: space-between;
+  overflow: hidden;
 }
 
 .post-author-date {
   font-size: 1rem;
   color: var(--tertiary-text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .post-title {
-  font-size: 2rem;
+  font-size: clamp(1rem, 2vw, 2rem);
   font-weight: 800;
   color: var(--primary-text-color);
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+  line-height: 1.2;
 }
 
 .post-tags {
   font-size: 1rem;
   color: var(--tertiary-text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .post-votes-comments {

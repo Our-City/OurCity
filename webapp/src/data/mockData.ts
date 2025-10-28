@@ -111,7 +111,11 @@ export const mockPosts: PostResponseDto[] = [
     title: "Street Construction around the University",
     description: "What is up with all of this street construction around the University? It takes me like double the time it usually does to go home everyday now. Is there actually like a legitimate reason why there is so much road construction in general in Winnipeg? It's always like this too in the summer and it feels like they redo the same road every year.",
     location: "University of Manitoba",
-    images: [],
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1581094271901-8022df4466f9?w=800&auto=format&fit=crop"
+      }
+    ],
     commentIds: [1, 2, 3],
     votes: 721,
   },
@@ -121,7 +125,11 @@ export const mockPosts: PostResponseDto[] = [
     title: "Exploring the City",
     description: "I had so much fun last weekend around Downtown! I don't really understand why people are always saying that there's nothing to do in Winnipeg. Especially in the Exchange district, I feel like I could literally just spend hours walking around and trying new things.",
     location: "Downtown",
-    images: [],
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&auto=format&fit=crop"
+      }
+    ],
     commentIds: [4, 5, 6, 7],
     votes: 426,
   },
@@ -131,7 +139,11 @@ export const mockPosts: PostResponseDto[] = [
     title: "Shopping Malls",
     description: "I'm very excited for the Portal Place redevelopments! It feels like that place has been dead for a while now...",
     location: "Portage Place",
-    images: [],
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1555529902-5261145633bf?w=800&auto=format&fit=crop"
+      }
+    ],
     commentIds: [],
     votes: 135,
   },
