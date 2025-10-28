@@ -49,28 +49,30 @@ const filteredAndSortedPosts = computed(() => {
 </script>
 
 <template>
-  <Dropdown 
-    button-class="sort-posts-button"
-  >
-    <template #button>
-      <i class="pi pi-sort-amount-down" />
-      {{ sortLabel }}
-    </template>
-    <template #dropdown="{ close }">
-      <ul>
-        <li @click="setSort('popular'); close()">
-          Popular
-        </li>
-        <li @click="setSort('recent'); close()">
-          Recent
-        </li>
-        <li @click="setSort('nearby'); close()">
-          Nearby
-        </li>
-      </ul>
-    </template>
+  <div class="sort-dropdown-container">
+    <Dropdown 
+      button-class="sort-posts-button"
+    >
+      <template #button>
+        <i class="pi pi-sort-amount-down" />
+        {{ sortLabel }}
+      </template>
+      <template #dropdown="{ close }">
+        <ul>
+          <li @click="setSort('popular'); close()">
+            Popular
+          </li>
+          <li @click="setSort('recent'); close()">
+            Recent
+          </li>
+          <li @click="setSort('nearby'); close()">
+            Nearby
+          </li>
+        </ul>
+      </template>
 
-  </Dropdown>
+    </Dropdown>
+  </div>
   <div class="post-list">
     <div v-if="filteredAndSortedPosts.length === 0" class="empty-message">
       <i class="pi pi-inbox"></i>
@@ -91,15 +93,23 @@ const filteredAndSortedPosts = computed(() => {
 
 <style scoped>
 
+.sort-dropdown-container :deep(.dropdown-menu) {
+  right: auto;
+}
+
 .post-list {
   padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .post-link {
   text-decoration: none;
+  max-width: 100%;
+  display: block;
 }
 
 .empty-message {

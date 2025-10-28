@@ -54,11 +54,15 @@ const posts = ref(mockPosts);
 .home-page-layout {
   display: flex; 
   height: 100vh;
+  overflow: hidden;
 }
 
 .home-page-body {
   flex: 1;
   background: var(--primary-background-color);
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .create-post-card {
@@ -102,11 +106,16 @@ const posts = ref(mockPosts);
   display: flex; 
   gap: 1rem;
   margin: 1rem 1.5rem 1rem 1rem;
+  min-width: 0;
+  overflow: visible;
 }
 
 .post-list {
   border-radius: 1rem;
-  width: 100%;
+  flex: 1;
+  max-width: 100%;
+  min-width: 0;
+  overflow: visible;
 }
 
 .map-overview {
