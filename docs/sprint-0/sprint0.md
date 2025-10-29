@@ -22,9 +22,9 @@ OurCity remedies this by providing an official hub for the citizens. It will all
 
 | User Story | Acceptance Criteria |
 | - | - |
-| As a citizen, I want to be able to create posts so that I can suggest municipal improvements for Winnipeg. | Given I am logged into the system, when I click on the “New” button, complete the required fields, and click on the “Post” button, then my post is published successfully. |
-| As a post author, I want to be able to edit my posts so that I can correct any mistakes and/or add additional information. | Given I am viewing my post, when I click on the “Edit” button, update the desired fields, and click on the “Save” button, then the updated information is stored and displayed. |
-| As a post author, I want to be able to delete my posts so that I can discard changes I do not want anymore. | Given I am viewing my post, when I click on the “Delete” button and confirm the deletion, then the post is permanently removed and no longer visible to others. |
+| As a citizen, I want to be able to create posts so that I can suggest municipal improvements for Winnipeg. | Given I am logged into the system, when I click on the “New” button, complete the required fields, and click on the “Post” button, then a success message stating that the post is created will be displayed and the new post appears on the dashboard. |
+| As a post author, I want to be able to edit my posts so that I can correct any mistakes and/or add additional information. | Given I am viewing my post, when I click on the “Edit” button, update the desired fields, and click on the “Save” button, then a success message stating that the post is updated will be displayed and the new information will be displayed on the updated post's details page. |
+| As a post author, I want to be able to delete my posts so that I can discard changes I do not want anymore. | Given I am viewing my post, when I click on the “Delete” button and confirm the deletion, then a success message stating that the post is deleted will be displayed and the post is removed from the dashboard. |
 | As a post author, I want to be able to save private drafts for my posts so that I can return later and finish my post without losing progress. | Given I am creating or editing a post, when I click on the “Save Draft” button, then the current content is saved privately and not published. |
 
 ### Core Feature: Post Interaction
@@ -34,8 +34,8 @@ OurCity remedies this by providing an official hub for the citizens. It will all
 | As a user, I want to be able to view the details for an existing post so that I can learn about what it is suggesting. | Given I am on the dashboard, when I select a post, then the post’s details including title, description, location, images, engagement metrics, and more are displayed. |
 | As a user, I want to be able to comment on posts so that I can further discuss ideas with other users. | Given I am viewing a post, when I click on the “Comment” or ”Reply” button, write a comment, and click on the “Post” button, then my comment will show up in the post’s comment section. |
 | As a citizen, I want to be able to vote positively or negatively on posts so that I can influence their visibility. | Given I am viewing a post, when I click on the “Upvote” or “Downvote” button, then the number of votes on the post is updated. |
-| As a citizen, I want to be able to report inappropriate posts so that I can prevent them from displaying to the public. | Given I am viewing a post, when I select the “Report” button, then a report for the post will be sent to the admins. |
-| As an administrator, I want to be able to mark posts as under investigation so that I can indicate the city is considering the post’s idea(s). | Given I am an administrator, when I flag a post as “Under Investigation”, then the post is added to a list of posts under investigation. |
+| As a citizen, I want to be able to report inappropriate posts so that I can prevent them from displaying to the public. | Given I am viewing a post, when I select the “Report” button, then a success message stating that the post is reported will be displayed and the report will be sent to the admin. |
+| As an administrator, I want to be able to mark posts as under consideration so that I can indicate the city is considering the post’s idea(s). | Given I am an administrator, when I flag a post as “Under Consideration", then the status of the post is changed to under consideration. |
 | As an administrator, I want to be able to mark posts as resolved so that I can indicate the post has been taken fully into consideration. | Given I am an administrator, when I mark a post as “Resolved”, then the status of the post is changed to resolved.  |
 
 ### Core Feature: Post Organization
@@ -43,7 +43,7 @@ OurCity remedies this by providing an official hub for the citizens. It will all
 | User Story | Acceptance Criteria |
 | - | - |
 | As a user, I want to be able to see a summary of popular posts so that I can understand the widely-approved ideas in the city. | Given I am on the dashboard, when I have my filter set to view the popular posts, then the list of posts with many comments and upvotes will be displayed. |
-| As a user, I want to be able to save posts to my bookmarks so that I can track their progress and come back to them later. | Given I am viewing a post, when I select the option to bookmark the post, then the post is added to my list of saved posts. |
+| As a user, I want to be able to save posts to my bookmarks so that I can track their progress and come back to them later. | Given I am viewing a post, when I select the option to bookmark the post, then the post is marked as saved by filling in the save icon on the post. |
 | As a user, I want to be able to search posts so that I can quickly find topics I am interested in. | Given I am on the search bar, when I search for a title of a post, then a list of posts with matching or similar titles is displayed. |
 | As a user, I want to be able to filter posts so that I can only see posts that fit my interest. | Given I am on the dashboard, when I choose filters in a filters menu, then the posts that match my filters are displayed. |
 | As a user, I want to be able to sort posts so that I can view posts in a certain order. | Given I am on the dashboard, when I choose a sorting option in a sorting menu, then posts are sorted in that specified order. |
@@ -55,7 +55,7 @@ OurCity remedies this by providing an official hub for the citizens. It will all
 | - | - |
 | As an administrator, I want to be able to see a summary of high-priority/highly upvoted posts so that I understand what the community wants. | Given I am an administrator, when I open the application, then a summary of high priority and upvoted posts are displayed. |
 | As an administrator, I want to be able to leave comments on posts that are only visible to other administrators so that we can discuss posts in private. | Given I am viewing a post, when I leave an “administrator only” comment, then they are only readable to other administrators. |
-| As an administrator, I want posts and comments that have received too many reports to be automatically hidden so that I can safely review them. | Given a post or comment, when it has passed a threshold for number of reports, then it becomes hidden automatically. |
+| As an administrator, I want posts and comments that have received too many reports to be automatically hidden so that I can safely review them. | Given a post or comment, when the number of reports exceeds 10% of its number of views, then it becomes hidden automatically. |
 | As an administrator, I want to be able to ban belligerent citizens so that I can keep the community safe. | Given I am an administrator viewing a belligerent citizen’s profile, when I click on the “Ban” button, then that user’s account is banned. |
 | As an administrator, I want to be able to create admin accounts so that I can add city officials to the application. | Given I am on the “Administrator Management” page, when I click on the “New” button, complete required fields, and click on the “Create” button, then a new admin account is created. |
 
