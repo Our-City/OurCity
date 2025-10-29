@@ -6,10 +6,6 @@ public class Post
 {
     public Guid Id { get; set; }
 
-    public int AuthorId { get; set; }
-
-    public int AuthorId { get; set; }
-
     public required string Title { get; set; }
 
     public required string Description { get; set; }
@@ -35,7 +31,6 @@ public class Post
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
-    public User Author { get; set; } = null!;               // Navigation property
     public List<Comment> Comments { get; set; } = new();
     public List<Media> Media { get; set; } = new();
 
