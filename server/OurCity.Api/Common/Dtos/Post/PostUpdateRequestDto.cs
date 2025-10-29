@@ -14,5 +14,5 @@ public class PostUpdateRequestDto
     [StringLength(50, ErrorMessage = "Location cannot exceed 50 characters")]
     public string? Location { get; set; }
 
-    public List<MediaDto> Media { get; set; } = new();
+    public List<MediaResponseDto> Media { get; set; } = new();
 }

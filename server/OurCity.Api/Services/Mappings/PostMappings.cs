@@ -24,7 +24,7 @@ public static class PostMappings
             Description = post.Description,
             Votes = post.UpvotedUserIds.Count - post.DownvotedUserIds.Count,
             Location = post.Location,
-            Media = post.Media.Select(media => new MediaDto { Url = media.Url }).ToList(),
+            Media = post.Media.Select(media => new MediaResponseDto { Url = media.Url }).ToList(),
             CommentIds = post.Comments?.Select(c => c.Id).ToList() ?? new List<int>(),
         };
     }
@@ -38,7 +38,7 @@ public static class PostMappings
             Location = postCreateRequestDto.Location,
             AuthorId = postCreateRequestDto.AuthorId,
             Media = postCreateRequestDto
-                .Media.Select(mediaDto => new Media { Url = mediaDto.Url })
+                .Media.Select(mediaResponseDto => new Media { Url = mediaResponseDto.Url })
                 .ToList(),
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,

@@ -10,6 +10,6 @@ public class PostResponseDto
     public required string Description { get; set; }
     public required int Votes { get; set; }
     public required string? Location { get; set; }
-    public required List<MediaDto> Media { get; set; } = new();
+    public required List<MediaResponseDto> Media { get; set; } = new();
     public List<int> CommentIds { get; set; } = new();
 }
