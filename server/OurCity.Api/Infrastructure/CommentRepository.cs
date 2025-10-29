@@ -8,8 +8,8 @@ namespace OurCity.Api.Infrastructure;
 
 public interface ICommentRepository
 {
-    Task<IEnumerable<Comment>> GetCommentsByPostId(int postId);
-    Task<Comment?> GetCommentById(int postId, int commentId);
+    Task<IEnumerable<Comment>> GetCommentsByPostId(Guid postId);
+    Task<Comment?> GetCommentById(Guid postId, int commentId);
     Task<Comment> CreateComment(Comment comment);
     Task<Comment> UpdateComment(Comment comment);
     Task<Comment> DeleteComment(Comment comment);
@@ -24,14 +24,14 @@ public class CommentRepository : ICommentRepository
         _appDbContext = appDbContext;
     }
 
-    public async Task<IEnumerable<Comment>> GetCommentsByPostId(int postId)
+    public async Task<IEnumerable<Comment>> GetCommentsByPostId(Guid postId)
     {
         return await _appDbContext
             .Comments.Where(c => c.PostId == postId && !c.IsDeleted)
             .ToListAsync();
     }
 
-    public async Task<Comment?> GetCommentById(int postId, int commentId)
+    public async Task<Comment?> GetCommentById(Guid postId, int commentId)
     {
         return await _appDbContext
             .Comments.Where(c => c.PostId == postId && c.Id == commentId && !c.IsDeleted)

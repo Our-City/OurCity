@@ -36,7 +36,7 @@ public class UserController : ControllerBase
     [EndpointSummary("Get user by ID")]
     [EndpointDescription("Gets a user with the specified ID")]
     [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetUserById([FromRoute] int id)
+    public async Task<IActionResult> GetUserById([FromRoute] Guid id)
     {
         var user = await _userService.GetUserById(id);
         if (!user.IsSuccess)
@@ -65,7 +65,7 @@ public class UserController : ControllerBase
     [EndpointDescription("Updates the user with the specified ID")]
     [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> UpdateUser(
-        [FromRoute] int id,
+        [FromRoute] Guid id,
         [FromBody] UserUpdateRequestDto userUpdateRequestDto
     )
     {
@@ -82,7 +82,7 @@ public class UserController : ControllerBase
     [EndpointSummary("Delete a user")]
     [EndpointDescription("Deletes the user with the specified ID")]
     [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> DeleteUser([FromRoute] int id)
+    public async Task<IActionResult> DeleteUser([FromRoute] Guid id)
     {
         var user = await _userService.DeleteUser(id);
         if (!user.IsSuccess)

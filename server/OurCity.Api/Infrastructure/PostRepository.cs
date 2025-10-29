@@ -6,7 +6,7 @@ namespace OurCity.Api.Infrastructure;
 public interface IPostRepository
 {
     Task<IEnumerable<Post>> GetAllPosts();
-    Task<Post?> GetPostById(int postId);
+    Task<Post?> GetPostById(Guid postId);
     Task<Post> CreatePost(Post post);
     Task<Post> UpdatePost(Post post);
     Task<Post> DeletePost(Post post);
@@ -29,7 +29,7 @@ public class PostRepository : IPostRepository
             .ToListAsync();
     }
 
-    public async Task<Post?> GetPostById(int postId)
+    public async Task<Post?> GetPostById(Guid postId)
     {
         return await _appDbContext
             .Posts.Include(p => p.Images)

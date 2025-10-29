@@ -24,7 +24,7 @@ public class CommentController : ControllerBase
     [EndpointSummary("Get all comments associated with a post")]
     [EndpointDescription("Gets a list of all comments for a specific post")]
     [ProducesResponseType(typeof(List<CommentResponseDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetComments([FromRoute] int postId)
+    public async Task<IActionResult> GetComments([FromRoute] Guid postId)
     {
         var comments = await _commentService.GetCommentsByPostId(postId);
         return Ok(comments);
@@ -34,7 +34,7 @@ public class CommentController : ControllerBase
     [EndpointSummary("Get a specific comment associated with a post")]
     [EndpointDescription("Gets a specific comment for a specific post")]
     [ProducesResponseType(typeof(CommentResponseDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetComment([FromRoute] int postId, [FromRoute] int commentId)
+    public async Task<IActionResult> GetComment([FromRoute] Guid postId, [FromRoute] int commentId)
     {
         var comment = await _commentService.GetCommentById(postId, commentId);
         if (comment == null)
@@ -49,9 +49,9 @@ public class CommentController : ControllerBase
     [ProducesResponseType(typeof(CommentUpvoteResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUserUpvoteStatus(
-        [FromRoute] int postId,
+        [FromRoute] Guid postId,
         [FromRoute] int commentId,
-        [FromRoute] int userId
+        [FromRoute] Guid userId
     )
     {
         var voteStatus = await _commentService.GetUserUpvoteStatus(postId, commentId, userId);
@@ -70,9 +70,9 @@ public class CommentController : ControllerBase
     [ProducesResponseType(typeof(CommentDownvoteResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUserDownvoteStatus(
-        [FromRoute] int postId,
+        [FromRoute] Guid postId,
         [FromRoute] int commentId,
-        [FromRoute] int userId
+        [FromRoute] Guid userId
     )
     {
         var voteStatus = await _commentService.GetUserDownvoteStatus(postId, commentId, userId);
@@ -90,7 +90,7 @@ public class CommentController : ControllerBase
     [EndpointDescription("Creates a new comment to be associated with a specific post")]
     [ProducesResponseType(typeof(CommentResponseDto), StatusCodes.Status201Created)]
     public async Task<IActionResult> CreateComment(
-        [FromRoute] int postId,
+        [FromRoute] Guid postId,
         [FromBody] CommentCreateRequestDto commentCreateRequestDto
     )
     {
@@ -108,7 +108,7 @@ public class CommentController : ControllerBase
     [EndpointDescription("Updates an existing comment associated with a specific post")]
     [ProducesResponseType(typeof(CommentResponseDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> UpdateComment(
-        [FromRoute] int postId,
+        [FromRoute] Guid postId,
         [FromRoute] int commentId,
         [FromBody] CommentUpdateRequestDto commentUpdateRequestDto
     )
@@ -132,7 +132,7 @@ public class CommentController : ControllerBase
     [ProducesResponseType(typeof(CommentResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> VoteComment(
-        [FromRoute] int postId,
+        [FromRoute] Guid postId,
         [FromRoute] int commentId,
         [FromBody] CommentVoteRequestDto commentVoteRequestDto
     )
@@ -157,7 +157,7 @@ public class CommentController : ControllerBase
     [EndpointDescription("Deletes a comment associated with a specific post")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeleteComment(
-        [FromRoute] int postId,
+        [FromRoute] Guid postId,
         [FromRoute] int commentId
     )
     {

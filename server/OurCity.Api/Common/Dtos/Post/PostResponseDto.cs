@@ -4,8 +4,8 @@ namespace OurCity.Api.Common.Dtos.Post;
 
 public class PostResponseDto
 {
-    public int Id { get; set; }
-    public int AuthorId { get; set; }
+    public Guid Id { get; set; }
+    public Guid AuthorId { get; set; }
     public required string Title { get; set; }
     public required string Description { get; set; }
     public required int Votes { get; set; }

@@ -1,8 +1,9 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace OurCity.Api.Infrastructure.Database;
 
-public class AppDbContext : DbContext
+public class AppDbContext : IdentityDbContext<User, UserRole, Guid>
 {
     public DbSet<Post> Posts { get; set; }
     public DbSet<Comment> Comments { get; set; }

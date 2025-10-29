@@ -9,7 +9,7 @@ namespace OurCity.Api.Infrastructure;
 public interface IUserRepository
 {
     Task<IEnumerable<User>> GetAllUsers();
-    Task<User?> GetUserById(int id);
+    Task<User?> GetUserById(Guid id);
     Task<User?> GetUserByUsername(string username);
     Task<User> CreateUser(User user);
     Task<User> UpdateUser(User user);
@@ -34,7 +34,7 @@ public class UserRepository : IUserRepository
             .ToListAsync();
     }
 
-    public async Task<User?> GetUserById(int id)
+    public async Task<User?> GetUserById(Guid id)
     {
         return await _appDbContext
             .Users.Where(u => u.Id == id && !u.IsDeleted)
@@ -45,7 +45,7 @@ public class UserRepository : IUserRepository
     public async Task<User?> GetUserByUsername(string username)
     {
         return await _appDbContext
-            .Users.Where(u => u.Username == username && !u.IsDeleted)
+            .Users.Where(u => u.UserName == username && !u.IsDeleted)
             .FirstOrDefaultAsync();
     }
 

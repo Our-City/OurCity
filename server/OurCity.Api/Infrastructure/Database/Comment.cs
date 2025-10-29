@@ -5,16 +5,16 @@ public class Comment
     public int Id { get; set; }
 
     public Post Post { get; set; } = null!;
-    public required int PostId { get; set; }
+    public required Guid PostId { get; set; }
 
     public User Author { get; set; } = null!;
-    public required int AuthorId { get; set; }
+    public required Guid AuthorId { get; set; }
 
     public required string Content { get; set; }
 
-    public List<int> UpvotedUserIds { get; set; } = new();
+    public List<Guid> UpvotedUserIds { get; set; } = new();
 
-    public List<int> DownvotedUserIds { get; set; } = new();
+    public List<Guid> DownvotedUserIds { get; set; } = new();
 
     public bool IsDeleted { get; set; } = false;
 
