@@ -8,11 +8,11 @@ namespace OurCity.Api.Services;
 public interface IUserService
 {
     Task<IEnumerable<UserResponseDto>> GetUsers();
-    Task<Result<UserResponseDto>> GetUserById(int id);
+    Task<Result<UserResponseDto>> GetUserById(Guid id);
     Task<Result<UserResponseDto>> GetUserByUsername(string username);
     Task<Result<UserResponseDto>> CreateUser(UserCreateRequestDto userRequestDto);
-    Task<Result<UserResponseDto>> UpdateUser(int id, UserUpdateRequestDto userRequestDto);
-    Task<Result<UserResponseDto>> DeleteUser(int id);
+    Task<Result<UserResponseDto>> UpdateUser(Guid id, UserUpdateRequestDto userRequestDto);
+    Task<Result<UserResponseDto>> DeleteUser(Guid id);
 }
 
 public class UserService : IUserService
@@ -29,7 +29,7 @@ public class UserService : IUserService
         return (await _userRepository.GetAllUsers()).ToDtos();
     }
 
-    public async Task<Result<UserResponseDto>> GetUserById(int id)
+    public async Task<Result<UserResponseDto>> GetUserById(Guid id)
     {
         var user = await _userRepository.GetUserById(id);
         if (user == null)
@@ -66,7 +66,7 @@ public class UserService : IUserService
     }
 
     public async Task<Result<UserResponseDto>> UpdateUser(
-        int id,
+        Guid id,
         UserUpdateRequestDto userUpdateRequestDto
     )
     {
@@ -83,7 +83,7 @@ public class UserService : IUserService
         return Result<UserResponseDto>.Success(updatedUser.ToDto());
     }
 
-    public async Task<Result<UserResponseDto>> DeleteUser(int id)
+    public async Task<Result<UserResponseDto>> DeleteUser(Guid id)
     {
         var existingUser = await _userRepository.GetUserById(id);
 

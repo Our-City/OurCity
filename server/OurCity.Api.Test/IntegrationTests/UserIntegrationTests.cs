@@ -80,7 +80,7 @@ public class UserIntegrationTests : IAsyncLifetime
         {
             Assert.Equal("Test Username", createdUser.Data.Username);
             Assert.Null(createdUser.Data.DisplayName);
-            Assert.False(createdUser.Data.IsDeleted);
+            Assert.False(createdUser.Data.IsAdmin);
         });
     }
 

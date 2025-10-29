@@ -2,19 +2,19 @@ namespace OurCity.Api.Infrastructure.Database;
 
 public class Post
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
     public required string Title { get; set; }
 
     public required string Description { get; set; }
 
     public User Author { get; set; } = null!;
-    public int AuthorId { get; set; }
+    public Guid AuthorId { get; set; }
 
     public string? Location { get; set; }
 
-    public List<int> UpvotedUserIds { get; set; } = new();
-    public List<int> DownvotedUserIds { get; set; } = new();
+    public List<Guid> UpvotedUserIds { get; set; } = new();
+    public List<Guid> DownvotedUserIds { get; set; } = new();
 
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }

@@ -46,12 +46,12 @@ public class PolicyService : IPolicyService
         bool isAllowed = false;
 
         if (policy == Policy.CanMutateThisPost)
-            isAllowed = await CheckCanMutateThisPost(user, policy, (int)resource);
+            isAllowed = await CheckCanMutateThisPost(user, policy, (Guid)resource);
 
         return isAllowed;
     }
 
-    public async Task<bool> CheckCanMutateThisPost(ClaimsPrincipal user, Policy policy, int postId)
+    public async Task<bool> CheckCanMutateThisPost(ClaimsPrincipal user, Policy policy, Guid postId)
     {
         var post = await _postRepository.GetPostById(postId);
 

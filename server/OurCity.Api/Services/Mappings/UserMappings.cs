@@ -18,12 +18,13 @@ public static class UserMappings
         return new UserResponseDto
         {
             Id = user.Id,
-            Username = user.Username,
-            DisplayName = user.DisplayName,
+            Username = user.UserName ?? "",
             PostIds = user.Posts.Select(p => p.Id).ToList(),
             CreatedAt = user.CreatedAt,
             UpdatedAt = user.UpdatedAt,
-            IsDeleted = user.IsDeleted,
+            IsAdmin = user.IsDeleted,
+            IsBanned = user.IsBanned,
+            IsDeleted = user.IsDeleted
         };
     }
 
@@ -31,8 +32,7 @@ public static class UserMappings
     {
         return new User
         {
-            Username = userCreateRequestDto.Username,
-            DisplayName = userCreateRequestDto.DisplayName,
+            UserName = userCreateRequestDto.Username,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
         };
@@ -43,8 +43,7 @@ public static class UserMappings
         User existingUser
     )
     {
-        existingUser.Username = userUpdateRequestDto.Username;
-        existingUser.DisplayName = userUpdateRequestDto.DisplayName ?? existingUser.DisplayName;
+        existingUser.UserName = userUpdateRequestDto.Username;
         existingUser.UpdatedAt = DateTime.UtcNow;
 
         return existingUser;

@@ -7,6 +7,6 @@ public class Image
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
-    public int PostId { get; set; }
+    public Guid PostId { get; set; }
     public Post? Post { get; set; }
 }

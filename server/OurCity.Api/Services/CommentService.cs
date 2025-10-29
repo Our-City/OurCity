@@ -11,34 +11,34 @@ namespace OurCity.Api.Services;
 
 public interface ICommentService
 {
-    Task<IEnumerable<CommentResponseDto>> GetCommentsByPostId(int postId);
-    Task<Result<CommentResponseDto>> GetCommentById(int postId, int commentId);
+    Task<IEnumerable<CommentResponseDto>> GetCommentsByPostId(Guid postId);
+    Task<Result<CommentResponseDto>> GetCommentById(Guid postId, int commentId);
     Task<Result<CommentUpvoteResponseDto>> GetUserUpvoteStatus(
-        int postId,
+        Guid postId,
         int commentId,
-        int userId
+        Guid userId
     );
     Task<Result<CommentDownvoteResponseDto>> GetUserDownvoteStatus(
-        int postId,
+        Guid postId,
         int commentId,
-        int userId
+        Guid userId
     );
     Task<Result<CommentResponseDto>> CreateComment(
-        int postId,
+        Guid postId,
         CommentCreateRequestDto commentCreateRequestDto
     );
     Task<Result<CommentResponseDto>> UpdateComment(
-        int postId,
+        Guid postId,
         int commentId,
         CommentUpdateRequestDto commentUpdateRequestDto
     );
     Task<Result<CommentResponseDto>> VoteComment(
-        int postId,
+        Guid postId,
         int commentId,
-        int userId,
+        Guid userId,
         VoteType voteType
     );
-    Task<Result<CommentResponseDto>> DeleteComment(int postId, int commentId);
+    Task<Result<CommentResponseDto>> DeleteComment(Guid postId, int commentId);
 }
 
 public class CommentService : ICommentService
@@ -50,12 +50,12 @@ public class CommentService : ICommentService
         _commentRepository = commentRepository;
     }
 
-    public async Task<IEnumerable<CommentResponseDto>> GetCommentsByPostId(int postId)
+    public async Task<IEnumerable<CommentResponseDto>> GetCommentsByPostId(Guid postId)
     {
         return (await _commentRepository.GetCommentsByPostId(postId)).ToDtos();
     }
 
-    public async Task<Result<CommentResponseDto>> GetCommentById(int postId, int commentId)
+    public async Task<Result<CommentResponseDto>> GetCommentById(Guid postId, int commentId)
     {
         var comment = await _commentRepository.GetCommentById(postId, commentId);
 
@@ -68,9 +68,9 @@ public class CommentService : ICommentService
     }
 
     public async Task<Result<CommentUpvoteResponseDto>> GetUserUpvoteStatus(
-        int postId,
+        Guid postId,
         int commentId,
-        int userId
+        Guid userId
     )
     {
         var comment = await _commentRepository.GetCommentById(postId, commentId);
@@ -93,9 +93,9 @@ public class CommentService : ICommentService
     }
 
     public async Task<Result<CommentDownvoteResponseDto>> GetUserDownvoteStatus(
-        int postId,
+        Guid postId,
         int commentId,
-        int userId
+        Guid userId
     )
     {
         var comment = await _commentRepository.GetCommentById(postId, commentId);
@@ -118,7 +118,7 @@ public class CommentService : ICommentService
     }
 
     public async Task<Result<CommentResponseDto>> CreateComment(
-        int postId,
+        Guid postId,
         CommentCreateRequestDto commentCreateRequestDto
     )
     {
@@ -129,7 +129,7 @@ public class CommentService : ICommentService
     }
 
     public async Task<Result<CommentResponseDto>> UpdateComment(
-        int postId,
+        Guid postId,
         int commentId,
         CommentUpdateRequestDto commentUpdateRequestDto
     )
@@ -149,9 +149,9 @@ public class CommentService : ICommentService
     }
 
     public async Task<Result<CommentResponseDto>> VoteComment(
-        int postId,
+        Guid postId,
         int commentId,
-        int userId,
+        Guid userId,
         VoteType voteType
     )
     {
@@ -179,7 +179,7 @@ public class CommentService : ICommentService
         return Result<CommentResponseDto>.Success(updatedComment.ToDto());
     }
 
-    public async Task<Result<CommentResponseDto>> DeleteComment(int postId, int commentId)
+    public async Task<Result<CommentResponseDto>> DeleteComment(Guid postId, int commentId)
     {
         var existingComment = await _commentRepository.GetCommentById(postId, commentId);
         if (existingComment == null)

@@ -21,13 +21,13 @@ namespace OurCity.Api.Services;
 public interface IPostService
 {
     Task<Result<IEnumerable<PostResponseDto>>> GetPosts();
-    Task<Result<PostResponseDto>> GetPostById(int postId);
-    Task<Result<PostUpvoteResponseDto>> GetUserUpvoteStatus(int postId, int userId);
-    Task<Result<PostDownvoteResponseDto>> GetUserDownvoteStatus(int postId, int userId);
+    Task<Result<PostResponseDto>> GetPostById(Guid postId);
+    Task<Result<PostUpvoteResponseDto>> GetUserUpvoteStatus(Guid postId, Guid userId);
+    Task<Result<PostDownvoteResponseDto>> GetUserDownvoteStatus(Guid postId, Guid userId);
     Task<Result<PostResponseDto>> CreatePost(PostCreateRequestDto postRequestDto);
-    Task<Result<PostResponseDto>> UpdatePost(int postId, PostUpdateRequestDto postRequestDto);
-    Task<Result<PostResponseDto>> VotePost(int postId, int userId, VoteType voteType);
-    Task<Result<PostResponseDto>> DeletePost(int postId);
+    Task<Result<PostResponseDto>> UpdatePost(Guid postId, PostUpdateRequestDto postRequestDto);
+    Task<Result<PostResponseDto>> VotePost(Guid postId, Guid userId, VoteType voteType);
+    Task<Result<PostResponseDto>> DeletePost(Guid postId);
 }
 
 public class PostService : IPostService
@@ -45,7 +45,7 @@ public class PostService : IPostService
         return Result<IEnumerable<PostResponseDto>>.Success(posts.ToDtos());
     }
 
-    public async Task<Result<PostResponseDto>> GetPostById(int postId)
+    public async Task<Result<PostResponseDto>> GetPostById(Guid postId)
     {
         var post = await _postRepository.GetPostById(postId);
 
@@ -57,7 +57,7 @@ public class PostService : IPostService
         return Result<PostResponseDto>.Success(post.ToDto());
     }
 
-    public async Task<Result<PostUpvoteResponseDto>> GetUserUpvoteStatus(int postId, int userId)
+    public async Task<Result<PostUpvoteResponseDto>> GetUserUpvoteStatus(Guid postId, Guid userId)
     {
         var post = await _postRepository.GetPostById(postId);
 
@@ -77,7 +77,7 @@ public class PostService : IPostService
         );
     }
 
-    public async Task<Result<PostDownvoteResponseDto>> GetUserDownvoteStatus(int postId, int userId)
+    public async Task<Result<PostDownvoteResponseDto>> GetUserDownvoteStatus(Guid postId, Guid userId)
     {
         var post = await _postRepository.GetPostById(postId);
 
@@ -106,7 +106,7 @@ public class PostService : IPostService
     }
 
     public async Task<Result<PostResponseDto>> UpdatePost(
-        int postId,
+        Guid postId,
         PostUpdateRequestDto postUpdateRequestDto
     )
     {
@@ -123,7 +123,7 @@ public class PostService : IPostService
         return Result<PostResponseDto>.Success(updatedPost.ToDto());
     }
 
-    public async Task<Result<PostResponseDto>> VotePost(int postId, int userId, VoteType voteType)
+    public async Task<Result<PostResponseDto>> VotePost(Guid postId, Guid userId, VoteType voteType)
     {
         var post = await _postRepository.GetPostById(postId);
 
@@ -149,7 +149,7 @@ public class PostService : IPostService
         return Result<PostResponseDto>.Success(updatedPost.ToDto());
     }
 
-    public async Task<Result<PostResponseDto>> DeletePost(int postId)
+    public async Task<Result<PostResponseDto>> DeletePost(Guid postId)
     {
         var post = await _postRepository.GetPostById(postId);
 

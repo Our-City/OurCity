@@ -40,7 +40,7 @@ public class AuthorizationController : ControllerBase
     [EndpointDescription("Check if the current user is authorized to mutate a given post")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-    public async Task<IActionResult> CanMutateThisPost([FromRoute] int postId)
+    public async Task<IActionResult> CanMutateThisPost([FromRoute] Guid postId)
     {
         var isAllowed = await _policyService.CheckResourcePolicy(
             HttpContext.User,

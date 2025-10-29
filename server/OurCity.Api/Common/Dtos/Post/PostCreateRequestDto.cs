@@ -6,7 +6,7 @@ namespace OurCity.Api.Common.Dtos.Post;
 public class PostCreateRequestDto
 {
     [Required(ErrorMessage = "AuthorId is required")]
-    public required int AuthorId { get; set; }
+    public required Guid AuthorId { get; set; }
 
     [Required(ErrorMessage = "Title is required")]
     [StringLength(50, ErrorMessage = "Title cannot exceed 50 characters")]
