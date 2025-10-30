@@ -10,19 +10,22 @@ const router = useRouter();
 const formData = ref({
   email: '',
   username: '',
-  password: ''
+  password: '',
+  confirmPassword: ''
 });
 
 // Form state
 const isSubmitting = ref(false);
 const errors = ref<Record<string, string>>({});
 const showPassword = ref(false);
+const showConfirmPassword = ref(false);
 
 // Computed properties
 const isFormValid = computed(() => {
   return formData.value.email.trim() && 
          formData.value.username.trim() && 
-         formData.value.password.trim();
+         formData.value.password.trim() &&
+         formData.value.confirmPassword.trim();
 });
 
 // Form handlers
@@ -62,7 +65,8 @@ const handleReset = () => {
   formData.value = {
     email: '',
     username: '',
-    password: ''
+    password: '',
+    confirmPassword: ''
   };
   errors.value = {};
 };
@@ -94,6 +98,13 @@ const validateForm = () => {
   } else if (formData.value.password.length < 6) {
     errors.value.password = 'Password must be at least 6 characters';
   }
+
+  // Confirm Password validation
+  if (!formData.value.confirmPassword.trim()) {
+    errors.value.confirmPassword = 'Please confirm your password';
+  } else if (formData.value.password !== formData.value.confirmPassword) {
+    errors.value.confirmPassword = 'Passwords do not match';
+  }
 };
 
 const isValidEmail = (email: string): boolean => {
@@ -101,12 +112,16 @@ const isValidEmail = (email: string): boolean => {
   return emailRegex.test(email);
 };
 
-const navigateToRegister = () => {
-  router.push('/register');
-};
-
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value;
+};
+
+const toggleConfirmPasswordVisibility = () => {
+  showConfirmPassword.value = !showConfirmPassword.value;
+};
+
+const handleCancel = () => {
+  router.push('/');
 };
 </script>
 
@@ -171,7 +186,7 @@ const togglePasswordVisibility = () => {
               class="form-input password-input"
               :class="{ 'invalid': errors.password }"
               placeholder="Enter your password"
-              autocomplete="current-password"
+              autocomplete="new-password"
               required
             />
             <button
@@ -186,8 +201,42 @@ const togglePasswordVisibility = () => {
           <div v-if="errors.password" class="form-error">{{ errors.password }}</div>
         </div>
 
+        <!-- Confirm Password Field -->
+        <div class="form-field">
+          <label class="form-label form-label--required" for="confirmPassword">Confirm Password</label>
+          <div class="password-input-container">
+            <input
+              id="confirmPassword"
+              v-model="formData.confirmPassword"
+              :type="showConfirmPassword ? 'text' : 'password'"
+              class="form-input password-input"
+              :class="{ 'invalid': errors.confirmPassword }"
+              placeholder="Confirm your password"
+              autocomplete="new-password"
+              required
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              @click="toggleConfirmPasswordVisibility"
+              :aria-label="showConfirmPassword ? 'Hide password' : 'Show password'"
+            >
+              <i :class="showConfirmPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+            </button>
+          </div>
+          <div v-if="errors.confirmPassword" class="form-error">{{ errors.confirmPassword }}</div>
+        </div>
+
         <!-- Form Actions -->
         <template #actions="{ loading }">
+          <button 
+            type="button" 
+            class="form-button form-button--outline"
+            @click="handleCancel"
+            :disabled="loading"
+          >
+            Cancel
+          </button>
           <button 
             type="submit" 
             class="form-button form-button--primary register-button"
@@ -207,7 +256,7 @@ const togglePasswordVisibility = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--primary-background-color, #007bff) 0%, var(--secondary-background-color, #6c757d) 100%);
+  background: linear-gradient(135deg, var(--neutral-color) 0%, var(--secondary-background-color) 100%);
   padding: 2rem;
 }
 
@@ -244,7 +293,7 @@ const togglePasswordVisibility = () => {
 }
 
 .register-button {
-  width: 100%;
+  flex: 1;
   justify-content: center;
 }
 

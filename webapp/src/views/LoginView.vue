@@ -8,8 +8,7 @@ const router = useRouter();
 
 // Form data
 const formData = ref({
-  email: '',
-  username: '',
+  usernameOrEmail: '',
   password: ''
 });
 
@@ -20,8 +19,7 @@ const showPassword = ref(false);
 
 // Computed properties
 const isFormValid = computed(() => {
-  return formData.value.email.trim() && 
-         formData.value.username.trim() && 
+  return formData.value.usernameOrEmail.trim() && 
          formData.value.password.trim();
 });
 
@@ -40,16 +38,12 @@ const handleSubmit = async (event: Event) => {
   try {
     // Simulate API call for login
     const loginData = {
-      email: formData.value.email.trim(),
-      username: formData.value.username.trim(),
+      usernameOrEmail: formData.value.usernameOrEmail.trim(),
       password: formData.value.password
     };
 
     // Here you would make the actual API call
     console.log('Logging in with:', loginData);
-
-    // Simulate delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Simulate success - redirect to home
     router.push('/');
@@ -63,8 +57,7 @@ const handleSubmit = async (event: Event) => {
 
 const handleReset = () => {
   formData.value = {
-    email: '',
-    username: '',
+    usernameOrEmail: '',
     password: ''
   };
   errors.value = {};
@@ -73,22 +66,9 @@ const handleReset = () => {
 const validateForm = () => {
   errors.value = {};
 
-  // Email validation
-  if (!formData.value.email.trim()) {
-    errors.value.email = 'Email is required';
-  } else if (!isValidEmail(formData.value.email.trim())) {
-    errors.value.email = 'Please enter a valid email address';
-  }
-
-  // Username validation
-  if (!formData.value.username.trim()) {
-    errors.value.username = 'Username is required';
-  } else if (formData.value.username.trim().length < 3) {
-    errors.value.username = 'Username must be at least 3 characters';
-  } else if (formData.value.username.trim().length > 20) {
-    errors.value.username = 'Username must be no more than 20 characters';
-  } else if (!/^[a-zA-Z0-9_]+$/.test(formData.value.username.trim())) {
-    errors.value.username = 'Username can only contain letters, numbers, and underscores';
+  // Username/Email validation
+  if (!formData.value.usernameOrEmail.trim()) {
+    errors.value.usernameOrEmail = 'Username or email is required';
   }
 
   // Password validation
@@ -97,11 +77,6 @@ const validateForm = () => {
   } else if (formData.value.password.length < 6) {
     errors.value.password = 'Password must be at least 6 characters';
   }
-};
-
-const isValidEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
 };
 
 const navigateToRegister = () => {
@@ -114,6 +89,10 @@ const navigateToForgotPassword = () => {
 
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value;
+};
+
+const handleCancel = () => {
+  router.push('/');
 };
 </script>
 
@@ -134,37 +113,20 @@ const togglePasswordVisibility = () => {
           <div class="form-error">{{ errors.submit }}</div>
         </div>
 
-        <!-- Email Field -->
+        <!-- Username/Email Field -->
         <div class="form-field">
-          <label class="form-label form-label--required" for="email">Email Address</label>
+          <label class="form-label form-label--required" for="usernameOrEmail">Username or Email</label>
           <InputText
-            id="email"
-            v-model="formData.email"
-            type="email"
+            id="usernameOrEmail"
+            v-model="formData.usernameOrEmail"
+            type="text"
             class="form-input"
-            placeholder="Enter your email address"
-            :class="{ 'p-invalid': errors.email }"
-            autocomplete="email"
-            required
-          />
-          <div v-if="errors.email" class="form-error">{{ errors.email }}</div>
-        </div>
-
-        <!-- Username Field -->
-        <div class="form-field">
-          <label class="form-label form-label--required" for="username">Username</label>
-          <InputText
-            id="username"
-            v-model="formData.username"
-            class="form-input"
-            placeholder="Enter your username"
-            :class="{ 'p-invalid': errors.username }"
+            placeholder="Enter your username or email"
+            :class="{ 'p-invalid': errors.usernameOrEmail }"
             autocomplete="username"
-            maxlength="20"
             required
           />
-          <div v-if="errors.username" class="form-error">{{ errors.username }}</div>
-          <div class="form-help">{{ formData.username.length }}/20 characters</div>
+          <div v-if="errors.usernameOrEmail" class="form-error">{{ errors.usernameOrEmail }}</div>
         </div>
 
         <!-- Password Field -->
@@ -209,6 +171,14 @@ const togglePasswordVisibility = () => {
         <!-- Form Actions -->
         <template #actions="{ loading }">
           <button 
+            type="button" 
+            class="form-button form-button--outline"
+            @click="handleCancel"
+            :disabled="loading"
+          >
+            Cancel
+          </button>
+          <button 
             type="submit" 
             class="form-button form-button--primary login-button"
             :disabled="loading || !isFormValid"
@@ -243,7 +213,7 @@ const togglePasswordVisibility = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--primary-background-color, #007bff) 0%, var(--secondary-background-color, #6c757d) 100%);
+  background: linear-gradient(135deg, var(--neutral-color) 0%, var(--secondary-background-color) 100%);
   padding: 2rem;
 }
 
@@ -259,14 +229,14 @@ const togglePasswordVisibility = () => {
 }
 
 .login-footer {
-    color: var(--primary-color);
+  color: var(--primary-text-color);
   text-align: center;
 }
 
 .link-button {
   background: none;
   border: none;
-  color: var(--primary-color, #007bff);
+  color: var(--link-color);
   cursor: pointer;
   text-decoration: underline;
   font-size: inherit;
@@ -276,11 +246,11 @@ const togglePasswordVisibility = () => {
 }
 
 .link-button:hover {
-  color: var(--primary-color-hover, #0056b3);
+  color: var(--link-color-hover);
 }
 
 .login-button {
-  width: 100%;
+  flex: 1;
   justify-content: center;
 }
 
@@ -301,7 +271,7 @@ const togglePasswordVisibility = () => {
   right: 0.75rem;
   background: none;
   border: none;
-  color: var(--text-color, #666666);
+  color: var(--tertiary-text-color);
   cursor: pointer;
   padding: 0.25rem;
   border-radius: 0.25rem;
@@ -312,22 +282,22 @@ const togglePasswordVisibility = () => {
 }
 
 .password-toggle:hover {
-  color: var(--primary-text-color, #333333);
-  background: var(--primary-background-color-hover, rgba(0, 0, 0, 0.05));
+  color: var(--primary-text-color);
+  background: var(--primary-background-color-hover);
 }
 
 .password-toggle:focus {
-  outline: 2px solid var(--primary-color, #007bff);
+  outline: 2px solid var(--neutral-color);
   outline-offset: 2px;
 }
 
 .password-input.invalid {
-  border-color: var(--error-color, #dc3545);
+  border-color: var(--error-color);
 }
 
 /* Remove PrimeVue Password component styles */
 :deep(.p-inputtext.p-invalid) {
-  border-color: var(--error-color, #dc3545);
+  border-color: var(--error-color);
 }
 
 /* Responsive design */

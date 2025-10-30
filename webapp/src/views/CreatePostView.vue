@@ -168,7 +168,7 @@ const removeImage = (index: number) => {
             variant="card" 
             width="wide"
             title="Create New Post"
-            subtitle="Share what's happening in your city"
+            subtitle="Share what you'd like to see in your city"
             :loading="isSubmitting"
             @submit="handleSubmit"
             @reset="handleReset"
@@ -187,11 +187,11 @@ const removeImage = (index: number) => {
                 class="form-input"
                 placeholder="Enter a descriptive title for your post"
                 :class="{ 'p-invalid': errors.title }"
-                maxlength="100"
+                maxlength="50"
                 required
               />
               <div v-if="errors.title" class="form-error">{{ errors.title }}</div>
-              <div class="form-help">{{ formData.title.length }}/100 characters</div>
+              <div class="form-help">{{ formData.title.length }}/50 characters</div>
             </div>
 
             <!-- Location Field -->
@@ -207,7 +207,7 @@ const removeImage = (index: number) => {
                 required
               />
               <div v-if="errors.location" class="form-error">{{ errors.location }}</div>
-              <div class="form-help">Where is this post about?</div>
+              <div class="form-help">Where is this post about? {{ formData.location.length }}/50 characters</div>
             </div>
 
             <!-- Description Field -->
@@ -220,11 +220,11 @@ const removeImage = (index: number) => {
                 placeholder="Describe what's happening, share your thoughts, or ask a question..."
                 :class="{ 'p-invalid': errors.description }"
                 rows="6"
-                maxlength="1000"
+                maxlength="500"
                 required
               />
               <div v-if="errors.description" class="form-error">{{ errors.description }}</div>
-              <div class="form-help">{{ formData.description.length }}/1000 characters</div>
+              <div class="form-help">{{ formData.description.length }}/500 characters</div>
             </div>
 
             <!-- Tags Field -->

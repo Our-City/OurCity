@@ -107,15 +107,15 @@ const handleReset = (event: Event) => {
 }
 
 .form-container--card {
-  background: var(--primary-background-color, #ffffff);
-  border: 1px solid var(--border-color, #e0e0e0);
+  background: var(--primary-background-color);
+  border: 1px solid var(--neutral-color);
   border-radius: 0.75rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 2rem;
 }
 
 .form-container--modal {
-  background: var(--primary-background-color, #ffffff);
+  background: var(--primary-background-color);
   border-radius: 0.5rem;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   padding: 1.5rem;
@@ -152,13 +152,13 @@ const handleReset = (event: Event) => {
 .form-title {
   font-size: 1.75rem;
   font-weight: 600;
-  color: var(--primary-text-color, #333333);
+  color: var(--primary-text-color);
   margin: 0 0 0.5rem 0;
 }
 
 .form-subtitle {
   font-size: 1rem;
-  color: var(--secondary-text-color, #666666);
+  color: var(--tertiary-text-color);
   margin: 0;
   line-height: 1.5;
 }
@@ -215,14 +215,14 @@ const handleReset = (event: Event) => {
   align-items: center;
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid var(--border-color, #e0e0e0);
+  border-top: 1px solid var(--neutral-color);
 }
 
 /* Form Footer */
 .form-footer {
   margin-top: 1.5rem;
   text-align: center;
-  color: var(--secondary-text-color, #666666);
+  color: var(--tertiary-text-color);
   font-size: 0.875rem;
 }
 
@@ -243,7 +243,7 @@ const handleReset = (event: Event) => {
 
 .form-spinner {
   font-size: 1.5rem;
-  color: var(--primary-color, #007bff);
+  color: var(--link-color);
 }
 
 /* Utility Classes for Form Elements */
@@ -261,18 +261,18 @@ const handleReset = (event: Event) => {
 
 .form :deep(.form-label) {
   font-weight: 500;
-  color: var(--primary-text-color, #333333);
+  color: var(--primary-text-color);
   font-size: 0.875rem;
 }
 
 .form :deep(.form-label--required)::after {
   content: ' *';
-  color: var(--error-color, #dc3545);
+  color: var(--error-color);
 }
 
 .form :deep(.form-input) {
   padding: 0.75rem;
-  border: 1px solid var(--border-color, #e0e0e0);
+  border: 1px solid var(--neutral-color);
   border-radius: 0.375rem;
   font-size: 1rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -280,29 +280,29 @@ const handleReset = (event: Event) => {
 
 .form :deep(.form-input:focus) {
   outline: none;
-  border-color: var(--primary-color, #007bff);
+  border-color: var(--link-color);
   box-shadow: 0 0 0 0.125rem rgba(0, 123, 255, 0.25);
 }
 
 .form :deep(.form-input:invalid) {
-  border-color: var(--error-color, #dc3545);
+  border-color: var(--error-color);
 }
 
 .form :deep(.form-error) {
-  color: var(--error-color, #dc3545);
+  color: var(--error-color);
   font-size: 0.875rem;
   margin-top: 0.25rem;
 }
 
 .form :deep(.form-help) {
-  color: var(--secondary-text-color, #666666);
+  color: var(--tertiary-text-color);
   font-size: 0.875rem;
   margin-top: 0.25rem;
 }
 
 .form :deep(.form-textarea) {
   padding: 0.75rem;
-  border: 1px solid var(--border-color, #e0e0e0);
+  border: 1px solid var(--neutral-color);
   border-radius: 0.375rem;
   font-size: 1rem;
   font-family: inherit;
@@ -313,7 +313,7 @@ const handleReset = (event: Event) => {
 
 .form :deep(.form-textarea:focus) {
   outline: none;
-  border-color: var(--primary-color, #007bff);
+  border-color: var(--link-color);
   box-shadow: 0 0 0 0.125rem rgba(0, 123, 255, 0.25);
 }
 
@@ -335,17 +335,17 @@ const handleReset = (event: Event) => {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  border: 2px dashed var(--border-color, #e0e0e0);
+  border: 2px dashed var(--neutral-color);
   border-radius: 0.375rem;
-  background: var(--secondary-background-color, #f8f9fa);
-  color: var(--text-color, #282828);
+  background: var(--secondary-background-color);
+  color: var(--primary-text-color);
   cursor: pointer;
   transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .form :deep(.form-file-button:hover) {
-  border-color: var(--primary-color, #007bff);
-  background: var(--primary-background-color-hover, #e3f2fd);
+  border-color: var(--link-color);
+  background: var(--primary-background-color);
 }
 
 .form :deep(.form-file-preview) {
@@ -361,7 +361,7 @@ const handleReset = (event: Event) => {
   max-height: 100px;
   border-radius: 0.375rem;
   overflow: hidden;
-  border: 1px solid var(--border-color, #e0e0e0);
+  border: 1px solid var(--neutral-color);
 }
 
 .form :deep(.form-file-preview-image) {
@@ -399,7 +399,7 @@ const handleReset = (event: Event) => {
   align-items: center;
   gap: 0.25rem;
   padding: 0.25rem 0.5rem;
-  background: var(--primary-color, #007bff);
+  background: var(--link-color);
   color: white;
   border-radius: 1rem;
   font-size: 0.875rem;
@@ -434,40 +434,40 @@ const handleReset = (event: Event) => {
 }
 
 .form :deep(.form-button--primary) {
-  background: var(--primary-color, #007bff);
+  background: var(--link-color);
   color: white;
 }
 
 .form :deep(.form-button--primary:hover) {
-  background: var(--primary-color-hover, #0056b3);
+  background: var(--link-color-hover);
 }
 
 .form :deep(.form-button--secondary) {
-  background: var(--secondary-color, #6c757d);
+  background: var(--neutral-color);
   color: white;
 }
 
 .form :deep(.form-button--secondary:hover) {
-  background: var(--secondary-color-hover, #545b62);
+  background: var(--tertiary-text-color);
 }
 
 .form :deep(.form-button--outline) {
   background: transparent;
-  border: 1px solid var(--border-color, #e0e0e0);
-  color: var(--primary-text-color, #333333);
+  border: 1px solid var(--neutral-color);
+  color: var(--primary-text-color);
 }
 
 .form :deep(.form-button--outline:hover) {
-  background: var(--primary-background-color-hover, #f8f9fa);
+  background: var(--secondary-background-color);
 }
 
 /* Custom styles for PrimeVue components */
 :deep(.p-inputtext.p-invalid) {
-  border-color: var(--error-color, #dc3545);
+  border-color: var(--error-color);
 }
 
 :deep(.p-inputtextarea.p-invalid) {
-  border-color: var(--error-color, #dc3545);
+  border-color: var(--error-color);
 }
 
 /* Responsive Design */

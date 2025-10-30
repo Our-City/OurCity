@@ -9,7 +9,6 @@ import { usePostFilters } from "@/composables/usePostFilters";
 const router = useRouter();
 const searchQuery = ref("");
 
-const loggedIn = ref(false);
 const { reset } = usePostFilters();
 
 function goToHome(): void {
@@ -17,22 +16,16 @@ function goToHome(): void {
     router.push("/");
 }
 
-function isLoggedIn(): boolean {
-  return loggedIn.value;
-}
-
 function handleLogin(): void {
   router.push("/login");
-  loggedIn.value = true;
 }
 
 function handleSignUp(): void {
-  // router.push("/signup");
+  router.push("/register");
 }
 
 function handleLogout(): void {
   router.push("/");
-  loggedIn.value = false;
 }
 
 function handleViewProfile(): void {
@@ -41,6 +34,11 @@ function handleViewProfile(): void {
 
 function handleCreatePost(): void {
   router.push("/create-post");
+}
+
+function isLoggedIn(): boolean {
+  // Replace with actual authentication check
+  return false;
 }
 </script>
 
