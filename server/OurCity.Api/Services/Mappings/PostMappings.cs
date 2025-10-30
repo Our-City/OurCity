@@ -48,6 +48,7 @@ public static class PostMappings
             Description = postCreateRequestDto.Description,
             Location = postCreateRequestDto.Location,
             Tags = tags,
+            Visisbility = PostVisibility.Published,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
         };

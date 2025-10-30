@@ -41,7 +41,7 @@ public class PostService : IPostService
 
         if (post == null)
         {
-            return Result<PostResponseDto>.Failure("Post does not exist");
+            return Result<PostResponseDto>.Failure("Resource not found");
         }
 
         return Result<PostResponseDto>.Success(post.ToDto(userId));

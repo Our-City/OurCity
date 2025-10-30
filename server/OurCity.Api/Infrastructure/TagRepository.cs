@@ -20,7 +20,7 @@ public class TagRepository : ITagRepository
     public async Task<IEnumerable<Tag>> GetTagsByIds(List<Guid> tagIds)
     {
         return await _appDbContext
-            .Tags.Where(t => tagIds.Contains(t.id))
+            .Tags.Where(t => tagIds.Contains(t.Id))
             .ToListAsync();
     }
 }
