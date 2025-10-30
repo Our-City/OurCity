@@ -5,10 +5,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace OurCity.Api.Infrastructure.Database.Migrations
+namespace OurCity.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class RemakeMigrations : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -55,6 +55,19 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Tags",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tags", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -174,6 +187,10 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     Location = table.Column<string>(type: "text", nullable: true),
                     UpvotedUserIds = table.Column<List<Guid>>(type: "uuid[]", nullable: false),
                     DownvotedUserIds = table.Column<List<Guid>>(type: "uuid[]", nullable: false),
+                    CommentIds = table.Column<List<int>>(type: "integer[]", nullable: false),
+                    Visibility = table.Column<int>(type: "integer", nullable: false),
+                    MediaAttachments = table.Column<List<int>>(type: "integer[]", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -221,7 +238,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Image",
+                name: "Media",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -233,11 +250,35 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Image", x => x.Id);
+                    table.PrimaryKey("PK_Media", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Image_Posts_PostId",
+                        name: "FK_Media_Posts_PostId",
                         column: x => x.PostId,
                         principalTable: "Posts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PostTags",
+                columns: table => new
+                {
+                    PostsId = table.Column<Guid>(type: "uuid", nullable: false),
+                    TagsId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PostTags", x => new { x.PostsId, x.TagsId });
+                    table.ForeignKey(
+                        name: "FK_PostTags_Posts_PostsId",
+                        column: x => x.PostsId,
+                        principalTable: "Posts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PostTags_Tags_TagsId",
+                        column: x => x.TagsId,
+                        principalTable: "Tags",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -290,14 +331,19 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                 column: "PostId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Image_PostId",
-                table: "Image",
+                name: "IX_Media_PostId",
+                table: "Media",
                 column: "PostId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Posts_AuthorId",
                 table: "Posts",
                 column: "AuthorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PostTags_TagsId",
+                table: "PostTags",
+                column: "TagsId");
         }
 
         /// <inheritdoc />
@@ -322,13 +368,19 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                 name: "Comments");
 
             migrationBuilder.DropTable(
-                name: "Image");
+                name: "Media");
+
+            migrationBuilder.DropTable(
+                name: "PostTags");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "Posts");
+
+            migrationBuilder.DropTable(
+                name: "Tags");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
