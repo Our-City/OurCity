@@ -26,7 +26,7 @@ public class TagController : ControllerBase
     [EndpointSummary("Get all tags")]
     [EndpointDescription("Gets a list of all tags")]
     [ProducesResponseType(typeof(List<TagResponseDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetPosts()
+    public async Task<IActionResult> GetTags()
     {
         var res = await _tagService.GetTags();
 
