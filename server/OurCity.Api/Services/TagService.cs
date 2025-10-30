@@ -17,9 +17,7 @@ public class TagService : ITagService
 {
     private readonly ITagRepository _tagRepository;
 
-    public TagService(
-        ITagRepository tagRepository
-    )
+    public TagService(ITagRepository tagRepository)
     {
         _tagRepository = tagRepository;
     }

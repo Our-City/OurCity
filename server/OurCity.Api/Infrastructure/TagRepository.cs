@@ -5,7 +5,7 @@ namespace OurCity.Api.Infrastructure;
 
 public interface ITagRepository
 {
-    Task<IEnumerable<Tag>> GetAllTags(); 
+    Task<IEnumerable<Tag>> GetAllTags();
     Task<IEnumerable<Tag>> GetTagsByIds(List<Guid> tagIds);
 }
 
