@@ -17,5 +17,5 @@ public class PostVote
     // Navigation Property
     public User? Voter { get; set; }
 
-    public List<Post>? Posts { get; set; }
+    public Post? Posts { get; set; }
 }
