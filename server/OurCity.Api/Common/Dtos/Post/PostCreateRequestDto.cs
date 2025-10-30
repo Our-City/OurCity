@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using OurCity.Api.Infrastructure.Database;
 
 namespace OurCity.Api.Common.Dtos.Post;
 
@@ -16,5 +15,5 @@ public class PostCreateRequestDto
     [StringLength(50, ErrorMessage = "Location cannot exceed 50 characters")]
     public string? Location { get; set; }
 
-    public List<Tag>? Tags { get; set; } = new(); 
+    public List<Guid> TagIds { get; set; } = new(); 
 }

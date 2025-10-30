@@ -23,11 +23,11 @@ public static class PostMappings
             Title = post.Title,
             Description = post.Description,
             Location = post.Location,
-            UpvoteCount = post.Votes.Count(vote => vote.VoteType == Common.Enum.VoteType.Upvote),
-            DownvoteCount = post.Votes.Count(vote => vote.VoteType == Common.Enum.VoteType.Downvote),
+            UpvoteCount = post.Votes.Count(vote => vote.VoteType == VoteType.Upvote),
+            DownvoteCount = post.Votes.Count(vote => vote.VoteType == VoteType.Downvote),
             CommentCount = post.Comments?.Count ?? 0,
             Visibility = post.Visisbility,
-            Tags = post.Tags,
+            Tags = post.Tags.ToDtos().ToList(),
             VoteStatus = userId.HasValue
                 ? post.Votes.FirstOrDefault(vote => vote.VoterId.Equals(userId))?.VoteType
                 ?? VoteType.NoVote
@@ -38,7 +38,7 @@ public static class PostMappings
         };
     }
 
-    public static Post CreateDtoToEntity(this PostCreateRequestDto postCreateRequestDto, Guid userId)
+    public static Post CreateDtoToEntity(this PostCreateRequestDto postCreateRequestDto, Guid userId, List<Tag> tags)
     {
         return new Post
         {
@@ -47,7 +47,7 @@ public static class PostMappings
             Title = postCreateRequestDto.Title,
             Description = postCreateRequestDto.Description,
             Location = postCreateRequestDto.Location,
-            Tags = postCreateRequestDto.Tags ?? new(),
+            Tags = tags,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
         };
@@ -55,13 +55,14 @@ public static class PostMappings
 
     public static Post UpdateDtoToEntity(
         this PostUpdateRequestDto postUpdateRequestDto,
-        Post existingPost
+        Post existingPost,
+        List<Tag>? tags
     )
     {
         existingPost.Title = postUpdateRequestDto.Title ?? existingPost.Title;
         existingPost.Description = postUpdateRequestDto.Description ?? existingPost.Description;
         existingPost.Location = postUpdateRequestDto.Location ?? existingPost.Location;
-        existingPost.Tags = postUpdateRequestDto.Tags ?? existingPost.Tags;
+        existingPost.Tags = tags ?? existingPost.Tags;
         existingPost.Visisbility = postUpdateRequestDto.Visibility ?? existingPost.Visisbility;
         existingPost.UpdatedAt = DateTime.UtcNow;
 

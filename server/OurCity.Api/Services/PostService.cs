@@ -21,10 +21,12 @@ public interface IPostService
 public class PostService : IPostService
 {
     private readonly IPostRepository _postRepository;
+    private readonly ITagRepository _tagRepository; 
 
-    public PostService(IPostRepository postRepository)
+    public PostService(IPostRepository postRepository, ITagRepository tagRepository)
     {
         _postRepository = postRepository;
+        _tagRepository = tagRepository;
     }
 
     public async Task<Result<IEnumerable<PostResponseDto>>> GetPosts(Guid? userId)
@@ -47,8 +49,10 @@ public class PostService : IPostService
 
     public async Task<Result<PostResponseDto>> CreatePost(Guid userId, PostCreateRequestDto postCreateRequestDto)
     {
+        var tags = await _tagRepository.GetTagsByIds(postCreateRequestDto.TagIds);
+
         var createdPost = await _postRepository.CreatePost(
-            postCreateRequestDto.CreateDtoToEntity(userId)
+            postCreateRequestDto.CreateDtoToEntity(userId, tags.ToList())
         );
         return Result<PostResponseDto>.Success(createdPost.ToDto(userId));
     }
@@ -71,7 +75,11 @@ public class PostService : IPostService
             return Result<PostResponseDto>.Failure("You do not have permission to perform this action");
         }
 
-        postUpdateRequestDto.UpdateDtoToEntity(post);
+        var tags = postUpdateRequestDto.TagIds != null
+            ? await _tagRepository.GetTagsByIds(postUpdateRequestDto.TagIds)
+            : null; 
+        
+        postUpdateRequestDto.UpdateDtoToEntity(post, tags?.ToList());
         await _postRepository.SaveChangesAsync(); 
 
         return Result<PostResponseDto>.Success(post.ToDto(userId));

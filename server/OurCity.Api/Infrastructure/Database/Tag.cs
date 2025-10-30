@@ -2,7 +2,7 @@ namespace OurCity.Api.Infrastructure.Database;
 
 public class Tag
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
     public required string Name { get; set; }
 
