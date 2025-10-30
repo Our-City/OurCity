@@ -6,5 +6,6 @@ public class Tag
 
     public required string Name { get; set; }
 
-     public List<Post>? Posts { get; set; }
+    // Navigation Properties
+    public List<Post> Posts { get; set; } = new();
 }

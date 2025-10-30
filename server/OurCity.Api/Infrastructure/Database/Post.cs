@@ -16,18 +16,18 @@ public class Post
 
     public PostVisibility Visisbility { get; set; } = PostVisibility.Published;
 
-    public List<Tag> Tags { get; set; } = new();
-
-    public List<PostVote> Votes { get; set; } = new();
-
     public bool IsDeleted { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }
 
-    // Navigation Property
+    // Navigation Properties
     public User? Author { get; set; }
-    
-    public List<Comment>? Comments { get; set; }
+
+    public List<Comment> Comments { get; set; } = new(); 
+
+    public List<Tag> Tags { get; set; } = new();
+
+    public List<PostVote> Votes { get; set; } = new();
 }

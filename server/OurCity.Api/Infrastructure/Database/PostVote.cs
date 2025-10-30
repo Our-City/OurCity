@@ -14,8 +14,8 @@ public class PostVote
 
     public required DateTime VotedAt { get; set; }
     
-    // Navigation Property
+    // Navigation Properties
     public User? Voter { get; set; }
 
-    public Post? Posts { get; set; }
+    public Post? Post { get; set; }
 }
