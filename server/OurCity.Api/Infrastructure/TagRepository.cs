@@ -5,6 +5,7 @@ namespace OurCity.Api.Infrastructure;
 
 public interface ITagRepository
 {
+    Task<IEnumerable<Tag>> GetAllTags(); 
     Task<IEnumerable<Tag>> GetTagsByIds(List<Guid> tagIds);
 }
 
@@ -15,6 +16,11 @@ public class TagRepository : ITagRepository
     public TagRepository(AppDbContext appDbContext)
     {
         _appDbContext = appDbContext;
+    }
+
+    public async Task<IEnumerable<Tag>> GetAllTags()
+    {
+        return await _appDbContext.Tags.ToListAsync();
     }
 
     public async Task<IEnumerable<Tag>> GetTagsByIds(List<Guid> tagIds)

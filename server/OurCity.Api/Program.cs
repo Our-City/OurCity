@@ -38,6 +38,7 @@ builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IPolicyService, PolicyService>();
+builder.Services.AddScoped<ITagService, TagService>(); 
 
 //Controller
 builder.Services.AddControllers();
