@@ -21,8 +21,9 @@ public class PostVoteRepository : IPostVoteRepository
 
     public async Task<PostVote?> GetVoteByPostAndUserId(Guid postId, Guid voterId)
     {
-        return await _appDbContext.PostVotes
-            .FirstOrDefaultAsync(v => v.PostId == postId && v.VoterId == voterId);
+        return await _appDbContext.PostVotes.FirstOrDefaultAsync(v =>
+            v.PostId == postId && v.VoterId == voterId
+        );
     }
 
     public async Task Add(PostVote vote)

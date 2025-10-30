@@ -10,7 +10,7 @@ public class AppDbContext : IdentityDbContext<User, UserRole, Guid>
     public DbSet<User> Users { get; set; }
     public DbSet<PostVote> PostVotes { get; set; }
     public DbSet<Tag> Tags { get; set; }
-    
+
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options) { }
 

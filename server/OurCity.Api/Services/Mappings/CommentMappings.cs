@@ -28,7 +28,10 @@ public static class CommentMappings
         };
     }
 
-    public static Comment ToEntity(this CommentCreateRequestDto commentCreateRequestDto, Guid postId)
+    public static Comment ToEntity(
+        this CommentCreateRequestDto commentCreateRequestDto,
+        Guid postId
+    )
     {
         return new Comment
         {

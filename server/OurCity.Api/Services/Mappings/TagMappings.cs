@@ -12,10 +12,6 @@ public static class TagMappings
 
     public static TagResponseDto ToDto(this Tag tag)
     {
-        return new TagResponseDto
-        {
-            Id = tag.Id,
-            Name = tag.Name
-        };
+        return new TagResponseDto { Id = tag.Id, Name = tag.Name };
     }
 }

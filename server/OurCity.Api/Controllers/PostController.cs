@@ -37,7 +37,7 @@ public class PostController : ControllerBase
                 detail: "User not authenticated"
             );
         }
-            
+
         var res = await _postService.CreatePost(userId.Value, postCreateRequestDto);
 
         return CreatedAtAction(nameof(GetPosts), new { id = res.Data?.Id }, res.Data);
@@ -68,10 +68,7 @@ public class PostController : ControllerBase
 
         if (!res.IsSuccess)
         {
-            return Problem(
-                statusCode: StatusCodes.Status404NotFound,
-                detail: res.Error
-            );
+            return Problem(statusCode: StatusCodes.Status404NotFound, detail: res.Error);
         }
 
         return Ok(res.Data);
@@ -103,7 +100,9 @@ public class PostController : ControllerBase
         if (!res.IsSuccess)
         {
             return Problem(
-                statusCode: (res.Error != null && res.Error.Equals("Resource not found")) ? StatusCodes.Status404NotFound : StatusCodes.Status403Forbidden,
+                statusCode: (res.Error != null && res.Error.Equals("Resource not found"))
+                    ? StatusCodes.Status404NotFound
+                    : StatusCodes.Status403Forbidden,
                 detail: res.Error
             );
         }
@@ -132,18 +131,11 @@ public class PostController : ControllerBase
             );
         }
 
-        var res = await _postService.VotePost(
-            userId.Value,
-            postId,
-            postVoteRequestDto
-        );
+        var res = await _postService.VotePost(userId.Value, postId, postVoteRequestDto);
 
         if (!res.IsSuccess)
         {
-            return Problem(
-                statusCode: StatusCodes.Status404NotFound,
-                detail: res.Error
-            );
+            return Problem(statusCode: StatusCodes.Status404NotFound, detail: res.Error);
         }
 
         return Ok(res.Data);
@@ -157,7 +149,7 @@ public class PostController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeletePost([FromRoute] Guid postId)
     {
-        var userId = User.GetUserId(); 
+        var userId = User.GetUserId();
 
         if (userId == null)
         {
@@ -172,7 +164,9 @@ public class PostController : ControllerBase
         if (!res.IsSuccess)
         {
             return Problem(
-                statusCode: (res.Error != null && res.Error.Equals("Resource not found")) ? StatusCodes.Status404NotFound : StatusCodes.Status403Forbidden,
+                statusCode: (res.Error != null && res.Error.Equals("Resource not found"))
+                    ? StatusCodes.Status404NotFound
+                    : StatusCodes.Status403Forbidden,
                 detail: res.Error
             );
         }

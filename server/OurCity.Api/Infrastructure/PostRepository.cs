@@ -9,7 +9,7 @@ public interface IPostRepository
     Task<Post?> GetFatPostById(Guid postId);
     Task<Post?> GetSlimPostbyId(Guid postId);
     Task<Post> CreatePost(Post post);
-    Task SaveChangesAsync(); 
+    Task SaveChangesAsync();
 }
 
 public class PostRepository : IPostRepository
@@ -41,8 +41,7 @@ public class PostRepository : IPostRepository
 
     public async Task<Post?> GetSlimPostbyId(Guid postId)
     {
-        return await _appDbContext
-            .Posts.FirstOrDefaultAsync(p => p.Id == postId);
+        return await _appDbContext.Posts.FirstOrDefaultAsync(p => p.Id == postId);
     }
 
     public async Task<Post> CreatePost(Post post)
@@ -54,6 +53,6 @@ public class PostRepository : IPostRepository
 
     public async Task SaveChangesAsync()
     {
-        await _appDbContext.SaveChangesAsync(); 
+        await _appDbContext.SaveChangesAsync();
     }
 }

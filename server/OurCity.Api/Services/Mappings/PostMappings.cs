@@ -34,11 +34,15 @@ public static class PostMappings
                 : VoteType.NoVote,
             IsDeleted = post.IsDeleted,
             CreatedAt = post.CreatedAt,
-            UpdatedAt = post.UpdatedAt
+            UpdatedAt = post.UpdatedAt,
         };
     }
 
-    public static Post CreateDtoToEntity(this PostCreateRequestDto postCreateRequestDto, Guid userId, List<Tag> tags)
+    public static Post CreateDtoToEntity(
+        this PostCreateRequestDto postCreateRequestDto,
+        Guid userId,
+        List<Tag> tags
+    )
     {
         return new Post
         {

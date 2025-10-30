@@ -13,8 +13,16 @@ public interface IPostService
     Task<Result<IEnumerable<PostResponseDto>>> GetPosts(Guid? userId);
     Task<Result<PostResponseDto>> GetPostById(Guid? userId, Guid postId);
     Task<Result<PostResponseDto>> CreatePost(Guid userId, PostCreateRequestDto postRequestDto);
-    Task<Result<PostResponseDto>> UpdatePost(Guid userId, Guid postId, PostUpdateRequestDto postRequestDto);
-    Task<Result<PostResponseDto>> VotePost(Guid userId, Guid postId, PostVoteRequestDto postVoteRequestDto);
+    Task<Result<PostResponseDto>> UpdatePost(
+        Guid userId,
+        Guid postId,
+        PostUpdateRequestDto postRequestDto
+    );
+    Task<Result<PostResponseDto>> VotePost(
+        Guid userId,
+        Guid postId,
+        PostVoteRequestDto postVoteRequestDto
+    );
     Task<Result<PostResponseDto>> DeletePost(Guid userId, Guid postId);
 }
 
@@ -22,9 +30,13 @@ public class PostService : IPostService
 {
     private readonly IPostRepository _postRepository;
     private readonly ITagRepository _tagRepository;
-    private readonly IPostVoteRepository _postVoteRepository; 
+    private readonly IPostVoteRepository _postVoteRepository;
 
-    public PostService(IPostRepository postRepository, ITagRepository tagRepository, IPostVoteRepository postVoteRepository)
+    public PostService(
+        IPostRepository postRepository,
+        ITagRepository tagRepository,
+        IPostVoteRepository postVoteRepository
+    )
     {
         _postRepository = postRepository;
         _tagRepository = tagRepository;
@@ -49,7 +61,10 @@ public class PostService : IPostService
         return Result<PostResponseDto>.Success(post.ToDto(userId));
     }
 
-    public async Task<Result<PostResponseDto>> CreatePost(Guid userId, PostCreateRequestDto postCreateRequestDto)
+    public async Task<Result<PostResponseDto>> CreatePost(
+        Guid userId,
+        PostCreateRequestDto postCreateRequestDto
+    )
     {
         var tags = await _tagRepository.GetTagsByIds(postCreateRequestDto.TagIds);
 
@@ -74,20 +89,27 @@ public class PostService : IPostService
 
         if (userId != post.AuthorId)
         {
-            return Result<PostResponseDto>.Failure("You do not have permission to perform this action");
+            return Result<PostResponseDto>.Failure(
+                "You do not have permission to perform this action"
+            );
         }
 
-        var tags = postUpdateRequestDto.TagIds != null
-            ? await _tagRepository.GetTagsByIds(postUpdateRequestDto.TagIds)
-            : null; 
-        
+        var tags =
+            postUpdateRequestDto.TagIds != null
+                ? await _tagRepository.GetTagsByIds(postUpdateRequestDto.TagIds)
+                : null;
+
         postUpdateRequestDto.UpdateDtoToEntity(post, tags?.ToList());
-        await _postRepository.SaveChangesAsync(); 
+        await _postRepository.SaveChangesAsync();
 
         return Result<PostResponseDto>.Success(post.ToDto(userId));
     }
 
-    public async Task<Result<PostResponseDto>> VotePost(Guid userId, Guid postId, PostVoteRequestDto postVoteRequestDto)
+    public async Task<Result<PostResponseDto>> VotePost(
+        Guid userId,
+        Guid postId,
+        PostVoteRequestDto postVoteRequestDto
+    )
     {
         var post = await _postRepository.GetSlimPostbyId(postId);
 
@@ -96,23 +118,25 @@ public class PostService : IPostService
             return Result<PostResponseDto>.Failure("Resource not found");
         }
 
-        var existingVote = await _postVoteRepository.GetVoteByPostAndUserId(postId, userId); 
+        var existingVote = await _postVoteRepository.GetVoteByPostAndUserId(postId, userId);
         var requestedVoteType = postVoteRequestDto.VoteType;
 
         if (existingVote != null && requestedVoteType == VoteType.NoVote)
         {
-            await _postVoteRepository.Remove(existingVote); 
+            await _postVoteRepository.Remove(existingVote);
         }
         else if (existingVote == null && requestedVoteType != VoteType.NoVote)
         {
-            await _postVoteRepository.Add(new PostVote
-            {
-                Id = Guid.NewGuid(),
-                PostId = postId,
-                VoterId = userId,
-                VoteType = requestedVoteType,
-                VotedAt = DateTime.UtcNow
-            });
+            await _postVoteRepository.Add(
+                new PostVote
+                {
+                    Id = Guid.NewGuid(),
+                    PostId = postId,
+                    VoterId = userId,
+                    VoteType = requestedVoteType,
+                    VotedAt = DateTime.UtcNow,
+                }
+            );
         }
         else if (existingVote != null && requestedVoteType != VoteType.NoVote)
         {
@@ -137,7 +161,9 @@ public class PostService : IPostService
 
         if (userId != post.AuthorId)
         {
-            return Result<PostResponseDto>.Failure("You do not have permission to perform this action");
+            return Result<PostResponseDto>.Failure(
+                "You do not have permission to perform this action"
+            );
         }
 
         post.IsDeleted = true;

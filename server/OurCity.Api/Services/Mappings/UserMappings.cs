@@ -24,7 +24,7 @@ public static class UserMappings
             UpdatedAt = user.UpdatedAt,
             IsAdmin = user.IsDeleted,
             IsBanned = user.IsBanned,
-            IsDeleted = user.IsDeleted
+            IsDeleted = user.IsDeleted,
         };
     }
 

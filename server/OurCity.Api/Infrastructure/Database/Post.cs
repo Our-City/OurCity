@@ -5,8 +5,8 @@ namespace OurCity.Api.Infrastructure.Database;
 public class Post
 {
     public Guid Id { get; set; }
-    
-    public Guid AuthorId { get; set; }  
+
+    public Guid AuthorId { get; set; }
 
     public required string Title { get; set; }
 
@@ -25,7 +25,7 @@ public class Post
     // Navigation Properties
     public User? Author { get; set; }
 
-    public List<Comment> Comments { get; set; } = new(); 
+    public List<Comment> Comments { get; set; } = new();
 
     public List<Tag> Tags { get; set; } = new();
 
