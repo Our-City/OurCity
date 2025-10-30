@@ -21,12 +21,14 @@ public interface IPostService
 public class PostService : IPostService
 {
     private readonly IPostRepository _postRepository;
-    private readonly ITagRepository _tagRepository; 
+    private readonly ITagRepository _tagRepository;
+    private readonly IPostVoteRepository _postVoteRepository; 
 
-    public PostService(IPostRepository postRepository, ITagRepository tagRepository)
+    public PostService(IPostRepository postRepository, ITagRepository tagRepository, IPostVoteRepository postVoteRepository)
     {
         _postRepository = postRepository;
         _tagRepository = tagRepository;
+        _postVoteRepository = postVoteRepository;
     }
 
     public async Task<Result<IEnumerable<PostResponseDto>>> GetPosts(Guid? userId)
@@ -87,23 +89,23 @@ public class PostService : IPostService
 
     public async Task<Result<PostResponseDto>> VotePost(Guid userId, Guid postId, PostVoteRequestDto postVoteRequestDto)
     {
-        var post = await _postRepository.GetPostWithVoteById(postId);
+        var post = await _postRepository.GetSlimPostbyId(postId);
 
         if (post == null)
         {
             return Result<PostResponseDto>.Failure("Resource not found");
         }
 
-        var existingVote = post.Votes.FirstOrDefault(vote => vote.VoterId == userId);
+        var existingVote = await _postVoteRepository.GetVoteByPostAndUserId(postId, userId); 
         var requestedVoteType = postVoteRequestDto.VoteType;
 
         if (existingVote != null && requestedVoteType == VoteType.NoVote)
         {
-            post.Votes.Remove(existingVote);
+            await _postVoteRepository.Remove(existingVote); 
         }
         else if (existingVote == null && requestedVoteType != VoteType.NoVote)
         {
-            post.Votes.Add(new PostVote
+            await _postVoteRepository.Add(new PostVote
             {
                 Id = Guid.NewGuid(),
                 PostId = postId,

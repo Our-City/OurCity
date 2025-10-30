@@ -8,7 +8,6 @@ public interface IPostRepository
     Task<IEnumerable<Post>> GetAllPosts();
     Task<Post?> GetFatPostById(Guid postId);
     Task<Post?> GetSlimPostbyId(Guid postId);
-    Task<Post?> GetPostWithVoteById(Guid postId);
     Task<Post> CreatePost(Post post);
     Task SaveChangesAsync(); 
 }
@@ -44,13 +43,6 @@ public class PostRepository : IPostRepository
     {
         return await _appDbContext
             .Posts.FirstOrDefaultAsync(p => p.Id == postId);
-    }
-
-    public async Task<Post?> GetPostWithVoteById(Guid postId)
-    {
-        return await _appDbContext
-            .Posts.Include(p => p.Votes)
-            .FirstOrDefaultAsync(p => p.Id == postId);
     }
 
     public async Task<Post> CreatePost(Post post)
