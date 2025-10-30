@@ -9,7 +9,7 @@ using OurCity.Api.Infrastructure.Database;
 
 #nullable disable
 
-namespace OurCity.Api.Infrastructure.Database.Migrations
+namespace OurCity.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
@@ -181,8 +181,8 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("PostId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -211,10 +211,6 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasColumnType("integer[]");
 
-                    b.PrimitiveCollection<List<int>>("CommentIds")
-                        .IsRequired()
-                        .HasColumnType("integer[]");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -225,9 +221,6 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.PrimitiveCollection<List<Guid>>("DownvotedUserIds")
                         .IsRequired()
                         .HasColumnType("uuid[]");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -253,9 +246,6 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Property<int>("Visibility")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Visibility")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AuthorId");
@@ -263,7 +253,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.ToTable("Posts");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.User", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tags", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -387,6 +377,21 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.ToTable("AspNetRoles", (string)null);
                 });
 
+            modelBuilder.Entity("PostTags", b =>
+                {
+                    b.Property<Guid>("PostsId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("TagsId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("PostsId", "TagsId");
+
+                    b.HasIndex("TagsId");
+
+                    b.ToTable("PostTags");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("OurCity.Api.Infrastructure.Database.UserRole", null)
@@ -436,36 +441,6 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("PostTags", b =>
-                {
-                    b.Property<int>("PostsId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TagsId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("PostsId", "TagsId");
-
-                    b.HasIndex("TagsId");
-
-                    b.ToTable("PostTags");
-                });
-
-            modelBuilder.Entity("PostTags", b =>
-                {
-                    b.Property<int>("PostsId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TagsId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("PostsId", "TagsId");
-
-                    b.HasIndex("TagsId");
-
-                    b.ToTable("PostTags");
                 });
 
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Comment", b =>
