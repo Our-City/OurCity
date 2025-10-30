@@ -1,6 +1,6 @@
 using OurCity.Api.Common.Enum;
 
-namespace OurCity.Api.Common.Dtos;
+namespace OurCity.Api.Common.Dtos.Post;
 
 public class PostVoteRequestDto
 {
