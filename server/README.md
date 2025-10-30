@@ -57,25 +57,31 @@ API documentation is not available for production.
     docker pull itsmannpatel/ourcity-backend:<TAG>
     docker pull itsmannpatel/ourcity-migrate:<TAG>
     ```
-    Replace `<TAG>` with the latest image tag (e.g., commit SHA).
+    Replace `<TAG>` with the desired image tag (e.g., commit SHA).
 
-2. Update `docker-compose.prod.yml` to use the correct image tags for backend and migration.
+2. Navigate to the server dir and start the backend, migration, and database containers using the desired image tag:
 
-3. Navigate to the server dir and start the backend, migration, and database containers using the following command:
-    ```sh
-    docker compose -f docker-compose.prod.yml --profile migrate up -d
-    ```
+    - **On macOS/Linux:**
+        ```sh
+        TAG=<TAG> docker compose -f docker-compose.prod.yml --profile migrate up -d
+        ```
+    - **On Windows (PowerShell):**
+        ```powershell
+        $env:TAG="<TAG>"
+        docker compose -f docker-compose.prod.yml --profile migrate up -d
+        ```
 
-4. Test API at this endpoint[http://localhost:9000/Posts](http://localhost:9000).
+3. Test API at this endpoint[http://localhost:9000/Posts](http://localhost:9000).
 
-5. To clean up the Docker containers:
+4. To clean up the Docker containers:
     ```sh
     docker compose -f docker-compose.prod.yml down
     ```
 
 **Note:**  
-You do not need to build the images locally for production.  
-The docker-compose.prod file is setup to use the images from DockerHub for consistency with the tested and deployed code.
+You do not need to edit the `docker-compose.prod.yml` file manually.  
+Just set the `TAG` environment variable to the desired image tag before running the command.
+
 
 
 ## Continuous Deployment (CD)
@@ -92,13 +98,19 @@ We use GitHub Actions to automate building and publishing Docker images for the 
     - Backend: `itsmannpatel/ourcity-backend:<tag>`
     - Migration: `itsmannpatel/ourcity-migrate:<tag>`
 
-### How to deploy
+You can deploy any version by specifying the image tag using an environment variable.
 
-1. Update `docker-compose.prod.yml` to use the correct image tags.
-2. Run:
+- **On macOS/Linux:**
     ```sh
+    TAG=<TAG> docker compose -f docker-compose.prod.yml --profile migrate up -d
+    ```
+- **On Windows (PowerShell):**
+    ```powershell
+    $env:TAG="<TAG>"
     docker compose -f docker-compose.prod.yml --profile migrate up -d
     ```
+
+Replace `<TAG>` with the desired image tag which is the commit SHA.
 
 See `.github/workflows/cd.yml` for the workflow definition.
 

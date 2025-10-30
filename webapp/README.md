@@ -39,29 +39,35 @@ Configuration is done through .env
 
 **Recommended: Use the Docker image from DockerHub built by our CD pipeline.**
 
-1. Pull the latest frontend image from DockerHub:
+1. Pull the desired frontend image from DockerHub:
     ```sh
     docker pull itsmannpatel/ourcity-frontend:<TAG>
     ```
-    Replace `<TAG>` with the latest image tag (e.g., commit SHA ).
+    Replace `<TAG>` with the desired image tag (e.g., commit SHA).
 
-2. Update `docker-compose.prod.yml` to use the correct image tag.
+2. Navigate to the webapp dir and start the frontend container using the desired image tag:
 
-3. Navigate to the webapp dir and start the frontend container:
-    ```sh
-    docker compose -f docker-compose.prod.yml up -d
-    ```
+    - **On macOS/Linux:**
+        ```sh
+        TAG=<TAG> docker compose -f docker-compose.prod.yml up -d
+        ```
+    - **On Windows (PowerShell):**
+        ```powershell
+        $env:TAG="<TAG>"
+        docker compose -f docker-compose.prod.yml up -d
+        ```
 
-4. The webapp should be accessible at [http://localhost](http://localhost) (maps to port 80).
+3. The webapp should be accessible at [http://localhost](http://localhost) (maps to port 80).
 
-5. To clean up the Docker container:
+4. To clean up the Docker container:
     ```sh
     docker compose -f docker-compose.prod.yml down
     ```
 
 **Note:**  
-You do not need to build the images locally for production.  
-The docker-compose.prod file is setup to use the images from DockerHub for consistency with the tested and deployed code.
+You do not need to edit the `docker-compose.prod.yml` file manually.  
+Just set the `TAG` environment variable to the desired image tag before running the command.
+
 
 ## Continuous Deployment (CD)
 
@@ -78,11 +84,19 @@ We use GitHub Actions to automate building and publishing Docker images for the 
 
 ### How to deploy
 
-1. Update `docker-compose.prod.yml` to use the correct image tag.
-2. From the `/webapp` directory, run:
+You can deploy any version by specifying the image tag using an environment variable.
+
+- **On macOS/Linux:**
     ```sh
+    TAG=<TAG> docker compose -f docker-compose.prod.yml up -d
+    ```
+- **On Windows (PowerShell):**
+    ```powershell
+    $env:TAG="<TAG>"
     docker compose -f docker-compose.prod.yml up -d
     ```
+
+Replace `<TAG>` with the desired image tag which is the commit SHA.
 
 See `.github/workflows/cd.yml` for the workflow definition.
 

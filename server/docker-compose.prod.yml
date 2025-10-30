@@ -2,7 +2,7 @@
 services:
   ourcity.api.prod:
     container_name: ourcity.api.prod
-    image: itsmannpatel/ourcity-backend:<TAG>   # Use the pushed backend image tag
+    image: itsmannpatel/ourcity-backend:${TAG}  # Use the pushed backend image tag
     ports:
       - "9000:9000"
     env_file:
@@ -32,7 +32,7 @@ services:
 
   ourcity.migrate.prod:
     container_name: ourcity.migrate.prod
-    image: itsmannpatel/ourcity-migrate:<TAG>   # Use the pushed migration image tag
+    image: itsmannpatel/ourcity-migrate:${TAG}  # Use the pushed migration image tag
     profiles: [ "migrate" ]
     depends_on:
       ourcity.postgres.prod:
