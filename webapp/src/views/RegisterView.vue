@@ -82,14 +82,14 @@ const validateForm = () => {
   }
 
   // Password validation
-  if (!formData.value.password.trim()) {
+  if (!formData.value.password) {
     errors.value.password = 'Password is required';
   } else if (formData.value.password.length < 6) {
     errors.value.password = 'Password must be at least 6 characters';
   }
 
   // Confirm Password validation
-  if (!formData.value.confirmPassword.trim()) {
+  if (!formData.value.confirmPassword) {
     errors.value.confirmPassword = 'Please confirm your password';
   } else if (formData.value.password !== formData.value.confirmPassword) {
     errors.value.confirmPassword = 'Passwords do not match';
@@ -231,17 +231,6 @@ const handleCancel = () => {
 .register-container {
   width: 100%;
   max-width: 400px;
-}
-
-.register-options {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 0.5rem;
-}
-
-.register-footer {
-    color: var(--primary-color);
-  text-align: center;
 }
 
 .link-button {

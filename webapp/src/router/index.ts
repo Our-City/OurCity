@@ -15,7 +15,6 @@ const router = createRouter({
     { path: "/profile", name: "profile", component: ProfileView },
     { path: "/posts/:id", name: "post-detail", component: PageDetailView },
     { path: "/create-post", name: "create-post", component: CreatePostView },
-    { path: "/login", name: "login", component: LoginView },
     { path: "/register", name: "register", component: RegisterView },
   ],
 });
