@@ -50,22 +50,69 @@
 
 API documentation is not available for production. 
 
-1. (Re)Build image, and spin up .NET API and Postgres Docker containers in the background
-    ```sh
-    docker compose -f docker-compose.prod.yml up -d --build
-    ```
+**Recommended: Use the Docker images from DockerHub built by our CD pipeline.**
 
-2. Run migrations
+1. Pull the latest backend and migration images from DockerHub:
     ```sh
-    docker compose -f docker-compose.prod.yml --profile migrate up ourcity.migrate.prod --build
+    docker pull itsmannpatel/ourcity-backend:<TAG>
+    docker pull itsmannpatel/ourcity-migrate:<TAG>
     ```
-    the server setup is completed here. 
+    Replace `<TAG>` with the desired image tag (e.g., commit SHA).
 
-3. To clean up the Docker containers
+2. Navigate to the server dir and start the backend, migration, and database containers using the desired image tag:
+
+    - **On macOS/Linux:**
+        ```sh
+        TAG=<TAG> docker compose -f docker-compose.prod.yml --profile migrate up -d
+        ```
+    - **On Windows (PowerShell):**
+        ```powershell
+        $env:TAG="<TAG>"
+        docker compose -f docker-compose.prod.yml --profile migrate up -d
+        ```
+
+3. Test API at this endpoint[http://localhost:9000/Posts](http://localhost:9000).
+
+4. To clean up the Docker containers:
     ```sh
     docker compose -f docker-compose.prod.yml down
     ```
 
+**Note:**  
+You do not need to edit the `docker-compose.prod.yml` file manually.  
+Just set the `TAG` environment variable to the desired image tag before running the command.
+
+
+
+## Continuous Deployment (CD)
+
+We use GitHub Actions to automate building and publishing Docker images for the backend and migration runner.
+
+- **Images are built and pushed to DockerHub** on manual workflow trigger.
+- **Image tags** use the Git commit SHA for traceability.
+
+### How to trigger CD
+
+1. Go to GitHub → Actions → CD → "Run workflow" (manual trigger).
+2. The workflow will build and push:
+    - Backend: `itsmannpatel/ourcity-backend:<tag>`
+    - Migration: `itsmannpatel/ourcity-migrate:<tag>`
+
+You can deploy any version by specifying the image tag using an environment variable.
+
+- **On macOS/Linux:**
+    ```sh
+    TAG=<TAG> docker compose -f docker-compose.prod.yml --profile migrate up -d
+    ```
+- **On Windows (PowerShell):**
+    ```powershell
+    $env:TAG="<TAG>"
+    docker compose -f docker-compose.prod.yml --profile migrate up -d
+    ```
+
+Replace `<TAG>` with the desired image tag which is the commit SHA.
+
+See `.github/workflows/cd.yml` for the workflow definition.
 
 
 ## Tooling

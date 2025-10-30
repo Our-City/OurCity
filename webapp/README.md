@@ -37,19 +37,68 @@ Configuration is done through .env
 
 ### Production Environment
 
-1. (Re)Build image, and spin up Docker container in the background
+**Recommended: Use the Docker image from DockerHub built by our CD pipeline.**
+
+1. Pull the desired frontend image from DockerHub:
     ```sh
-    docker compose -f docker-compose.prod.yml up -d --build
+    docker pull itsmannpatel/ourcity-frontend:<TAG>
     ```
+    Replace `<TAG>` with the desired image tag (e.g., commit SHA).
 
+2. Navigate to the webapp dir and start the frontend container using the desired image tag:
 
-2. Webapp should be accessible at http://localhost (maps to port 80)
+    - **On macOS/Linux:**
+        ```sh
+        TAG=<TAG> docker compose -f docker-compose.prod.yml up -d
+        ```
+    - **On Windows (PowerShell):**
+        ```powershell
+        $env:TAG="<TAG>"
+        docker compose -f docker-compose.prod.yml up -d
+        ```
 
+3. The webapp should be accessible at [http://localhost](http://localhost) (maps to port 80).
 
-3. To clean up the Docker container
+4. To clean up the Docker container:
     ```sh
     docker compose -f docker-compose.prod.yml down
     ```
+
+**Note:**  
+You do not need to edit the `docker-compose.prod.yml` file manually.  
+Just set the `TAG` environment variable to the desired image tag before running the command.
+
+
+## Continuous Deployment (CD)
+
+We use GitHub Actions to automate building and publishing Docker images for the frontend.
+
+- **Images are built and pushed to DockerHub** on manual workflow trigger.
+- **Image tags** use the Git commit SHA for traceability.
+
+### How to trigger CD
+
+1. Go to GitHub → Actions → CD → "Run workflow" (manual trigger).
+2. The workflow will build and push:
+    - Frontend: `itsmannpatel/ourcity-frontend:<tag>`
+
+### How to deploy
+
+You can deploy any version by specifying the image tag using an environment variable.
+
+- **On macOS/Linux:**
+    ```sh
+    TAG=<TAG> docker compose -f docker-compose.prod.yml up -d
+    ```
+- **On Windows (PowerShell):**
+    ```powershell
+    $env:TAG="<TAG>"
+    docker compose -f docker-compose.prod.yml up -d
+    ```
+
+Replace `<TAG>` with the desired image tag which is the commit SHA.
+
+See `.github/workflows/cd.yml` for the workflow definition.
 
 ## Running app locally on machine
 
