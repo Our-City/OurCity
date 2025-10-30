@@ -8,7 +8,7 @@ const router = useRouter();
 
 // Form data
 const formData = ref({
-  usernameOrEmail: '',
+  username: '',
   password: ''
 });
 
@@ -19,7 +19,7 @@ const showPassword = ref(false);
 
 // Computed properties
 const isFormValid = computed(() => {
-  return formData.value.usernameOrEmail.trim() && 
+  return formData.value.username.trim() && 
          formData.value.password.trim();
 });
 
@@ -38,7 +38,7 @@ const handleSubmit = async (event: Event) => {
   try {
     // Simulate API call for login
     const loginData = {
-      usernameOrEmail: formData.value.usernameOrEmail.trim(),
+      username: formData.value.username.trim(),
       password: formData.value.password
     };
 
@@ -57,7 +57,7 @@ const handleSubmit = async (event: Event) => {
 
 const handleReset = () => {
   formData.value = {
-    usernameOrEmail: '',
+    username: '',
     password: ''
   };
   errors.value = {};
@@ -66,9 +66,9 @@ const handleReset = () => {
 const validateForm = () => {
   errors.value = {};
 
-  // Username/Email validation
-  if (!formData.value.usernameOrEmail.trim()) {
-    errors.value.usernameOrEmail = 'Username or email is required';
+  // Username validation
+  if (!formData.value.username.trim()) {
+    errors.value.username = 'Username is required';
   }
 
   // Password validation
@@ -113,20 +113,20 @@ const handleCancel = () => {
           <div class="form-error">{{ errors.submit }}</div>
         </div>
 
-        <!-- Username/Email Field -->
+        <!-- Username Field -->
         <div class="form-field">
-          <label class="form-label form-label--required" for="usernameOrEmail">Username or Email</label>
+          <label class="form-label form-label--required" for="username">Username</label>
           <InputText
-            id="usernameOrEmail"
-            v-model="formData.usernameOrEmail"
+            id="username"
+            v-model="formData.username"
             type="text"
             class="form-input"
-            placeholder="Enter your username or email"
-            :class="{ 'p-invalid': errors.usernameOrEmail }"
+            placeholder="Enter your username"
+            :class="{ 'p-invalid': errors.username }"
             autocomplete="username"
             required
           />
-          <div v-if="errors.usernameOrEmail" class="form-error">{{ errors.usernameOrEmail }}</div>
+          <div v-if="errors.username" class="form-error">{{ errors.username }}</div>
         </div>
 
         <!-- Password Field -->

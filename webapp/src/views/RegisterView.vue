@@ -8,7 +8,6 @@ const router = useRouter();
 
 // Form data
 const formData = ref({
-  email: '',
   username: '',
   password: '',
   confirmPassword: ''
@@ -22,8 +21,7 @@ const showConfirmPassword = ref(false);
 
 // Computed properties
 const isFormValid = computed(() => {
-  return formData.value.email.trim() && 
-         formData.value.username.trim() && 
+  return formData.value.username.trim() && 
          formData.value.password.trim() &&
          formData.value.confirmPassword.trim();
 });
@@ -43,7 +41,6 @@ const handleSubmit = async (event: Event) => {
   try {
     // Simulate API call for registration
     const registerData = {
-      email: formData.value.email.trim(),
       username: formData.value.username.trim(),
       password: formData.value.password
     };
@@ -63,7 +60,6 @@ const handleSubmit = async (event: Event) => {
 
 const handleReset = () => {
   formData.value = {
-    email: '',
     username: '',
     password: '',
     confirmPassword: ''
@@ -73,13 +69,6 @@ const handleReset = () => {
 
 const validateForm = () => {
   errors.value = {};
-
-  // Email validation
-  if (!formData.value.email.trim()) {
-    errors.value.email = 'Email is required';
-  } else if (!isValidEmail(formData.value.email.trim())) {
-    errors.value.email = 'Please enter a valid email address';
-  }
 
   // Username validation
   if (!formData.value.username.trim()) {
@@ -105,11 +94,6 @@ const validateForm = () => {
   } else if (formData.value.password !== formData.value.confirmPassword) {
     errors.value.confirmPassword = 'Passwords do not match';
   }
-};
-
-const isValidEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
 };
 
 const togglePasswordVisibility = () => {
@@ -140,22 +124,6 @@ const handleCancel = () => {
         <!-- Error display -->
         <div v-if="errors.submit" class="form-section form-section--before">
           <div class="form-error">{{ errors.submit }}</div>
-        </div>
-
-        <!-- Email Field -->
-        <div class="form-field">
-          <label class="form-label form-label--required" for="email">Email Address</label>
-          <InputText
-            id="email"
-            v-model="formData.email"
-            type="email"
-            class="form-input"
-            placeholder="Enter your email address"
-            :class="{ 'p-invalid': errors.email }"
-            autocomplete="email"
-            required
-          />
-          <div v-if="errors.email" class="form-error">{{ errors.email }}</div>
         </div>
 
         <!-- Username Field -->
