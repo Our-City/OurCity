@@ -12,7 +12,7 @@ public class PostVote
 
     public required VoteType VoteType { get; set; }
 
-    public required DateTime CreatedAt { get; set; }
+    public required DateTime VotedAt { get; set; }
     
     // Navigation Property
     public User? Voter { get; set; }
