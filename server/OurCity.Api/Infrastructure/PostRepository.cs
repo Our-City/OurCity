@@ -6,7 +6,9 @@ namespace OurCity.Api.Infrastructure;
 public interface IPostRepository
 {
     Task<IEnumerable<Post>> GetAllPosts();
-    Task<Post?> GetPostById(Guid postId);
+    Task<Post?> GetFatPostById(Guid postId);
+    Task<Post?> GetSlimPostbyId(Guid postId);
+    Task<Post?> GetPostWithVoteById(Guid postId);
     Task<Post> CreatePost(Post post);
     Task SaveChangesAsync(); 
 }
@@ -29,12 +31,25 @@ public class PostRepository : IPostRepository
             .ToListAsync();
     }
 
-    public async Task<Post?> GetPostById(Guid postId)
+    public async Task<Post?> GetFatPostById(Guid postId)
     {
         return await _appDbContext
             .Posts.Include(p => p.Votes)
             .Include(p => p.Comments)
             .Include(p => p.Tags)
+            .FirstOrDefaultAsync(p => p.Id == postId);
+    }
+
+    public async Task<Post?> GetSlimPostbyId(Guid postId)
+    {
+        return await _appDbContext
+            .Posts.FirstOrDefaultAsync(p => p.Id == postId);
+    }
+
+    public async Task<Post?> GetPostWithVoteById(Guid postId)
+    {
+        return await _appDbContext
+            .Posts.Include(p => p.Votes)
             .FirstOrDefaultAsync(p => p.Id == postId);
     }
 

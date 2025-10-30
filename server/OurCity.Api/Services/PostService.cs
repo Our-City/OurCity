@@ -37,7 +37,7 @@ public class PostService : IPostService
 
     public async Task<Result<PostResponseDto>> GetPostById(Guid? userId, Guid postId)
     {
-        var post = await _postRepository.GetPostById(postId);
+        var post = await _postRepository.GetFatPostById(postId);
 
         if (post == null)
         {
@@ -63,7 +63,7 @@ public class PostService : IPostService
         PostUpdateRequestDto postUpdateRequestDto
     )
     {
-        var post = await _postRepository.GetPostById(postId);
+        var post = await _postRepository.GetFatPostById(postId);
 
         if (post == null)
         {
@@ -87,7 +87,7 @@ public class PostService : IPostService
 
     public async Task<Result<PostResponseDto>> VotePost(Guid userId, Guid postId, PostVoteRequestDto postVoteRequestDto)
     {
-        var post = await _postRepository.GetPostById(postId);
+        var post = await _postRepository.GetPostWithVoteById(postId);
 
         if (post == null)
         {
@@ -126,7 +126,7 @@ public class PostService : IPostService
 
     public async Task<Result<PostResponseDto>> DeletePost(Guid userId, Guid postId)
     {
-        var post = await _postRepository.GetPostById(postId);
+        var post = await _postRepository.GetSlimPostbyId(postId);
 
         if (post == null)
         {
