@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos;
 using OurCity.Api.Common.Dtos.Post;
 using OurCity.Api.Extensions;
@@ -100,7 +101,7 @@ public class PostController : ControllerBase
         if (!res.IsSuccess)
         {
             return Problem(
-                statusCode: (res.Error != null && res.Error.Equals("Resource not found"))
+                statusCode: (res.Error != null && res.Error.Equals(ErrorMessages.PostNotFound))
                     ? StatusCodes.Status404NotFound
                     : StatusCodes.Status403Forbidden,
                 detail: res.Error
@@ -164,7 +165,7 @@ public class PostController : ControllerBase
         if (!res.IsSuccess)
         {
             return Problem(
-                statusCode: (res.Error != null && res.Error.Equals("Resource not found"))
+                statusCode: (res.Error != null && res.Error.Equals(ErrorMessages.PostNotFound))
                     ? StatusCodes.Status404NotFound
                     : StatusCodes.Status403Forbidden,
                 detail: res.Error

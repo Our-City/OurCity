@@ -55,7 +55,7 @@ public class PostService : IPostService
 
         if (post == null)
         {
-            return Result<PostResponseDto>.Failure("Resource not found");
+            return Result<PostResponseDto>.Failure(ErrorMessages.PostNotFound);
         }
 
         return Result<PostResponseDto>.Success(post.ToDto(userId));
@@ -84,14 +84,12 @@ public class PostService : IPostService
 
         if (post == null)
         {
-            return Result<PostResponseDto>.Failure("Resource not found");
+            return Result<PostResponseDto>.Failure(ErrorMessages.PostNotFound);
         }
 
         if (userId != post.AuthorId)
         {
-            return Result<PostResponseDto>.Failure(
-                "You do not have permission to perform this action"
-            );
+            return Result<PostResponseDto>.Failure(ErrorMessages.PostUnauthorized);
         }
 
         var tags =
@@ -115,7 +113,7 @@ public class PostService : IPostService
 
         if (post == null)
         {
-            return Result<PostResponseDto>.Failure("Resource not found");
+            return Result<PostResponseDto>.Failure(ErrorMessages.PostNotFound);
         }
 
         var existingVote = await _postVoteRepository.GetVoteByPostAndUserId(postId, userId);
@@ -156,14 +154,12 @@ public class PostService : IPostService
 
         if (post == null)
         {
-            return Result<PostResponseDto>.Failure("Resource not found");
+            return Result<PostResponseDto>.Failure(ErrorMessages.PostNotFound);
         }
 
         if (userId != post.AuthorId)
         {
-            return Result<PostResponseDto>.Failure(
-                "You do not have permission to perform this action"
-            );
+            return Result<PostResponseDto>.Failure(ErrorMessages.PostUnauthorized);
         }
 
         post.IsDeleted = true;
