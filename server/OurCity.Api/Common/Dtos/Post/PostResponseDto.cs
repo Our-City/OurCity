@@ -16,6 +16,7 @@ public class PostResponseDto
     public required PostVisibility Visibility { get; set; }
     public required List<Tag> Tags { get; set; }
     public required VoteType VoteStatus { get; set; }
+    public required bool IsDeleted { get; set; }
     public required DateTime CreatedAt { get; set; }
     public required DateTime UpdatedAt { get; set; }
 }
