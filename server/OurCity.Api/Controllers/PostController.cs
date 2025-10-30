@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OurCity.Api.Common.Dtos;
 using OurCity.Api.Common.Dtos.Post;
+using OurCity.Api.Extensions;
 using OurCity.Api.Services;
 
 namespace OurCity.Api.Controllers;
@@ -18,15 +19,40 @@ public class PostController : ControllerBase
         _logger = logger;
     }
 
+    [HttpPost]
+    [EndpointSummary("Create a new post")]
+    [EndpointDescription("Creates a new post with the provided data")]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(PostResponseDto), StatusCodes.Status201Created)]
+    public async Task<IActionResult> CreatePost(
+        [FromBody] PostCreateRequestDto postCreateRequestDto
+    )
+    {
+        var userId = User.GetUserId();
+
+        if (userId == null)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status401Unauthorized,
+                detail: "User not authenticated"
+            );
+        }
+            
+        var res = await _postService.CreatePost(userId.Value, postCreateRequestDto);
+
+        return CreatedAtAction(nameof(GetPosts), new { id = res.Data?.Id }, res.Data);
+    }
+
     [HttpGet]
     [EndpointSummary("Get all posts")]
     [EndpointDescription("Gets a list of all posts")]
     [ProducesResponseType(typeof(List<PostResponseDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetPosts()
     {
-        var posts = await _postService.GetPosts();
+        var userId = User.GetUserId();
+        var res = await _postService.GetPosts(userId);
 
-        return Ok(posts);
+        return Ok(res.Data);
     }
 
     [HttpGet]
@@ -37,67 +63,18 @@ public class PostController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetPostById([FromRoute] Guid postId)
     {
-        var post = await _postService.GetPostById(postId);
+        var userId = User.GetUserId();
+        var res = await _postService.GetPostById(userId, postId);
 
-        if (!post.IsSuccess)
+        if (!res.IsSuccess)
         {
-            return NotFound(post.Error);
+            return Problem(
+                statusCode: StatusCodes.Status404NotFound,
+                detail: res.Error
+            );
         }
 
-        return Ok(post.Data);
-    }
-
-    [HttpGet]
-    [Route("{postId}/upvote/{userId}")]
-    [EndpointSummary("Get a user's upvote status for a post")]
-    [ProducesResponseType(typeof(PostUpvoteResponseDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetUserUpvoteStatus(
-        [FromRoute] Guid postId,
-        [FromRoute] Guid userId
-    )
-    {
-        var voteStatus = await _postService.GetUserUpvoteStatus(postId, userId);
-
-        if (!voteStatus.IsSuccess)
-        {
-            return NotFound(voteStatus.Error);
-        }
-
-        return Ok(voteStatus.Data);
-    }
-
-    [HttpGet]
-    [Route("{postId}/downvote/{userId}")]
-    [EndpointSummary("Get a user's downvote status for a post")]
-    [ProducesResponseType(typeof(PostDownvoteResponseDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetUserDownvoteStatus(
-        [FromRoute] Guid postId,
-        [FromRoute] Guid userId
-    )
-    {
-        var voteStatus = await _postService.GetUserDownvoteStatus(postId, userId);
-
-        if (!voteStatus.IsSuccess)
-        {
-            return NotFound(voteStatus.Error);
-        }
-
-        return Ok(voteStatus.Data);
-    }
-
-    [HttpPost]
-    [EndpointSummary("Create a new post")]
-    [EndpointDescription("Creates a new post with the provided data")]
-    [ProducesResponseType(typeof(PostResponseDto), StatusCodes.Status201Created)]
-    public async Task<IActionResult> CreatePost(
-        [FromBody] PostCreateRequestDto postCreateRequestDto
-    )
-    {
-        var post = await _postService.CreatePost(postCreateRequestDto);
-
-        return CreatedAtAction(nameof(GetPosts), new { id = post.Data?.Id }, post.Data);
+        return Ok(res.Data);
     }
 
     [HttpPut]
@@ -111,14 +88,27 @@ public class PostController : ControllerBase
         [FromBody] PostUpdateRequestDto postUpdateRequestDto
     )
     {
-        var post = await _postService.UpdatePost(postId, postUpdateRequestDto);
+        var userId = User.GetUserId();
 
-        if (!post.IsSuccess)
+        if (userId == null)
         {
-            return NotFound(post.Error);
+            return Problem(
+                statusCode: StatusCodes.Status401Unauthorized,
+                detail: "User not authenticated"
+            );
         }
 
-        return Ok(post.Data);
+        var res = await _postService.UpdatePost(userId.Value, postId, postUpdateRequestDto);
+
+        if (!res.IsSuccess)
+        {
+            return Problem(
+                statusCode: (res.Error != null && res.Error.Equals("Resource not found")) ? StatusCodes.Status404NotFound : StatusCodes.Status403Forbidden,
+                detail: res.Error
+            );
+        }
+
+        return Ok(res.Data);
     }
 
     [HttpPut]
@@ -132,18 +122,31 @@ public class PostController : ControllerBase
         [FromBody] PostVoteRequestDto postVoteRequestDto
     )
     {
-        var post = await _postService.VotePost(
-            postId,
-            postVoteRequestDto.UserId,
-            postVoteRequestDto.VoteType
-        );
+        var userId = User.GetUserId();
 
-        if (!post.IsSuccess)
+        if (userId == null)
         {
-            return NotFound(post.Error);
+            return Problem(
+                statusCode: StatusCodes.Status401Unauthorized,
+                detail: "User not authenticated"
+            );
         }
 
-        return Ok(post.Data);
+        var res = await _postService.VotePost(
+            userId.Value,
+            postId,
+            postVoteRequestDto
+        );
+
+        if (!res.IsSuccess)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status404NotFound,
+                detail: res.Error
+            );
+        }
+
+        return Ok(res.Data);
     }
 
     [HttpDelete]
@@ -154,13 +157,26 @@ public class PostController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeletePost([FromRoute] Guid postId)
     {
-        var post = await _postService.DeletePost(postId);
+        var userId = User.GetUserId(); 
 
-        if (!post.IsSuccess)
+        if (userId == null)
         {
-            return NotFound(post.Error);
+            return Problem(
+                statusCode: StatusCodes.Status401Unauthorized,
+                detail: "User not authenticated"
+            );
         }
 
-        return Ok(post.Data);
+        var res = await _postService.DeletePost(userId.Value, postId);
+
+        if (!res.IsSuccess)
+        {
+            return Problem(
+                statusCode: (res.Error != null && res.Error.Equals("Resource not found")) ? StatusCodes.Status404NotFound : StatusCodes.Status403Forbidden,
+                detail: res.Error
+            );
+        }
+
+        return Ok(res.Data);
     }
 }

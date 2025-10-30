@@ -8,8 +8,7 @@ public interface IPostRepository
     Task<IEnumerable<Post>> GetAllPosts();
     Task<Post?> GetPostById(Guid postId);
     Task<Post> CreatePost(Post post);
-    Task<Post> UpdatePost(Post post);
-    Task<Post> DeletePost(Post post);
+    Task SaveChangesAsync(); 
 }
 
 public class PostRepository : IPostRepository
@@ -24,16 +23,18 @@ public class PostRepository : IPostRepository
     public async Task<IEnumerable<Post>> GetAllPosts()
     {
         return await _appDbContext
-            .Posts.Include(p => p.Images)
+            .Posts.Include(p => p.Votes)
             .Include(p => p.Comments)
+            .Include(p => p.Tags)
             .ToListAsync();
     }
 
     public async Task<Post?> GetPostById(Guid postId)
     {
         return await _appDbContext
-            .Posts.Include(p => p.Images)
+            .Posts.Include(p => p.Votes)
             .Include(p => p.Comments)
+            .Include(p => p.Tags)
             .FirstOrDefaultAsync(p => p.Id == postId);
     }
 
@@ -44,17 +45,8 @@ public class PostRepository : IPostRepository
         return post;
     }
 
-    public async Task<Post> UpdatePost(Post post)
+    public async Task SaveChangesAsync()
     {
-        _appDbContext.Posts.Update(post);
-        await _appDbContext.SaveChangesAsync();
-        return post;
-    }
-
-    public async Task<Post> DeletePost(Post post)
-    {
-        _appDbContext.Posts.Remove(post);
-        await _appDbContext.SaveChangesAsync();
-        return post;
+        await _appDbContext.SaveChangesAsync(); 
     }
 }
