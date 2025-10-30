@@ -68,7 +68,6 @@ public static class PostMappings
         existingPost.Description = postUpdateRequestDto.Description ?? existingPost.Description;
         existingPost.Location = postUpdateRequestDto.Location ?? existingPost.Location;
         existingPost.Tags = tags ?? existingPost.Tags;
-        existingPost.Visisbility = postUpdateRequestDto.Visibility ?? existingPost.Visisbility;
         existingPost.UpdatedAt = DateTime.UtcNow;
 
         return existingPost;

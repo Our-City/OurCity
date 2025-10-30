@@ -15,6 +15,4 @@ public class PostUpdateRequestDto
     public string? Location { get; set; }
 
     public List<Guid>? TagIds { get; set; }
-
-    public PostVisibility? Visibility { get; set; }
 }
