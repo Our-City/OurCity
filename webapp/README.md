@@ -37,19 +37,54 @@ Configuration is done through .env
 
 ### Production Environment
 
-1. (Re)Build image, and spin up Docker container in the background
+**Recommended: Use the Docker image from DockerHub built by our CD pipeline.**
+
+1. Pull the latest frontend image from DockerHub:
     ```sh
-    docker compose -f docker-compose.prod.yml up -d --build
+    docker pull itsmannpatel/ourcity-frontend:<TAG>
+    ```
+    Replace `<TAG>` with the latest image tag (e.g., commit SHA ).
+
+2. Update `docker-compose.prod.yml` to use the correct image tag.
+
+3. Navigate to the webapp dir and start the frontend container:
+    ```sh
+    docker compose -f docker-compose.prod.yml up -d
     ```
 
+4. The webapp should be accessible at [http://localhost](http://localhost) (maps to port 80).
 
-2. Webapp should be accessible at http://localhost (maps to port 80)
-
-
-3. To clean up the Docker container
+5. To clean up the Docker container:
     ```sh
     docker compose -f docker-compose.prod.yml down
     ```
+
+**Note:**  
+You do not need to build the images locally for production.  
+The docker-compose.prod file is setup to use the images from DockerHub for consistency with the tested and deployed code.
+
+## Continuous Deployment (CD)
+
+We use GitHub Actions to automate building and publishing Docker images for the frontend.
+
+- **Images are built and pushed to DockerHub** on manual workflow trigger.
+- **Image tags** use the Git commit SHA for traceability.
+
+### How to trigger CD
+
+1. Go to GitHub → Actions → CD → "Run workflow" (manual trigger).
+2. The workflow will build and push:
+    - Frontend: `itsmannpatel/ourcity-frontend:<tag>`
+
+### How to deploy
+
+1. Update `docker-compose.prod.yml` to use the correct image tag.
+2. From the `/webapp` directory, run:
+    ```sh
+    docker compose -f docker-compose.prod.yml up -d
+    ```
+
+See `.github/workflows/cd.yml` for the workflow definition.
 
 ## Running app locally on machine
 

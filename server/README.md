@@ -50,22 +50,57 @@
 
 API documentation is not available for production. 
 
-1. (Re)Build image, and spin up .NET API and Postgres Docker containers in the background
+**Recommended: Use the Docker images from DockerHub built by our CD pipeline.**
+
+1. Pull the latest backend and migration images from DockerHub:
     ```sh
-    docker compose -f docker-compose.prod.yml up -d --build
+    docker pull itsmannpatel/ourcity-backend:<TAG>
+    docker pull itsmannpatel/ourcity-migrate:<TAG>
+    ```
+    Replace `<TAG>` with the latest image tag (e.g., commit SHA).
+
+2. Update `docker-compose.prod.yml` to use the correct image tags for backend and migration.
+
+3. Navigate to the server dir and start the backend, migration, and database containers using the following command:
+    ```sh
+    docker compose -f docker-compose.prod.yml --profile migrate up -d
     ```
 
-2. Run migrations
-    ```sh
-    docker compose -f docker-compose.prod.yml --profile migrate up ourcity.migrate.prod --build
-    ```
-    the server setup is completed here. 
+4. Test API at this endpoint[http://localhost:9000/Posts](http://localhost:9000).
 
-3. To clean up the Docker containers
+5. To clean up the Docker containers:
     ```sh
     docker compose -f docker-compose.prod.yml down
     ```
 
+**Note:**  
+You do not need to build the images locally for production.  
+The docker-compose.prod file is setup to use the images from DockerHub for consistency with the tested and deployed code.
+
+
+## Continuous Deployment (CD)
+
+We use GitHub Actions to automate building and publishing Docker images for the backend and migration runner.
+
+- **Images are built and pushed to DockerHub** on manual workflow trigger.
+- **Image tags** use the Git commit SHA for traceability.
+
+### How to trigger CD
+
+1. Go to GitHub → Actions → CD → "Run workflow" (manual trigger).
+2. The workflow will build and push:
+    - Backend: `itsmannpatel/ourcity-backend:<tag>`
+    - Migration: `itsmannpatel/ourcity-migrate:<tag>`
+
+### How to deploy
+
+1. Update `docker-compose.prod.yml` to use the correct image tags.
+2. Run:
+    ```sh
+    docker compose -f docker-compose.prod.yml --profile migrate up -d
+    ```
+
+See `.github/workflows/cd.yml` for the workflow definition.
 
 
 ## Tooling
