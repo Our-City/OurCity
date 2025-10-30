@@ -7,6 +7,7 @@ namespace OurCity.Api.Common.Enum;
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum VoteType
 {
-    Upvote,
-    Downvote,
+    Upvote = 1,
+    NoVote = 0,
+    Downvote = -1,
 }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using OurCity.Api.Infrastructure.Database;
@@ -12,9 +13,11 @@ using OurCity.Api.Infrastructure.Database;
 namespace OurCity.Api.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251030063707_FixPostVoteRelationshipWithPost")]
+    partial class FixPostVoteRelationshipWithPost
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -427,7 +430,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Comment", b =>
                 {
                     b.HasOne("OurCity.Api.Infrastructure.Database.User", "Author")
-                        .WithMany("Comments")
+                        .WithMany()
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -456,19 +459,19 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.PostVote", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.Post", "Post")
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Post", "Posts")
                         .WithMany("Votes")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("OurCity.Api.Infrastructure.Database.User", "Voter")
-                        .WithMany("PostVotes")
+                        .WithMany()
                         .HasForeignKey("VoterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Post");
+                    b.Navigation("Posts");
 
                     b.Navigation("Voter");
                 });
@@ -497,10 +500,6 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.User", b =>
                 {
-                    b.Navigation("Comments");
-
-                    b.Navigation("PostVotes");
-
                     b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618

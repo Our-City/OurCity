@@ -53,7 +53,7 @@ public class PolicyService : IPolicyService
 
     public async Task<bool> CheckCanMutateThisPost(ClaimsPrincipal user, Policy policy, Guid postId)
     {
-        var post = await _postRepository.GetPostById(postId);
+        var post = await _postRepository.GetSlimPostbyId(postId);
 
         if (post == null)
             return false;

@@ -4,10 +4,8 @@ public class Comment
 {
     public int Id { get; set; }
 
-    public Post Post { get; set; } = null!;
     public required Guid PostId { get; set; }
 
-    public User Author { get; set; } = null!;
     public required Guid AuthorId { get; set; }
 
     public required string Content { get; set; }
@@ -21,4 +19,9 @@ public class Comment
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }
+
+    // Navigation Properties
+    public Post? Post { get; set; }
+
+    public User? Author { get; set; }
 }

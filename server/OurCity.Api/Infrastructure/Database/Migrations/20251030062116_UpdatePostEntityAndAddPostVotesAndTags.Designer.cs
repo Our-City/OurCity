@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using OurCity.Api.Infrastructure.Database;
@@ -12,9 +13,11 @@ using OurCity.Api.Infrastructure.Database;
 namespace OurCity.Api.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251030062116_UpdatePostEntityAndAddPostVotesAndTags")]
+    partial class UpdatePostEntityAndAddPostVotesAndTags
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -229,8 +232,6 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PostId");
-
                     b.HasIndex("VoterId");
 
                     b.ToTable("PostVotes");
@@ -358,6 +359,21 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.ToTable("AspNetRoles", (string)null);
                 });
 
+            modelBuilder.Entity("PostPostVote", b =>
+                {
+                    b.Property<Guid>("PostsId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("VotesId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("PostsId", "VotesId");
+
+                    b.HasIndex("VotesId");
+
+                    b.ToTable("PostPostVote");
+                });
+
             modelBuilder.Entity("PostTag", b =>
                 {
                     b.Property<Guid>("PostsId")
@@ -427,7 +443,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Comment", b =>
                 {
                     b.HasOne("OurCity.Api.Infrastructure.Database.User", "Author")
-                        .WithMany("Comments")
+                        .WithMany()
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -456,21 +472,28 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.PostVote", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.Post", "Post")
-                        .WithMany("Votes")
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("OurCity.Api.Infrastructure.Database.User", "Voter")
-                        .WithMany("PostVotes")
+                        .WithMany()
                         .HasForeignKey("VoterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Post");
-
                     b.Navigation("Voter");
+                });
+
+            modelBuilder.Entity("PostPostVote", b =>
+                {
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Post", null)
+                        .WithMany()
+                        .HasForeignKey("PostsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OurCity.Api.Infrastructure.Database.PostVote", null)
+                        .WithMany()
+                        .HasForeignKey("VotesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("PostTag", b =>
@@ -491,16 +514,10 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Post", b =>
                 {
                     b.Navigation("Comments");
-
-                    b.Navigation("Votes");
                 });
 
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.User", b =>
                 {
-                    b.Navigation("Comments");
-
-                    b.Navigation("PostVotes");
-
                     b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618
