@@ -17,15 +17,31 @@ const isSubmitting = ref(false);
 const errors = ref<Record<string, string>>({});
 const showPassword = ref(false);
 
+const usernameTouched = ref(false);
+const passwordTouched = ref(false);
+
 // Computed properties
 const isFormValid = computed(() => {
   return formData.value.username.trim() && 
          formData.value.password.trim();
 });
 
+// Computed properties for showing errors only after touch
+const showUsernameError = computed(() => {
+  return usernameTouched.value && errors.value.username;
+});
+
+const showPasswordError = computed(() => {
+  return passwordTouched.value && errors.value.password;
+});
+
 // Form handlers
 const handleSubmit = async (event: Event) => {
   event.preventDefault();
+  
+  // Mark all fields as touched on submit
+  usernameTouched.value = true;
+  passwordTouched.value = true;
   
   if (!isFormValid.value) {
     validateForm();
@@ -61,6 +77,8 @@ const handleReset = () => {
     password: ''
   };
   errors.value = {};
+  usernameTouched.value = false;
+  passwordTouched.value = false;
 };
 
 const validateForm = () => {
@@ -122,11 +140,11 @@ const handleCancel = () => {
             type="text"
             class="form-input"
             placeholder="Enter your username"
-            :class="{ 'p-invalid': errors.username }"
+            :class="{ 'p-invalid': showUsernameError }"
             autocomplete="username"
-            required
+            @blur="usernameTouched = true; validateForm();"
           />
-          <div v-if="errors.username" class="form-error">{{ errors.username }}</div>
+          <div v-if="showUsernameError" class="form-error">{{ errors.username }}</div>
         </div>
 
         <!-- Password Field -->
@@ -138,10 +156,10 @@ const handleCancel = () => {
               v-model="formData.password"
               :type="showPassword ? 'text' : 'password'"
               class="form-input password-input"
-              :class="{ 'invalid': errors.password }"
+              :class="{ 'invalid': showPasswordError }"
               placeholder="Enter your password"
               autocomplete="current-password"
-              required
+              @blur="passwordTouched = true; validateForm();"
             />
             <button
               type="button"
@@ -152,7 +170,7 @@ const handleCancel = () => {
               <i :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
             </button>
           </div>
-          <div v-if="errors.password" class="form-error">{{ errors.password }}</div>
+          <div v-if="showPasswordError" class="form-error">{{ errors.password }}</div>
         </div>
 
         <!-- Additional Options -->

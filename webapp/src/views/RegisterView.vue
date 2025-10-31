@@ -19,6 +19,10 @@ const errors = ref<Record<string, string>>({});
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 
+const usernameTouched = ref(false);
+const passwordTouched = ref(false);
+const confirmPasswordTouched = ref(false);
+
 // Computed properties
 const isFormValid = computed(() => {
   return formData.value.username.trim() && 
@@ -26,9 +30,27 @@ const isFormValid = computed(() => {
          formData.value.confirmPassword.trim();
 });
 
+// Computed properties for showing errors only after touch
+const showUsernameError = computed(() => {
+  return usernameTouched.value && errors.value.username;
+});
+
+const showPasswordError = computed(() => {
+  return passwordTouched.value && errors.value.password;
+});
+
+const showConfirmPasswordError = computed(() => {
+  return confirmPasswordTouched.value && errors.value.confirmPassword;
+});
+
 // Form handlers
 const handleSubmit = async (event: Event) => {
   event.preventDefault();
+  
+  // Mark all fields as touched on submit
+  usernameTouched.value = true;
+  passwordTouched.value = true;
+  confirmPasswordTouched.value = true;
   
   if (!isFormValid.value) {
     validateForm();
@@ -65,6 +87,9 @@ const handleReset = () => {
     confirmPassword: ''
   };
   errors.value = {};
+  usernameTouched.value = false;
+  passwordTouched.value = false;
+  confirmPasswordTouched.value = false;
 };
 
 const validateForm = () => {
@@ -134,12 +159,12 @@ const handleCancel = () => {
             v-model="formData.username"
             class="form-input"
             placeholder="Enter your username"
-            :class="{ 'p-invalid': errors.username }"
+            :class="{ 'p-invalid': showUsernameError }"
             autocomplete="username"
             maxlength="20"
-            required
+            @blur="usernameTouched = true; validateForm();"
           />
-          <div v-if="errors.username" class="form-error">{{ errors.username }}</div>
+          <div v-if="showUsernameError" class="form-error">{{ errors.username }}</div>
           <div class="form-help">{{ formData.username.length }}/20 characters</div>
         </div>
 
@@ -152,10 +177,10 @@ const handleCancel = () => {
               v-model="formData.password"
               :type="showPassword ? 'text' : 'password'"
               class="form-input password-input"
-              :class="{ 'invalid': errors.password }"
+              :class="{ 'invalid': showPasswordError }"
               placeholder="Enter your password"
               autocomplete="new-password"
-              required
+              @blur="passwordTouched = true; validateForm();"
             />
             <button
               type="button"
@@ -166,7 +191,7 @@ const handleCancel = () => {
               <i :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
             </button>
           </div>
-          <div v-if="errors.password" class="form-error">{{ errors.password }}</div>
+          <div v-if="showPasswordError" class="form-error">{{ errors.password }}</div>
         </div>
 
         <!-- Confirm Password Field -->
@@ -178,10 +203,10 @@ const handleCancel = () => {
               v-model="formData.confirmPassword"
               :type="showConfirmPassword ? 'text' : 'password'"
               class="form-input password-input"
-              :class="{ 'invalid': errors.confirmPassword }"
+              :class="{ 'invalid': showConfirmPasswordError }"
               placeholder="Confirm your password"
               autocomplete="new-password"
-              required
+              @blur="confirmPasswordTouched = true; validateForm();"
             />
             <button
               type="button"
@@ -192,7 +217,7 @@ const handleCancel = () => {
               <i :class="showConfirmPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
             </button>
           </div>
-          <div v-if="errors.confirmPassword" class="form-error">{{ errors.confirmPassword }}</div>
+          <div v-if="showConfirmPasswordError" class="form-error">{{ errors.confirmPassword }}</div>
         </div>
 
         <!-- Form Actions -->
