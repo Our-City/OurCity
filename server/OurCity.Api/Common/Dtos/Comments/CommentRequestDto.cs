@@ -2,11 +2,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OurCity.Api.Common.Dtos.Comments;
 
-public class CommentCreateRequestDto
+public class CommentRequestDto
 {
-    [Required(ErrorMessage = "AuthorId is required")]
-    public required Guid AuthorId { get; set; }
-
     [Required(ErrorMessage = "Content is required")]
+    [StringLength(500, ErrorMessage = "Comment cannot exceed 500 characters")]
     public required string Content { get; set; }
 }
