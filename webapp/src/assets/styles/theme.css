@@ -15,5 +15,12 @@
   --positive-color:#10B981;
   --negative-color:#F87171;
 
+  /* Link colors */
+  --link-color:#0265C2;
+  --link-color-hover:#025BB5;
+
+  /* Error/validation color */
+  --error-color:#F87171;
+
   --test-color:#fb00ff;
 }

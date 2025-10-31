@@ -9,7 +9,6 @@ import { usePostFilters } from "@/composables/usePostFilters";
 const router = useRouter();
 const searchQuery = ref("");
 
-const loggedIn = ref(false);
 const { reset } = usePostFilters();
 
 function goToHome(): void {
@@ -17,26 +16,29 @@ function goToHome(): void {
     router.push("/");
 }
 
-function isLoggedIn(): boolean {
-  return loggedIn.value;
-}
-
 function handleLogin(): void {
-  // router.push("/login");
-  loggedIn.value = true;
+  router.push("/login");
 }
 
 function handleSignUp(): void {
-  // router.push("/signup");
+  router.push("/register");
 }
 
 function handleLogout(): void {
-  // router.push("/logout");
-  loggedIn.value = false;
+  router.push("/");
 }
 
 function handleViewProfile(): void {
   router.push("/profile");
+}
+
+function handleCreatePost(): void {
+  router.push("/create-post");
+}
+
+function isLoggedIn(): boolean {
+  // Replace with actual authentication check
+  return false;
 }
 </script>
 
@@ -64,6 +66,7 @@ function handleViewProfile(): void {
     <template #end>
       <button v-if="!isLoggedIn()" class="login-button" @click="handleLogin">Login</button>
       <button v-if="!isLoggedIn()" class="signup-button" @click="handleSignUp">Sign Up</button>
+      <button v-if="isLoggedIn()" class="create-post-button" @click="handleCreatePost"><i class="pi pi-plus"></i> Create Post</button>
       <Dropdown 
         v-if="isLoggedIn()"
         button-class="account-button"

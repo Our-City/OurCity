@@ -35,6 +35,12 @@
         <button class="nearby-button" @click="reset(); handleSort('nearby')"><i class="pi pi-map-marker"></i> Nearby</button>
         <button class="recreational-button" @click="reset(); handleFilter('recreational')"><i class="pi pi-sun"></i> Recreational</button>
         <button class="infrastructure-button" @click="reset(); handleFilter('infrastructure')"><i class="pi pi-building"></i> Infrastructure</button>
+        
+        <div class="sidebar-divider"></div>
+        
+        <a href="https://github.com/Our-City/OurCity" target="_blank" rel="noopener noreferrer" class="github-link">
+            <i class="pi pi-github"></i> Visit on GitHub
+        </a>
     </div>
 </template>
 
@@ -56,5 +62,37 @@
         text-align: left;
         display: flex;
         gap: 0.7rem;
+    }
+
+    .sidebar-divider {
+        width: 100%;
+        height: 1px;
+        background-color: var(--neutral-color);
+        margin: 1rem 0;
+    }
+
+    .github-link {
+        width: 100%;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        background: var(--primary-background-color);
+        color: var(--primary-text-color);
+        border: none;
+        border-radius: 0.75rem;
+        padding: 0.5rem 1rem;
+        font-size: 1.25rem;
+        transition: background 0.2s, color 0.2s;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .github-link:hover {
+        background: var(--primary-background-color-hover);
+    }
+
+    .github-link i {
+        font-size: 1rem;
     }
 </style>
