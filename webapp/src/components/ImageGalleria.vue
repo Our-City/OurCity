@@ -80,7 +80,6 @@ function closeImageModal() {
 .post-image-container {
   display: flex;
   flex-direction: column;
-  margin-bottom: 1rem;
   justify-content: center;
   align-items: center;
   width: 100%;

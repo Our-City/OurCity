@@ -57,22 +57,22 @@ function downvote() {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
-  color: var(--subtle-text-color) !important;
+  color: var(--primary-text-color) !important;
 }
 .vote-btn.p-button .pi {
   font-size: 0.9rem;
 }
 .vote-btn.p-button:hover {
-  color: var(--text-color) !important;
+  color: var(--primary-text-color) !important;
   transform: translateY(-1px);
 }
 
 .vote-btn.upvote.p-button:hover {
-  color: var(--secondary-color) !important;
+  color: var(--positive-color) !important;
 }
 
 .vote-btn.downvote.p-button:hover {
-  color: var(--danger-color) !important;
+  color: var(--negative-color) !important;
 }
 .vote-count {
   font-weight: bold;

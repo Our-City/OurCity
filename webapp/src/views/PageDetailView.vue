@@ -2,9 +2,14 @@
 import { useRouter } from "vue-router"; 
 import { ref, onMounted } from "vue";
 import PageHeader from "@/components/PageHeader.vue";
+import SideBar from "@/components/SideBar.vue";
 import ImageGalleria from "@/components/ImageGalleria.vue";
+import VoteBox from "@/components/VoteBox.vue";
+import CommentList from "@/components/CommentList.vue";
+import { mockComments } from "@/data/mockData.ts";
 
 const images = ref();
+const comments = ref(mockComments);
 
 onMounted(() => {
   images.value = [
@@ -38,30 +43,48 @@ onMounted(() => {
   </div>
   <div class="post-detail-layout">
     <div class="side-bar">
-      Temporary Sidebar Placeholder 
+        <SideBar view="home"/>
     </div>
     <div class="post-detail-body">
       <div class="post-detail-content-layout">
-        <div class="post-list">
+        <div class="post-content">
+          <div class="post-card">
+            <div class="post-tags">
+              Tags Placeholder
+            </div>
+            <h1 class="post-title">
+              Exploring the City Streets
+            </h1>
+            <div class="post-author">
+              @username · 6 days ago
+            </div>
 
-          <div class="post-tags">
-            Tags Placeholder
-          </div>
-          <h1 class="post-title">
-            Exploring the City Streets
-          </h1>
-          <div class="post-author-date">
-            @a_real_prof • 6 days ago
-          </div>
+            <div class="post-images">
+              <div v-if="images" class="post-images">
+                <ImageGalleria :images="images" />
+              </div>
+            </div>
 
-          <div v-if="images" class="post-images">
-            <ImageGalleria :images="images" />
+            <div class="post-description">
+              Post description 
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum mattis vehicula sagittis. Nunc ut suscipit justo. Praesent ut enim vel elit fringilla iaculis quis at est. Nullam augue nunc, auctor eget dolor quis, sodales vehicula erat. In hac habitasse platea dictumst. Curabitur id diam a est lobortis sollicitudin eget eget dui. Praesent mattis ullamcorper purus a pellentesque. Phasellus quis risus ut ligula hendrerit finibus. Pellentesque interdum ligula nec egestas varius. Fusce erat nibh, suscipit et aliquam nec, ornare ac lectus. Fusce eu erat scelerisque, luctus ante a, volutpat leo. Donec congue nibh odio, eget viverra odio commodo ac.
+              Fusce eleifend tincidunt convallis. Suspendisse potenti. Curabitur molestie dolor ac suscipit consequat. Proin eu lacus nec tortor sodales semper. Nulla diam tellus, posuere quis lectus id, malesuada rhoncus tellus. Duis libero metus, mollis sed aliquam rhoncus, suscipit eu dui. Aliquam vel elit porttitor diam bibendum rutrum. Nam posuere purus ligula, sed fermentum sapien condimentum non. Aenean rutrum sagittis eros, at dapibus augue ullamcorper vitae. Cras porttitor vulputate erat non faucibus. Nunc volutpat, augue fringilla commodo aliquam, elit neque fermentum dolor, tempus tempus nisi odio sed ipsum. 
+            </div>
+            <div class="post-footer">
+              <div class="post-voting">
+                <VoteBox :votes="318"/>
+              </div>
+            </div>
           </div>
-
-          <div class="post-description">
-            I had so much fun last weekend around Downtown! I don't really understand why people are always saying that there's nothing to do in Winnipeg. Especially in the Exchange district, I feel like I could literally just spend hours walking around and trying new things.
+          <div class="comment-card">
+            <h1 class="comment-header">
+              Comments ({{ comments.length }})
+            </h1>
+            <div class="comment-input">
+              
+            </div>
+            <CommentList :props="comments" />
           </div>
-
         </div>
         <div class="map-overview">
           Map Overview Coming Soon
@@ -78,44 +101,50 @@ onMounted(() => {
 .post-detail-layout {
   display: flex; 
   height: 100vh;
-}
-
-.side-bar {
-  display: flex; 
-  justify-content: center;
-  align-items: center; 
-  width: 20rem; 
-  height: 100%; 
-  background: var(--primary-background-color); 
-  border: 0.1rem solid var(--border-color);
+  overflow: hidden;
 }
 
 .post-detail-body {
   flex: 1;
-  background: var(--primary-background-color);
+  background: var(--secondary-background-color);
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .post-detail-content-layout {
   display: flex; 
   gap: 1rem;
   margin: 1rem 1.5rem 1rem 1rem;
+  padding: 1rem 0 0 1rem;
 }
 
-.post-list {
+.post-content {
+  display: flex; 
+  flex: 1;
+  flex-direction: column;
+}
+
+.post-card {
   border-radius: 1rem;
   width: 100%;
+  background: var(--primary-background-color);
+  border: 0.1rem solid var(--border-color);
+  padding: 4rem 4rem;
 }
 
 .post-tags {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
+  color: var(--tertiary-text-color);
 }
 
 .post-title {
-  font-size: 4rem;
+  font-size: 3rem;
 }
 
-.post-author-date {
-  font-size: 1.5rem;
+.post-author {
+  font-size: 1.25rem;
+  color: var(--tertiary-text-color);
 }
 
 .post-images {
@@ -125,12 +154,35 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 1rem 0;
-  padding: 1rem 0;
+  padding: 0 2rem;
 }
 
 .post-description {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.post-footer {
+  display: flex; 
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.comment-card {
+  border-radius: 1rem;
+  width: 100%;
+  background: var(--primary-background-color);
+  border: 0.1rem solid var(--border-color);
+  margin-top: 2rem;
+  padding: 2rem 2rem;
+}
+
+.comment-header {
+  padding: 2rem 0 0 2rem;
+}
+
+.comment-input {
+
 }
 
 .map-overview {
@@ -139,7 +191,7 @@ onMounted(() => {
   justify-content: center;
   align-items: center; 
   gap: 0.5rem;
-  width: 40rem; 
+  width: 30rem; 
   height: 65rem; 
   background: var(--primary-background-color); 
   border: 0.1rem solid var(--border-color);

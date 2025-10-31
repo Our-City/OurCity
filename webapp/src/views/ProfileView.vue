@@ -5,6 +5,7 @@ import PostList from "@/components/PostList.vue";
 import { mockPosts } from "@/data/mockData.ts";
 import ProfileHeader from "@/components/profile/ProfileHeader.vue";
 import ProfileToolbar from "@/components/profile/ProfileToolbar.vue";
+import SideBar from "@/components/SideBar.vue";
 
 const posts = ref(mockPosts);
 
@@ -16,15 +17,13 @@ const posts = ref(mockPosts);
       <PageHeader />
     </div>
     <div class="profile-page-layout">
-      <div class="side-bar">
-        Temporary Sidebar Placeholder 
-      </div>
+      <SideBar view="profile"/>
       <div class="profile-page-body">
         <ProfileHeader username="JohnDoe" />
         <ProfileToolbar />
         <div class="profile-page-content-layout">
           <div class="post-list">
-            <PostList :posts="mockPosts"/>
+            <PostList :posts="posts"/>
           </div>
         </div>
       </div>
@@ -36,15 +35,6 @@ const posts = ref(mockPosts);
 .profile-page-layout {
   display: flex; 
   height: 100vh;
-}
-
-.side-bar {
-  display: flex; 
-  justify-content: center;
-  align-items: center; 
-  width: 20rem; 
-  height: 100vw; 
-  background: var(--test-color); 
 }
 
 .profile-page-body {
