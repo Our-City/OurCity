@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -8,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace OurCity.Api.Infrastructure.Database.Migrations
 {
     /// <inheritdoc />
-    public partial class RemakeMigrations : Migration
+    public partial class RedoFreshInitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -55,6 +54,18 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Tags",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tags", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -168,12 +179,12 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    AuthorId = table.Column<Guid>(type: "uuid", nullable: false),
                     Title = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
-                    AuthorId = table.Column<Guid>(type: "uuid", nullable: false),
                     Location = table.Column<string>(type: "text", nullable: true),
-                    UpvotedUserIds = table.Column<List<Guid>>(type: "uuid[]", nullable: false),
-                    DownvotedUserIds = table.Column<List<Guid>>(type: "uuid[]", nullable: false),
+                    Visisbility = table.Column<int>(type: "integer", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -192,13 +203,10 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                 name: "Comments",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     PostId = table.Column<Guid>(type: "uuid", nullable: false),
                     AuthorId = table.Column<Guid>(type: "uuid", nullable: false),
                     Content = table.Column<string>(type: "text", nullable: false),
-                    UpvotedUserIds = table.Column<List<Guid>>(type: "uuid[]", nullable: false),
-                    DownvotedUserIds = table.Column<List<Guid>>(type: "uuid[]", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
@@ -221,23 +229,78 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Image",
+                name: "PostTag",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Url = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    PostId = table.Column<Guid>(type: "uuid", nullable: false)
+                    PostsId = table.Column<Guid>(type: "uuid", nullable: false),
+                    TagsId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Image", x => x.Id);
+                    table.PrimaryKey("PK_PostTag", x => new { x.PostsId, x.TagsId });
                     table.ForeignKey(
-                        name: "FK_Image_Posts_PostId",
+                        name: "FK_PostTag_Posts_PostsId",
+                        column: x => x.PostsId,
+                        principalTable: "Posts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PostTag_Tags_TagsId",
+                        column: x => x.TagsId,
+                        principalTable: "Tags",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PostVotes",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    PostId = table.Column<Guid>(type: "uuid", nullable: false),
+                    VoterId = table.Column<Guid>(type: "uuid", nullable: false),
+                    VoteType = table.Column<int>(type: "integer", nullable: false),
+                    VotedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PostVotes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PostVotes_AspNetUsers_VoterId",
+                        column: x => x.VoterId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PostVotes_Posts_PostId",
                         column: x => x.PostId,
                         principalTable: "Posts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CommentVotes",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CommentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    VoterId = table.Column<Guid>(type: "uuid", nullable: false),
+                    VoteType = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CommentVotes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CommentVotes_AspNetUsers_VoterId",
+                        column: x => x.VoterId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CommentVotes_Comments_CommentId",
+                        column: x => x.CommentId,
+                        principalTable: "Comments",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -290,14 +353,34 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                 column: "PostId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Image_PostId",
-                table: "Image",
-                column: "PostId");
+                name: "IX_CommentVotes_CommentId",
+                table: "CommentVotes",
+                column: "CommentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CommentVotes_VoterId",
+                table: "CommentVotes",
+                column: "VoterId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Posts_AuthorId",
                 table: "Posts",
                 column: "AuthorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PostTag_TagsId",
+                table: "PostTag",
+                column: "TagsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PostVotes_PostId",
+                table: "PostVotes",
+                column: "PostId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PostVotes_VoterId",
+                table: "PostVotes",
+                column: "VoterId");
         }
 
         /// <inheritdoc />
@@ -319,13 +402,22 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Comments");
+                name: "CommentVotes");
 
             migrationBuilder.DropTable(
-                name: "Image");
+                name: "PostTag");
+
+            migrationBuilder.DropTable(
+                name: "PostVotes");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Comments");
+
+            migrationBuilder.DropTable(
+                name: "Tags");
 
             migrationBuilder.DropTable(
                 name: "Posts");
