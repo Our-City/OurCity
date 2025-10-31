@@ -2,13 +2,14 @@
 ///  CoPilot assisted by generating boilerplate code for standard CRUD operations
 ///  and routing attributes based on common patterns in ASP.NET API development
 using Microsoft.AspNetCore.Mvc;
+using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos.Comments;
+using OurCity.Api.Extensions;
 using OurCity.Api.Services;
 
 namespace OurCity.Api.Controllers;
 
 [ApiController]
-[Route("Posts/{postId}/[controller]s")] // comments are sub-resource of posts
 public class CommentController : ControllerBase
 {
     private readonly ILogger<CommentController> _logger;
@@ -20,152 +21,154 @@ public class CommentController : ControllerBase
         _logger = logger;
     }
 
+    [HttpPost]
+    [Route("Posts/{postId}/Comments")]
+    [EndpointSummary("Create a new comment under a post")]
+    [EndpointDescription("Creates a new comment to be associated with a specific post")]
+    [ProducesResponseType(typeof(CommentResponseDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> CreateComment(
+        [FromRoute] Guid postId,
+        [FromBody] CommentRequestDto commentRequestDto
+    )
+    {
+        var userId = User.GetUserId();
+        
+        if (userId == null)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status401Unauthorized,
+                detail: "User not authenticated"
+            );
+        }
+
+        var res = await _commentService.CreateComment(userId.Value, postId, commentRequestDto);
+
+        return StatusCode(StatusCodes.Status201Created, res.Data);
+    }
+
     [HttpGet]
+    [Route("Posts/{postId}/Comments")]
     [EndpointSummary("Get all comments associated with a post")]
     [EndpointDescription("Gets a list of all comments for a specific post")]
     [ProducesResponseType(typeof(List<CommentResponseDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetComments([FromRoute] Guid postId)
     {
-        var comments = await _commentService.GetCommentsByPostId(postId);
-        return Ok(comments);
-    }
+        var userId = User.GetUserId();
+        var res = await _commentService.GetCommentsByPostId(userId, postId);
 
-    [HttpGet("{commentId}")]
-    [EndpointSummary("Get a specific comment associated with a post")]
-    [EndpointDescription("Gets a specific comment for a specific post")]
-    [ProducesResponseType(typeof(CommentResponseDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetComment([FromRoute] Guid postId, [FromRoute] int commentId)
-    {
-        var comment = await _commentService.GetCommentById(postId, commentId);
-        if (comment == null)
-            return NotFound();
-
-        return Ok(comment);
-    }
-
-    [HttpGet]
-    [Route("{commentId}/upvote/{userId}")]
-    [EndpointSummary("Get a user's upvote status for a comment")]
-    [ProducesResponseType(typeof(CommentUpvoteResponseDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetUserUpvoteStatus(
-        [FromRoute] Guid postId,
-        [FromRoute] int commentId,
-        [FromRoute] Guid userId
-    )
-    {
-        var voteStatus = await _commentService.GetUserUpvoteStatus(postId, commentId, userId);
-
-        if (!voteStatus.IsSuccess)
-        {
-            return NotFound(voteStatus.Error);
-        }
-
-        return Ok(voteStatus.Data);
-    }
-
-    [HttpGet]
-    [Route("{commentId}/downvote/{userId}")]
-    [EndpointSummary("Get a user's downvote status for a comment")]
-    [ProducesResponseType(typeof(CommentDownvoteResponseDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetUserDownvoteStatus(
-        [FromRoute] Guid postId,
-        [FromRoute] int commentId,
-        [FromRoute] Guid userId
-    )
-    {
-        var voteStatus = await _commentService.GetUserDownvoteStatus(postId, commentId, userId);
-
-        if (!voteStatus.IsSuccess)
-        {
-            return NotFound(voteStatus.Error);
-        }
-
-        return Ok(voteStatus.Data);
-    }
-
-    [HttpPost]
-    [EndpointSummary("Create a new comment under a post")]
-    [EndpointDescription("Creates a new comment to be associated with a specific post")]
-    [ProducesResponseType(typeof(CommentResponseDto), StatusCodes.Status201Created)]
-    public async Task<IActionResult> CreateComment(
-        [FromRoute] Guid postId,
-        [FromBody] CommentCreateRequestDto commentCreateRequestDto
-    )
-    {
-        var comment = await _commentService.CreateComment(postId, commentCreateRequestDto);
-
-        return CreatedAtAction(
-            nameof(GetComment),
-            new { postId = comment.Data?.PostId, commentId = comment.Data?.Id },
-            comment.Data
-        );
-    }
-
-    [HttpPut("{commentId}")]
-    [EndpointSummary("Update an existing comment")]
-    [EndpointDescription("Updates an existing comment associated with a specific post")]
-    [ProducesResponseType(typeof(CommentResponseDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> UpdateComment(
-        [FromRoute] Guid postId,
-        [FromRoute] int commentId,
-        [FromBody] CommentUpdateRequestDto commentUpdateRequestDto
-    )
-    {
-        var comment = await _commentService.UpdateComment(
-            postId,
-            commentId,
-            commentUpdateRequestDto
-        );
-
-        if (comment.Data == null)
-            return NotFound();
-
-        return Ok(comment.Data);
+        return Ok(res.Data);
     }
 
     [HttpPut]
-    [Route("{commentId}/vote")]
+    [Route("Comments/{commentId}")]
+    [EndpointSummary("Update an existing comment")]
+    [EndpointDescription("Updates an existing comment associated with a specific post")]
+    [ProducesResponseType(typeof(CommentResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> UpdateComment(
+        [FromRoute] Guid commentId,
+        [FromBody] CommentRequestDto commentRequestDto
+    )
+    {
+        var userId = User.GetUserId();
+
+        if (userId == null)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status401Unauthorized,
+                detail: "User not authenticated"
+            );
+        }
+
+        var res = await _commentService.UpdateComment(
+            userId.Value,
+            commentId,
+            commentRequestDto
+        );
+
+        if (!res.IsSuccess)
+        {
+            return Problem(
+                statusCode: (res.Error != null && res.Error.Equals(ErrorMessages.CommentNotFound))
+                    ? StatusCodes.Status404NotFound
+                    : StatusCodes.Status403Forbidden,
+                detail: res.Error
+            );
+        }
+
+        return Ok(res.Data);
+    }
+
+    [HttpPut]
+    [Route("Comments/{commentId}/vote")]
     [EndpointSummary("Vote on a comment")]
     [EndpointDescription("A user votes on a comment, either upvote or downvote")]
     [ProducesResponseType(typeof(CommentResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> VoteComment(
-        [FromRoute] Guid postId,
-        [FromRoute] int commentId,
+        [FromRoute] Guid commentId,
         [FromBody] CommentVoteRequestDto commentVoteRequestDto
     )
     {
-        var comment = await _commentService.VoteComment(
-            postId,
-            commentId,
-            commentVoteRequestDto.UserId,
-            commentVoteRequestDto.VoteType
-        );
+        var userId = User.GetUserId();
 
-        if (!comment.IsSuccess)
+        if (userId == null)
         {
-            return NotFound(comment.Error);
+            return Problem(
+                statusCode: StatusCodes.Status401Unauthorized,
+                detail: "User not authenticated"
+            );
         }
 
-        return Ok(comment.Data);
+        var res = await _commentService.VoteComment(
+            userId.Value,
+            commentId,
+            commentVoteRequestDto
+        );
+
+        if (!res.IsSuccess)
+        {
+            return Problem(statusCode: StatusCodes.Status404NotFound, detail: res.Error);
+        }
+
+        return Ok(res.Data);
     }
 
-    [HttpDelete("{commentId}")]
+    [HttpDelete("Comments/{commentId}")]
     [EndpointSummary("Delete a comment")]
     [EndpointDescription("Deletes a comment associated with a specific post")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> DeleteComment(
-        [FromRoute] Guid postId,
-        [FromRoute] int commentId
-    )
+    [ProducesResponseType(typeof(CommentResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> DeleteComment([FromRoute] Guid commentId)
     {
-        var comment = await _commentService.DeleteComment(postId, commentId);
+        var userId = User.GetUserId();
 
-        if (comment.Data == null)
-            return NotFound();
+        if (userId == null)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status401Unauthorized,
+                detail: "User not authenticated"
+            );
+        }
 
-        return Ok(comment.Data);
+        var res = await _commentService.DeleteComment(userId.Value, commentId);
+
+        if (!res.IsSuccess)
+        {
+            return Problem(
+                statusCode: (res.Error != null && res.Error.Equals(ErrorMessages.CommentNotFound))
+                    ? StatusCodes.Status404NotFound
+                    : StatusCodes.Status403Forbidden,
+                detail: res.Error
+            );
+        }
+
+        return Ok(res.Data);
     }
 }
