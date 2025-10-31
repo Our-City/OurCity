@@ -9,6 +9,7 @@ public class AppDbContext : IdentityDbContext<User, UserRole, Guid>
     public DbSet<Comment> Comments { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<PostVote> PostVotes { get; set; }
+    public DbSet<CommentVote> CommentVotes { get; set; }
     public DbSet<Tag> Tags { get; set; }
 
     public AppDbContext(DbContextOptions<AppDbContext> options)

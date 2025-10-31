@@ -32,6 +32,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<IPostVoteRepository, PostVoteRepository>();
+builder.Services.AddScoped<ICommentVoteRepository, CommentVoteRepository>();
 
 //Service
 builder.Services.AddScoped<IPostService, PostService>();
