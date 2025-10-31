@@ -15,7 +15,10 @@ public static class ErrorMessages
     // Posts
     public const string PostNotFound = "Post not found";
     public const string PostUnauthorized = "You do not have permission to modify this post";
-    public const string PostAlreadyDeleted = "This post has already been deleted";
+
+    // Comments
+    public const string CommentNotFound = "Comment not found";
+    public const string CommentUnauthorized = "You do not have permission to modify this Comment";
 
     // Tags
     public const string TagNotFound = "Tag not found";
