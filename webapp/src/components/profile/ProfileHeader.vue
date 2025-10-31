@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 interface Props {
   username?: string;
 }
+
+const router = useRouter();
 
 const props = withDefaults(defineProps<Props>(), {
   username: 'Username'
@@ -41,8 +44,8 @@ function handleKeyDown(event: KeyboardEvent) {
   }
 }
 
-function handleCreatePost() {
-  // TODO: Implement create post functionality
+function handleCreatePost(): void {
+  router.push("/create-post");
 }
 </script>
 

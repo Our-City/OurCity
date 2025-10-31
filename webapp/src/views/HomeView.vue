@@ -5,8 +5,15 @@ import PageHeader from "@/components/PageHeader.vue";
 import PostList from "@/components/PostList.vue";
 import { mockPosts } from "@/data/mockData.ts";
 import SideBar from "@/components/SideBar.vue";
+import { useRouter } from "vue-router";
 
 const posts = ref(mockPosts);
+
+const router = useRouter();
+
+function handleCreatePost(): void {
+  router.push("/create-post");
+}
 
 </script>
 
@@ -32,7 +39,7 @@ const posts = ref(mockPosts);
             </div>
           </template>
           <template #footer>
-            <button class="create-post-button">Create Post</button>
+            <button class="create-post-button" @click="handleCreatePost">Create Post</button>
           </template>
         </Card>
         <div class="home-page-content-layout">
@@ -124,7 +131,7 @@ const posts = ref(mockPosts);
   justify-content: center;
   align-items: center; 
   gap: 0.5rem;
-  width: 30rem; 
+  width: 20rem; 
   height: 65rem; 
   background: var(--primary-background-color); 
   border: 0.1rem solid var(--border-color);
