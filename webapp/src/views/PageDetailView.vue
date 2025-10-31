@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router"; 
 import { ref, onMounted } from "vue";
+import Textarea from "primevue/textarea";
 import PageHeader from "@/components/PageHeader.vue";
 import SideBar from "@/components/SideBar.vue";
 import ImageGalleria from "@/components/ImageGalleria.vue";
@@ -10,6 +11,20 @@ import { mockComments } from "@/data/mockData.ts";
 
 const images = ref();
 const comments = ref(mockComments);
+
+const commentText = ref("");
+
+function submitComment() {
+
+}
+
+function handleUpvote() {
+
+}
+
+function handleDownvote() {
+  
+}
 
 onMounted(() => {
   images.value = [
@@ -72,7 +87,7 @@ onMounted(() => {
             </div>
             <div class="post-footer">
               <div class="post-voting">
-                <VoteBox :votes="318"/>
+                <VoteBox :votes="318" @upvote="handleUpvote" @downvote="handleDownvote"/>
               </div>
             </div>
           </div>
@@ -80,8 +95,17 @@ onMounted(() => {
             <h1 class="comment-header">
               Comments ({{ comments.length }})
             </h1>
-            <div class="comment-input">
-              
+            <div class="comment-input-container">
+              <TextArea
+                class="comment-input"
+                v-model="commentText"
+                placeholder="Add your thoughts here..."
+                rows="3"
+              ></TextArea>
+              <button
+                class="comment-submit-button"
+                @click="submitComment"
+              >Submit</button>
             </div>
             <CommentList :props="comments" />
           </div>
@@ -175,14 +199,38 @@ onMounted(() => {
   border: 0.1rem solid var(--border-color);
   margin-top: 2rem;
   padding: 2rem 2rem;
+  font-size: 1.5rem;
 }
 
 .comment-header {
-  padding: 2rem 0 0 2rem;
+  padding: 2rem 2rem 0 2rem;
+  font-size: 2rem;
+}
+
+.comment-input-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .comment-input {
+  padding: 1rem;
+  margin: 1rem 2rem;
+  border-radius: 1rem;
+  resize: vertical;
+  box-sizing: border-box;
+  width: calc(100% - 4rem);
+}
 
+.comment-submit-button {
+  margin-right: 2rem;
+  color: var(--secondary-text-color);
+  background: var(--neutral-color);
+  
+}
+
+.comment-submit-button:hover {
+  background: var(--neutral-color-hover);
 }
 
 .map-overview {
