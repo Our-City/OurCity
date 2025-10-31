@@ -2,7 +2,7 @@ namespace OurCity.Api.Infrastructure.Database;
 
 public class Comment
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
     public required Guid PostId { get; set; }
 
@@ -10,11 +10,7 @@ public class Comment
 
     public required string Content { get; set; }
 
-    public List<Guid> UpvotedUserIds { get; set; } = new();
-
-    public List<Guid> DownvotedUserIds { get; set; } = new();
-
-    public bool IsDeleted { get; set; } = false;
+    public required bool IsDeleted { get; set; } = false;
 
     public DateTime CreatedAt { get; set; }
 
@@ -24,4 +20,6 @@ public class Comment
     public Post? Post { get; set; }
 
     public User? Author { get; set; }
+
+    public required List<CommentVote> Votes { get; set; } = new();
 }
