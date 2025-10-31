@@ -24,6 +24,10 @@ const formData = ref({
 const isSubmitting = ref(false);
 const errors = ref<Record<string, string>>({});
 
+const titleTouched = ref(false);
+const locationTouched = ref(false);
+const descriptionTouched = ref(false);
+
 // Available tags for multiselect
 const availableTags = ref([
   'Construction',
@@ -49,7 +53,6 @@ const availableTags = ref([
 // Computed properties
 const isFormValid = computed(() => {
   return formData.value.title.trim() && 
-         formData.value.location.trim() && 
          formData.value.description.trim();
 });
 
@@ -57,9 +60,27 @@ const imagePreviewUrls = computed(() => {
   return formData.value.images.map(file => URL.createObjectURL(file));
 });
 
+// Computed properties for showing errors only after touch
+const showTitleError = computed(() => {
+  return titleTouched.value && errors.value.title;
+});
+
+const showLocationError = computed(() => {
+  return locationTouched.value && errors.value.location;
+});
+
+const showDescriptionError = computed(() => {
+  return descriptionTouched.value && errors.value.description;
+});
+
 // Form handlers
 const handleSubmit = async (event: Event) => {
   event.preventDefault();
+  
+  // Mark all fields as touched on submit
+  titleTouched.value = true;
+  locationTouched.value = true;
+  descriptionTouched.value = true;
   
   if (!isFormValid.value) {
     validateForm();
@@ -105,6 +126,9 @@ const handleReset = () => {
     images: []
   };
   errors.value = {};
+  titleTouched.value = false;
+  locationTouched.value = false;
+  descriptionTouched.value = false;
 };
 
 const validateForm = () => {
@@ -112,10 +136,6 @@ const validateForm = () => {
 
   if (!formData.value.title.trim()) {
     errors.value.title = 'Title is required';
-  }
-
-  if (!formData.value.location.trim()) {
-    errors.value.location = 'Location is required';
   }
 
   if (!formData.value.description.trim()) {
@@ -186,28 +206,28 @@ const removeImage = (index: number) => {
                 v-model="formData.title"
                 class="form-input"
                 placeholder="Enter a descriptive title for your post"
-                :class="{ 'p-invalid': errors.title }"
+                :class="{ 'p-invalid': showTitleError }"
                 maxlength="50"
-                required
+                @blur="titleTouched = true; validateForm();"
               />
-              <div v-if="errors.title" class="form-error">{{ errors.title }}</div>
+              <div v-if="showTitleError" class="form-error">{{ errors.title }}</div>
               <div class="form-help">{{ formData.title.length }}/50 characters</div>
             </div>
 
             <!-- Location Field -->
             <div class="form-field">
-              <label class="form-label form-label--required" for="location">Location</label>
+              <label class="form-label" for="location">Location</label>
               <InputText
                 id="location"
                 v-model="formData.location"
                 class="form-input"
                 placeholder="e.g., Downtown Winnipeg, University of Manitoba"
-                :class="{ 'p-invalid': errors.location }"
+                :class="{ 'p-invalid': showLocationError }"
                 maxlength="50"
-                required
+                @blur="locationTouched = true; validateForm();"
               />
-              <div v-if="errors.location" class="form-error">{{ errors.location }}</div>
-              <div class="form-help">Where is this post? {{ formData.location.length }}/50 characters</div>
+              <div v-if="showLocationError" class="form-error">{{ errors.location }}</div>
+              <div class="form-help">Where is this post about? {{ formData.location.length }}/50 characters (optional)</div>
             </div>
 
             <!-- Description Field -->
@@ -218,12 +238,12 @@ const removeImage = (index: number) => {
                 v-model="formData.description"
                 class="form-textarea"
                 placeholder="Describe what's happening, share your thoughts, or ask a question..."
-                :class="{ 'p-invalid': errors.description }"
+                :class="{ 'p-invalid': showDescriptionError }"
                 rows="6"
                 maxlength="500"
-                required
+                @blur="descriptionTouched = true; validateForm();"
               />
-              <div v-if="errors.description" class="form-error">{{ errors.description }}</div>
+              <div v-if="showDescriptionError" class="form-error">{{ errors.description }}</div>
               <div class="form-help">{{ formData.description.length }}/500 characters</div>
             </div>
 
@@ -348,6 +368,14 @@ const removeImage = (index: number) => {
 
 :deep(.p-inputtextarea.p-invalid) {
   border-color: var(--error-color, #dc3545);
+}
+
+:deep(textarea.p-invalid) {
+  border-color: var(--error-color, #dc3545) !important;
+}
+
+.form-textarea.p-invalid {
+  border-color: var(--error-color, #dc3545) !important;
 }
 
 /* Responsive design */
