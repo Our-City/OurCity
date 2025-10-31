@@ -207,7 +207,7 @@ const removeImage = (index: number) => {
                 required
               />
               <div v-if="errors.location" class="form-error">{{ errors.location }}</div>
-              <div class="form-help">Where is this post about? {{ formData.location.length }}/50 characters</div>
+              <div class="form-help">Where is this post? {{ formData.location.length }}/50 characters</div>
             </div>
 
             <!-- Description Field -->
