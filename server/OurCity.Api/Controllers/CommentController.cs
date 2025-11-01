@@ -3,7 +3,7 @@
 ///  and routing attributes based on common patterns in ASP.NET API development
 using Microsoft.AspNetCore.Mvc;
 using OurCity.Api.Common;
-using OurCity.Api.Common.Dtos;
+using OurCity.Api.Common.Dtos.Pagination;
 using OurCity.Api.Common.Dtos.Comments;
 using OurCity.Api.Extensions;
 using OurCity.Api.Services;

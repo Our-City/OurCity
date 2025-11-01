@@ -41,16 +41,7 @@ public class PostRepository : IPostRepository
 
         return await query.Take(limit).ToListAsync();
     }
-
-    // public async Task<IEnumerable<Post>> GetAllPosts()
-    // {
-    //     return await _appDbContext
-    //         .Posts.Include(p => p.Votes)
-    //         .Include(p => p.Comments)
-    //         .Include(p => p.Tags)
-    //         .ToListAsync();
-    // }
-
+    
     public async Task<Post?> GetFatPostById(Guid postId)
     {
         return await _appDbContext

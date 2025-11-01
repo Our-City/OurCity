@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using OurCity.Api.Common;
-using OurCity.Api.Common.Dtos;
+using OurCity.Api.Common.Dtos.Pagination;
 using OurCity.Api.Common.Dtos.Post;
 using OurCity.Api.Extensions;
 using OurCity.Api.Services;
@@ -35,7 +35,7 @@ public class PostController : ControllerBase
         {
             return Problem(
                 statusCode: StatusCodes.Status401Unauthorized,
-                detail: "User not authenticated"
+                detail: ErrorMessages.UserNotAuthenticated
             );
         }
 
@@ -55,19 +55,6 @@ public class PostController : ControllerBase
 
         return Ok(res.Data);
     }
-
-
-    // [HttpGet]
-    // [EndpointSummary("Get all posts")]
-    // [EndpointDescription("Gets a list of all posts")]
-    // [ProducesResponseType(typeof(List<PostResponseDto>), StatusCodes.Status200OK)]
-    // public async Task<IActionResult> GetPosts()
-    // {
-    //     var userId = User.GetUserId();
-    //     var res = await _postService.GetPosts(userId);
-
-    //     return Ok(res.Data);
-    // }
 
     [HttpGet]
     [Route("{postId}")]
@@ -107,7 +94,7 @@ public class PostController : ControllerBase
         {
             return Problem(
                 statusCode: StatusCodes.Status401Unauthorized,
-                detail: "User not authenticated"
+                detail: ErrorMessages.UserNotAuthenticated
             );
         }
 
@@ -143,7 +130,7 @@ public class PostController : ControllerBase
         {
             return Problem(
                 statusCode: StatusCodes.Status401Unauthorized,
-                detail: "User not authenticated"
+                detail: ErrorMessages.UserNotAuthenticated
             );
         }
 
@@ -171,7 +158,7 @@ public class PostController : ControllerBase
         {
             return Problem(
                 statusCode: StatusCodes.Status401Unauthorized,
-                detail: "User not authenticated"
+                detail: ErrorMessages.UserNotAuthenticated
             );
         }
 

@@ -1,6 +1,6 @@
 using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos.Post;
-using OurCity.Api.Common.Dtos;
+using OurCity.Api.Common.Dtos.Pagination;
 using OurCity.Api.Common.Enum;
 using OurCity.Api.Infrastructure;
 using OurCity.Api.Infrastructure.Database;
@@ -43,7 +43,7 @@ public class PostService : IPostService
         _postVoteRepository = postVoteRepository;
     }
 
-    
+
 
     public async Task<Result<PaginatedResponseDto<PostResponseDto>>> GetPosts(Guid? userId, Guid? cursor, int limit)
     {
@@ -61,13 +61,7 @@ public class PostService : IPostService
 
         return Result<PaginatedResponseDto<PostResponseDto>>.Success(response);
     }
-
-    // public async Task<Result<IEnumerable<PostResponseDto>>> GetPosts(Guid? userId)
-    // {
-    //     var posts = await _postRepository.GetAllPosts();
-    //     return Result<IEnumerable<PostResponseDto>>.Success(posts.ToDtos(userId));
-    // }
-
+    
     public async Task<Result<PostResponseDto>> GetPostById(Guid? userId, Guid postId)
     {
         var post = await _postRepository.GetFatPostById(postId);
