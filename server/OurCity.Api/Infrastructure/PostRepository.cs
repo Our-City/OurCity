@@ -74,7 +74,6 @@ public class PostRepository : IPostRepository
 
         return await query.Take(limit).ToListAsync();
     }
-
     public async Task<Post?> GetFatPostById(Guid postId)
     {
         return await _appDbContext

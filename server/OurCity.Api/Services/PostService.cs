@@ -70,7 +70,6 @@ public class PostService : IPostService
 
         return Result<PaginatedResponseDto<PostResponseDto>>.Success(response);
     }
-
     public async Task<Result<PostResponseDto>> GetPostById(Guid? userId, Guid postId)
     {
         var post = await _postRepository.GetFatPostById(postId);
