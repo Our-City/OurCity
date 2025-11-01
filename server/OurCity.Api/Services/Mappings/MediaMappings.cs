@@ -13,7 +13,7 @@ public static class MediaMappings
             PostId = media.PostId,
             Url = media.Url,
             CreatedAt = media.CreatedAt,
-            UpdatedAt = media.UpdatedAt
+            UpdatedAt = media.UpdatedAt,
         };
     }
 

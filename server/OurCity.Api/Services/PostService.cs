@@ -1,6 +1,6 @@
 using OurCity.Api.Common;
-using OurCity.Api.Common.Dtos.Post;
 using OurCity.Api.Common.Dtos;
+using OurCity.Api.Common.Dtos.Post;
 using OurCity.Api.Common.Enum;
 using OurCity.Api.Infrastructure;
 using OurCity.Api.Infrastructure.Database;
@@ -10,7 +10,11 @@ namespace OurCity.Api.Services;
 
 public interface IPostService
 {
-    Task<Result<PaginatedResponseDto<PostResponseDto>>> GetPosts(Guid? userId, Guid? cursor, int limit);
+    Task<Result<PaginatedResponseDto<PostResponseDto>>> GetPosts(
+        Guid? userId,
+        Guid? cursor,
+        int limit
+    );
     Task<Result<PostResponseDto>> GetPostById(Guid? userId, Guid postId);
     Task<Result<PostResponseDto>> CreatePost(Guid userId, PostCreateRequestDto postRequestDto);
     Task<Result<PostResponseDto>> UpdatePost(
@@ -43,9 +47,11 @@ public class PostService : IPostService
         _postVoteRepository = postVoteRepository;
     }
 
-    
-
-    public async Task<Result<PaginatedResponseDto<PostResponseDto>>> GetPosts(Guid? userId, Guid? cursor, int limit)
+    public async Task<Result<PaginatedResponseDto<PostResponseDto>>> GetPosts(
+        Guid? userId,
+        Guid? cursor,
+        int limit
+    )
     {
         // Fetch one extra item to determine if there's a next page.
         var posts = await _postRepository.GetAllPosts(cursor, limit + 1);
@@ -56,7 +62,7 @@ public class PostService : IPostService
         var response = new PaginatedResponseDto<PostResponseDto>
         {
             Items = pageItems.ToDtos(userId),
-            NextCursor = hasNextPage ? pageItems.LastOrDefault()?.Id : null
+            NextCursor = hasNextPage ? pageItems.LastOrDefault()?.Id : null,
         };
 
         return Result<PaginatedResponseDto<PostResponseDto>>.Success(response);

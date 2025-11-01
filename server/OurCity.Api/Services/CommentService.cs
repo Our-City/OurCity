@@ -2,9 +2,9 @@
 /// CoPilot assisted by generating boilerplate code for standard mapping functions
 /// based on common patterns in C# for mapping between entities and DTOs
 using OurCity.Api.Common;
+using OurCity.Api.Common.Dtos;
 using OurCity.Api.Common.Dtos.Comments;
 using OurCity.Api.Common.Enum;
-using OurCity.Api.Common.Dtos;
 using OurCity.Api.Infrastructure;
 using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Services.Mappings;
@@ -13,7 +13,12 @@ namespace OurCity.Api.Services;
 
 public interface ICommentService
 {
-    Task<Result<PaginatedResponseDto<CommentResponseDto>>> GetCommentsForPost(Guid? userId, Guid postId, Guid? cursor, int limit);
+    Task<Result<PaginatedResponseDto<CommentResponseDto>>> GetCommentsForPost(
+        Guid? userId,
+        Guid postId,
+        Guid? cursor,
+        int limit
+    );
     Task<Result<CommentResponseDto>> CreateComment(
         Guid userId,
         Guid postId,
@@ -37,13 +42,21 @@ public class CommentService : ICommentService
     private readonly ICommentRepository _commentRepository;
     private readonly ICommentVoteRepository _commentVoteRepository;
 
-    public CommentService(ICommentRepository commentRepository, ICommentVoteRepository commentVoteRepository)
+    public CommentService(
+        ICommentRepository commentRepository,
+        ICommentVoteRepository commentVoteRepository
+    )
     {
         _commentRepository = commentRepository;
         _commentVoteRepository = commentVoteRepository;
     }
 
-    public async Task<Result<PaginatedResponseDto<CommentResponseDto>>> GetCommentsForPost(Guid? userId, Guid postId, Guid? cursor, int limit)
+    public async Task<Result<PaginatedResponseDto<CommentResponseDto>>> GetCommentsForPost(
+        Guid? userId,
+        Guid postId,
+        Guid? cursor,
+        int limit
+    )
     {
         var comments = await _commentRepository.GetCommentsForPost(postId, cursor, limit + 1);
 
@@ -53,7 +66,7 @@ public class CommentService : ICommentService
         var response = new PaginatedResponseDto<CommentResponseDto>
         {
             Items = pageItems.ToDtos(userId),
-            NextCursor = hasNextPage ? pageItems.LastOrDefault()?.Id : null
+            NextCursor = hasNextPage ? pageItems.LastOrDefault()?.Id : null,
         };
 
         return Result<PaginatedResponseDto<CommentResponseDto>>.Success(response);
@@ -120,7 +133,10 @@ public class CommentService : ICommentService
             return Result<CommentResponseDto>.Failure(ErrorMessages.CommentNotFound);
         }
 
-        var existingVote = await _commentVoteRepository.GetVoteByCommentAndUserId(commentId, userId);
+        var existingVote = await _commentVoteRepository.GetVoteByCommentAndUserId(
+            commentId,
+            userId
+        );
         var requestedVoteType = commentVoteRequestDto.VoteType;
 
         if (existingVote != null && requestedVoteType == VoteType.NoVote)

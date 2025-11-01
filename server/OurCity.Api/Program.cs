@@ -45,7 +45,6 @@ builder.Services.AddScoped<IMediaRepository, MediaRepository>();
 builder.Services.AddScoped<MediaService>();
 builder.Services.Configure<AwsS3Options>(builder.Configuration.GetSection(AwsS3Options.AWS));
 
-
 //Controller
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();

@@ -34,7 +34,7 @@ public class CommentController : ControllerBase
     )
     {
         var userId = User.GetUserId();
-        
+
         if (userId == null)
         {
             return Problem(
@@ -52,14 +52,20 @@ public class CommentController : ControllerBase
     [Route("Posts/{postId}/Comments")]
     [EndpointSummary("Get all comments associated with a post")]
     [EndpointDescription("Gets a list of all comments for a specific post")]
-    [ProducesResponseType(typeof(PaginatedResponseDto<CommentResponseDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetCommentsForPost([FromRoute] Guid postId, [FromQuery] Guid? cursor, [FromQuery] int limit = 25)
+    [ProducesResponseType(
+        typeof(PaginatedResponseDto<CommentResponseDto>),
+        StatusCodes.Status200OK
+    )]
+    public async Task<IActionResult> GetCommentsForPost(
+        [FromRoute] Guid postId,
+        [FromQuery] Guid? cursor,
+        [FromQuery] int limit = 25
+    )
     {
         var userId = User.GetUserId();
         var result = await _commentService.GetCommentsForPost(userId, postId, cursor, limit);
         return Ok(result.Data);
     }
-
 
     [HttpPut]
     [Route("Comments/{commentId}")]
@@ -84,11 +90,7 @@ public class CommentController : ControllerBase
             );
         }
 
-        var res = await _commentService.UpdateComment(
-            userId.Value,
-            commentId,
-            commentRequestDto
-        );
+        var res = await _commentService.UpdateComment(userId.Value, commentId, commentRequestDto);
 
         if (!res.IsSuccess)
         {
@@ -125,11 +127,7 @@ public class CommentController : ControllerBase
             );
         }
 
-        var res = await _commentService.VoteComment(
-            userId.Value,
-            commentId,
-            commentVoteRequestDto
-        );
+        var res = await _commentService.VoteComment(userId.Value, commentId, commentVoteRequestDto);
 
         if (!res.IsSuccess)
         {

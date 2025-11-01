@@ -1,5 +1,5 @@
+using Microsoft.EntityFrameworkCore;
 using OurCity.Api.Infrastructure.Database;
-using Microsoft.EntityFrameworkCore; 
 
 public interface IMediaRepository
 {
@@ -12,6 +12,7 @@ public interface IMediaRepository
 public class MediaRepository : IMediaRepository
 {
     private readonly AppDbContext _dbContext;
+
     public MediaRepository(AppDbContext dbContext) => _dbContext = dbContext;
 
     public async Task<Media> AddMediaAsync(Media media)
@@ -23,11 +24,9 @@ public class MediaRepository : IMediaRepository
 
     public async Task<IEnumerable<Media>> GetMediaByPostIdAsync(Guid postId)
     {
-        return await _dbContext.Media
-            .Where(m => m.PostId == postId)
-            .ToListAsync();
+        return await _dbContext.Media.Where(m => m.PostId == postId).ToListAsync();
     }
-    
+
     public async Task<Media> GetMediaByIdAsync(Guid mediaId)
     {
         return await _dbContext.Media.FindAsync(mediaId);
