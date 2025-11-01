@@ -35,7 +35,7 @@ public class PostController : ControllerBase
         {
             return Problem(
                 statusCode: StatusCodes.Status401Unauthorized,
-                detail: "User not authenticated"
+                detail: ErrorMessages.UserNotAuthenticated
             );
         }
 
@@ -96,7 +96,7 @@ public class PostController : ControllerBase
         {
             return Problem(
                 statusCode: StatusCodes.Status401Unauthorized,
-                detail: "User not authenticated"
+                detail: ErrorMessages.UserNotAuthenticated
             );
         }
 
@@ -132,7 +132,7 @@ public class PostController : ControllerBase
         {
             return Problem(
                 statusCode: StatusCodes.Status401Unauthorized,
-                detail: "User not authenticated"
+                detail: ErrorMessages.UserNotAuthenticated
             );
         }
 
@@ -160,7 +160,7 @@ public class PostController : ControllerBase
         {
             return Problem(
                 statusCode: StatusCodes.Status401Unauthorized,
-                detail: "User not authenticated"
+                detail: ErrorMessages.UserNotAuthenticated
             );
         }
 
