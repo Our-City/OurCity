@@ -40,6 +40,9 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IPolicyService, PolicyService>();
 builder.Services.AddScoped<ITagService, TagService>();
+builder.Services.AddSingleton<AwsS3Service>();
+builder.Services.AddScoped<IMediaRepository, MediaRepository>();
+builder.Services.AddScoped<MediaService>();
 
 //Controller
 builder.Services.AddControllers();

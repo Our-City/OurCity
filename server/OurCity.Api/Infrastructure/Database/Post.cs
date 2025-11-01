@@ -30,4 +30,6 @@ public class Post
     public List<Tag> Tags { get; set; } = new();
 
     public List<PostVote> Votes { get; set; } = new();
+
+    public List<Media> Media { get; set; } = new();
 }
