@@ -1,4 +1,4 @@
-namespace OurCity.Api.Common.Dtos;
+namespace OurCity.Api.Common.Dtos.Pagination;
 
 public class PaginatedResponseDto<T>
 {

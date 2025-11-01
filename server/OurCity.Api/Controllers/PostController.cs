@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using OurCity.Api.Common;
-using OurCity.Api.Common.Dtos;
+using OurCity.Api.Common.Dtos.Pagination;
 using OurCity.Api.Common.Dtos.Post;
 using OurCity.Api.Extensions;
 using OurCity.Api.Services;
