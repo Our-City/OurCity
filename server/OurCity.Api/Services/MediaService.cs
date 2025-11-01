@@ -44,4 +44,11 @@ public class MediaService
         var media = await _mediaRepository.GetMediaByPostIdAsync(postId);
         return media.ToDtos();
     }
+
+    public async Task<MediaResponseDto> GetMediaByIdAsync(Guid mediaId)
+    {
+        var media = await _mediaRepository.GetMediaByIdAsync(mediaId);
+
+        return media?.ToDto();
+    }
 }

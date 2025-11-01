@@ -26,11 +26,26 @@ public class MediaController : ControllerBase
         return CreatedAtAction(nameof(UploadMedia), new { id = result.Id }, result);
     }
 
-    [HttpGet("{postId}")]
+    [HttpGet("post/{postId}")]
     [ProducesResponseType(typeof(List<MediaResponseDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetMediaForPost([FromRoute] Guid postId)
     {
         var result = await _mediaService.GetMediaForPostAsync(postId);
+        return Ok(result);
+    }
+
+    [HttpGet("{mediaId:guid}", Name = "GetMediaById")]
+    [ProducesResponseType(typeof(MediaResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMediaById([FromRoute] Guid mediaId)
+    {
+        var result = await _mediaService.GetMediaByIdAsync(mediaId);
+
+        if (result == null)
+        {
+            return NotFound();
+        }
+
         return Ok(result);
     }
 }
