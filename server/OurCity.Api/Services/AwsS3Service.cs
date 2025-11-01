@@ -19,7 +19,7 @@ public class AwsS3Service
             throw new Exception("AWS SecretKey is missing!");
         if (string.IsNullOrEmpty(awsOptions.BucketName))
             throw new Exception("AWS BucketName is missing!");
-            
+
         // Using the properties from our options object to create the S3 client.
         _s3Client = new AmazonS3Client(
             awsOptions.AccessKey,
@@ -35,14 +35,14 @@ public class AwsS3Service
         var fileExtension = Path.GetExtension(fileName);
         var uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
 
-        var s3Key = $"media/{uniqueFileName}";          //storing in the media folder in S3 bucket
+        var s3Key = $"media/{uniqueFileName}"; //storing in the media folder in S3 bucket
 
         var uploadRequest = new TransferUtilityUploadRequest
         {
             InputStream = fileStream,
-            Key = s3Key,                            //using unique filename with the required path
+            Key = s3Key, //using unique filename with the required path
             BucketName = _bucketName,
-            ContentType = "application/octet-stream",   
+            ContentType = "application/octet-stream",
         };
 
         var transferUtility = new TransferUtility(_s3Client);

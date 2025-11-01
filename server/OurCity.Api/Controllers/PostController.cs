@@ -56,7 +56,6 @@ public class PostController : ControllerBase
         return Ok(res.Data);
     }
 
-
     // [HttpGet]
     // [EndpointSummary("Get all posts")]
     // [EndpointDescription("Gets a list of all posts")]

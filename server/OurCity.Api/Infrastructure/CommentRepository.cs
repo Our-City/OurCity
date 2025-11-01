@@ -25,8 +25,8 @@ public class CommentRepository : ICommentRepository
 
     public async Task<IEnumerable<Comment>> GetCommentsForPost(Guid postId, Guid? cursor, int limit)
     {
-        IQueryable<Comment> query = _appDbContext.Comments
-            .Where(c => c.PostId == postId)
+        IQueryable<Comment> query = _appDbContext
+            .Comments.Where(c => c.PostId == postId)
             .Include(c => c.Author)
             .Include(c => c.Votes)
             .OrderByDescending(c => c.CreatedAt)
@@ -37,7 +37,13 @@ public class CommentRepository : ICommentRepository
             var cursorComment = await _appDbContext.Comments.FindAsync(cursor.Value);
             if (cursorComment != null)
             {
-                query = query.Where(c => c.CreatedAt < cursorComment.CreatedAt || (c.CreatedAt == cursorComment.CreatedAt && c.Id.CompareTo(cursorComment.Id) < 0));
+                query = query.Where(c =>
+                    c.CreatedAt < cursorComment.CreatedAt
+                    || (
+                        c.CreatedAt == cursorComment.CreatedAt
+                        && c.Id.CompareTo(cursorComment.Id) < 0
+                    )
+                );
             }
         }
 

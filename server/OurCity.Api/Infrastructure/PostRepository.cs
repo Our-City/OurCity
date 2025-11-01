@@ -35,7 +35,10 @@ public class PostRepository : IPostRepository
             var cursorPost = await _appDbContext.Posts.FindAsync(cursor.Value);
             if (cursorPost != null)
             {
-                query = query.Where(p => p.CreatedAt < cursorPost.CreatedAt || (p.CreatedAt == cursorPost.CreatedAt && p.Id.CompareTo(cursorPost.Id) < 0));
+                query = query.Where(p =>
+                    p.CreatedAt < cursorPost.CreatedAt
+                    || (p.CreatedAt == cursorPost.CreatedAt && p.Id.CompareTo(cursorPost.Id) < 0)
+                );
             }
         }
 

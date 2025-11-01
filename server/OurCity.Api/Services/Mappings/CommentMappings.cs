@@ -16,7 +16,7 @@ public static class CommentMappings
     {
         return comments.Select(comment => comment.ToDto(userId));
     }
- 
+
     public static CommentResponseDto ToDto(this Comment comment, Guid? userId)
     {
         return new CommentResponseDto

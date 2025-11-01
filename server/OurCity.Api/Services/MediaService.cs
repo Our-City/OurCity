@@ -14,7 +14,11 @@ public class MediaService
         _mediaRepository = mediaRepository;
     }
 
-    public async Task<MediaResponseDto> UploadMediaAsync(Guid postId, Stream fileStream, string fileName)
+    public async Task<MediaResponseDto> UploadMediaAsync(
+        Guid postId,
+        Stream fileStream,
+        string fileName
+    )
     {
         var url = await _s3Service.UploadFileAsync(fileStream, fileName);
 
@@ -24,7 +28,7 @@ public class MediaService
             PostId = postId,
             Url = url,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
         };
 
         var savedMedia = await _mediaRepository.AddMediaAsync(media);
@@ -35,7 +39,7 @@ public class MediaService
             PostId = savedMedia.PostId,
             Url = savedMedia.Url,
             CreatedAt = savedMedia.CreatedAt,
-            UpdatedAt = savedMedia.UpdatedAt
+            UpdatedAt = savedMedia.UpdatedAt,
         };
     }
 
