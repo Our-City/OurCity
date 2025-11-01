@@ -1,48 +1,54 @@
 using Amazon.S3;
 using Amazon.S3.Transfer;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 public class AwsS3Service
 {
     private readonly IAmazonS3 _s3Client;
     private readonly string _bucketName;
 
-    public AwsS3Service(IConfiguration config)
+    public AwsS3Service(IOptions<AwsS3Options> options)
     {
-        var region = config["AWS__Region"];
-        var accessKey = config["AWS__AccessKey"];
-        var secretKey = config["AWS__SecretKey"];
-        var bucketName = config["AWS__BucketName"];
+        var awsOptions = options.Value;
 
-        Console.WriteLine($"AWS__Region: {region}");
-        Console.WriteLine($"AWS__AccessKey: {accessKey}");
-        Console.WriteLine($"AWS__SecretKey: {secretKey}");
-        Console.WriteLine($"AWS__BucketName: {bucketName}");
-
-        if (string.IsNullOrEmpty(region))
-            throw new Exception("AWS__Region is missing!");
+        if (string.IsNullOrEmpty(awsOptions.Region))
+            throw new Exception("AWS Region is missing!");
+        if (string.IsNullOrEmpty(awsOptions.AccessKey))
+            throw new Exception("AWS AccessKey is missing!");
+        if (string.IsNullOrEmpty(awsOptions.SecretKey))
+            throw new Exception("AWS SecretKey is missing!");
+        if (string.IsNullOrEmpty(awsOptions.BucketName))
+            throw new Exception("AWS BucketName is missing!");
             
+        // Using the properties from our options object to create the S3 client.
         _s3Client = new AmazonS3Client(
-            config["AWS__AccessKey"],
-            config["AWS__SecretKey"],
-            Amazon.RegionEndpoint.GetBySystemName(config["AWS__Region"])
+            awsOptions.AccessKey,
+            awsOptions.SecretKey,
+            Amazon.RegionEndpoint.GetBySystemName(awsOptions.Region)
         );
-        _bucketName = config["AWS__BucketName"];
+        _bucketName = awsOptions.BucketName;
     }
 
     public async Task<string> UploadFileAsync(Stream fileStream, string fileName)
     {
+        // Generating a unique file name to prevent overwrites and collisions.
+        var fileExtension = Path.GetExtension(fileName);
+        var uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
+
+        var s3Key = $"media/{uniqueFileName}";          //storing in the media folder in S3 bucket
+
         var uploadRequest = new TransferUtilityUploadRequest
         {
             InputStream = fileStream,
-            Key = fileName,
+            Key = s3Key,                            //using unique filename with the required path
             BucketName = _bucketName,
-            ContentType = "application/octet-stream"
+            ContentType = "application/octet-stream",   
         };
 
         var transferUtility = new TransferUtility(_s3Client);
         await transferUtility.UploadAsync(uploadRequest);
 
-        return $"https://{_bucketName}.s3.amazonaws.com/{fileName}";
+        // Returning the full public URL of the uploaded file.
+        return $"https://{_bucketName}.s3.amazonaws.com/{s3Key}";
     }
 }
