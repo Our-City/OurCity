@@ -51,4 +51,9 @@ public class AwsS3Service
         // Returning the full public URL of the uploaded file.
         return $"https://{_bucketName}.s3.amazonaws.com/{s3Key}";
     }
+
+    public async Task DeleteFileAsync(string key)
+    {
+        await _s3Client.DeleteObjectAsync(_bucketName, key);
+    }
 }

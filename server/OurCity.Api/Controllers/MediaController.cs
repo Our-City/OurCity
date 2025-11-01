@@ -48,4 +48,19 @@ public class MediaController : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpDelete("{mediaId:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteMedia([FromRoute] Guid mediaId)
+    {
+        var success = await _mediaService.DeleteMediaAsync(mediaId);
+
+        if (!success)
+        {
+            return NotFound();
+        }
+
+        return NoContent(); // This is a standard response for a successful DELETE
+    }
 }

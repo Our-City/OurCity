@@ -51,4 +51,27 @@ public class MediaService
 
         return media?.ToDto();
     }
+
+    public async Task<bool> DeleteMediaAsync(Guid mediaId)
+    {
+        // 1. Finding the media record in the database.
+        var media = await _mediaRepository.GetMediaByIdAsync(mediaId);
+        if (media == null)
+        {
+            return false; // Not found
+        }
+
+        // 2. Extracting the S3 object key from the URL.
+        // The key is the part of the URL after the bucket name and ".com/".
+        var uri = new Uri(media.Url);
+        var key = uri.AbsolutePath.TrimStart('/');
+
+        // 3. Deleting the file from S3.
+        await _s3Service.DeleteFileAsync(key);
+
+        // 4. Deleting the record from the database.
+        await _mediaRepository.DeleteMediaAsync(media);
+
+        return true; // Success
+    }
 }

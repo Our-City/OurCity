@@ -6,6 +6,7 @@ public interface IMediaRepository
     Task<Media> AddMediaAsync(Media media);
     Task<IEnumerable<Media>> GetMediaByPostIdAsync(Guid postId);
     Task<Media> GetMediaByIdAsync(Guid mediaId);
+    Task DeleteMediaAsync(Media media);
 }
 
 public class MediaRepository : IMediaRepository
@@ -30,5 +31,11 @@ public class MediaRepository : IMediaRepository
     public async Task<Media> GetMediaByIdAsync(Guid mediaId)
     {
         return await _dbContext.Media.FindAsync(mediaId);
+    }
+
+    public async Task DeleteMediaAsync(Media media)
+    {
+        _dbContext.Media.Remove(media);
+        await _dbContext.SaveChangesAsync();
     }
 }
