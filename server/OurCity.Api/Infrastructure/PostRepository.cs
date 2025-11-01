@@ -5,7 +5,7 @@ namespace OurCity.Api.Infrastructure;
 
 public interface IPostRepository
 {
-    Task<IEnumerable<Post>> GetAllPosts();
+    Task<IEnumerable<Post>> GetAllPosts(Guid? cursor, int limit);
     Task<Post?> GetFatPostById(Guid postId);
     Task<Post?> GetSlimPostbyId(Guid postId);
     Task<Post> CreatePost(Post post);
@@ -21,14 +21,35 @@ public class PostRepository : IPostRepository
         _appDbContext = appDbContext;
     }
 
-    public async Task<IEnumerable<Post>> GetAllPosts()
+    public async Task<IEnumerable<Post>> GetAllPosts(Guid? cursor, int limit)
     {
-        return await _appDbContext
+        IQueryable<Post> query = _appDbContext
             .Posts.Include(p => p.Votes)
             .Include(p => p.Comments)
             .Include(p => p.Tags)
-            .ToListAsync();
+            .OrderByDescending(p => p.CreatedAt)
+            .ThenByDescending(p => p.Id);
+
+        if (cursor.HasValue)
+        {
+            var cursorPost = await _appDbContext.Posts.FindAsync(cursor.Value);
+            if (cursorPost != null)
+            {
+                query = query.Where(p => p.CreatedAt < cursorPost.CreatedAt || (p.CreatedAt == cursorPost.CreatedAt && p.Id.CompareTo(cursorPost.Id) < 0));
+            }
+        }
+
+        return await query.Take(limit).ToListAsync();
     }
+
+    // public async Task<IEnumerable<Post>> GetAllPosts()
+    // {
+    //     return await _appDbContext
+    //         .Posts.Include(p => p.Votes)
+    //         .Include(p => p.Comments)
+    //         .Include(p => p.Tags)
+    //         .ToListAsync();
+    // }
 
     public async Task<Post?> GetFatPostById(Guid postId)
     {

@@ -3,6 +3,7 @@
 ///  and routing attributes based on common patterns in ASP.NET API development
 using Microsoft.AspNetCore.Mvc;
 using OurCity.Api.Common;
+using OurCity.Api.Common.Dtos;
 using OurCity.Api.Common.Dtos.Comments;
 using OurCity.Api.Extensions;
 using OurCity.Api.Services;
@@ -51,14 +52,14 @@ public class CommentController : ControllerBase
     [Route("Posts/{postId}/Comments")]
     [EndpointSummary("Get all comments associated with a post")]
     [EndpointDescription("Gets a list of all comments for a specific post")]
-    [ProducesResponseType(typeof(List<CommentResponseDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetComments([FromRoute] Guid postId)
+    [ProducesResponseType(typeof(PaginatedResponseDto<CommentResponseDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetCommentsForPost([FromRoute] Guid postId, [FromQuery] Guid? cursor, [FromQuery] int limit = 25)
     {
         var userId = User.GetUserId();
-        var res = await _commentService.GetCommentsByPostId(userId, postId);
-
-        return Ok(res.Data);
+        var result = await _commentService.GetCommentsForPost(userId, postId, cursor, limit);
+        return Ok(result.Data);
     }
+
 
     [HttpPut]
     [Route("Comments/{commentId}")]

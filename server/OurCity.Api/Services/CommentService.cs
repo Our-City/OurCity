@@ -4,6 +4,7 @@
 using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos.Comments;
 using OurCity.Api.Common.Enum;
+using OurCity.Api.Common.Dtos;
 using OurCity.Api.Infrastructure;
 using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Services.Mappings;
@@ -12,7 +13,7 @@ namespace OurCity.Api.Services;
 
 public interface ICommentService
 {
-    Task<Result<IEnumerable<CommentResponseDto>>> GetCommentsByPostId(Guid? userId, Guid postId);
+    Task<Result<PaginatedResponseDto<CommentResponseDto>>> GetCommentsForPost(Guid? userId, Guid postId, Guid? cursor, int limit);
     Task<Result<CommentResponseDto>> CreateComment(
         Guid userId,
         Guid postId,
@@ -42,15 +43,31 @@ public class CommentService : ICommentService
         _commentVoteRepository = commentVoteRepository;
     }
 
-    public async Task<Result<IEnumerable<CommentResponseDto>>> GetCommentsByPostId(
-        Guid? userId,
-        Guid postId
-    )
+    public async Task<Result<PaginatedResponseDto<CommentResponseDto>>> GetCommentsForPost(Guid? userId, Guid postId, Guid? cursor, int limit)
     {
-        var comments = await _commentRepository.GetCommentsByPostId(postId);
+        var comments = await _commentRepository.GetCommentsForPost(postId, cursor, limit + 1);
 
-        return Result<IEnumerable<CommentResponseDto>>.Success(comments.ToDtos(userId));
+        var hasNextPage = comments.Count() > limit;
+        var pageItems = comments.Take(limit);
+
+        var response = new PaginatedResponseDto<CommentResponseDto>
+        {
+            Items = pageItems.ToDtos(userId),
+            NextCursor = hasNextPage ? pageItems.LastOrDefault()?.Id : null
+        };
+
+        return Result<PaginatedResponseDto<CommentResponseDto>>.Success(response);
     }
+
+    // public async Task<Result<IEnumerable<CommentResponseDto>>> GetCommentsByPostId(
+    //     Guid? userId,
+    //     Guid postId
+    // )
+    // {
+    //     var comments = await _commentRepository.GetCommentsByPostId(postId);
+
+    //     return Result<IEnumerable<CommentResponseDto>>.Success(comments.ToDtos(userId));
+    // }
 
     public async Task<Result<CommentResponseDto>> CreateComment(
         Guid userId,
