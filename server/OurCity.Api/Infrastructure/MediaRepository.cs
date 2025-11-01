@@ -1,8 +1,10 @@
 using OurCity.Api.Infrastructure.Database;
+using Microsoft.EntityFrameworkCore; 
 
 public interface IMediaRepository
 {
     Task<Media> AddMediaAsync(Media media);
+    Task<IEnumerable<Media>> GetMediaByPostIdAsync(Guid postId);
 }
 
 public class MediaRepository : IMediaRepository
@@ -15,5 +17,12 @@ public class MediaRepository : IMediaRepository
         _dbContext.Media.Add(media);
         await _dbContext.SaveChangesAsync();
         return media;
+    }
+
+    public async Task<IEnumerable<Media>> GetMediaByPostIdAsync(Guid postId)
+    {
+        return await _dbContext.Media
+            .Where(m => m.PostId == postId)
+            .ToListAsync();
     }
 }

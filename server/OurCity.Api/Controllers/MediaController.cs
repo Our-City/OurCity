@@ -25,4 +25,12 @@ public class MediaController : ControllerBase
 
         return CreatedAtAction(nameof(UploadMedia), new { id = result.Id }, result);
     }
+
+    [HttpGet("{postId}")]
+    [ProducesResponseType(typeof(List<MediaResponseDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetMediaForPost([FromRoute] Guid postId)
+    {
+        var result = await _mediaService.GetMediaForPostAsync(postId);
+        return Ok(result);
+    }
 }

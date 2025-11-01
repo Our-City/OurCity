@@ -1,6 +1,7 @@
 using OurCity.Api.Common.Dtos.Media;
 using OurCity.Api.Infrastructure;
 using OurCity.Api.Infrastructure.Database;
+using OurCity.Api.Services.Mappings;
 
 public class MediaService
 {
@@ -36,5 +37,11 @@ public class MediaService
             CreatedAt = savedMedia.CreatedAt,
             UpdatedAt = savedMedia.UpdatedAt
         };
+    }
+
+    public async Task<IEnumerable<MediaResponseDto>> GetMediaForPostAsync(Guid postId)
+    {
+        var media = await _mediaRepository.GetMediaByPostIdAsync(postId);
+        return media.ToDtos();
     }
 }
