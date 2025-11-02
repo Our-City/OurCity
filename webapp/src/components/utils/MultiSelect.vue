@@ -151,11 +151,7 @@ onUnmounted(() => {
       <div class="multiselect__content">
         <!-- Selected items display -->
         <div v-if="selectedValues.length > 0" class="multiselect__selected">
-          <span
-            v-for="(item) in selectedValues.slice(0, 3)"
-            :key="item"
-            class="multiselect__tag"
-          >
+          <span v-for="item in selectedValues.slice(0, 3)" :key="item" class="multiselect__tag">
             {{ item }}
             <button
               type="button"
