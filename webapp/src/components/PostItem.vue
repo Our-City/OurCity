@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Card from "primevue/card";
-import { defineProps, defineEmits, computed } from "vue";
+import { computed } from "vue";
 import type { PostResponseDto } from "@/types/posts";
 import { mockUsers } from "@/data/mockData";
 
