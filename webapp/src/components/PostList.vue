@@ -9,38 +9,40 @@ const props = defineProps<{
   posts: PostResponseDto[];
 }>();
 
-const {  setSort, currentSort, currentFilter } = usePostFilters();
+const { setSort, currentSort, currentFilter } = usePostFilters();
 
 const sortLabel = computed(() => {
   switch (currentSort.value) {
-    case 'popular':
-      return 'Popular';
-    case 'nearby':
-      return 'Nearby';
-    case 'recent':
+    case "popular":
+      return "Popular";
+    case "nearby":
+      return "Nearby";
+    case "recent":
     default:
-      return 'Recent';
+      return "Recent";
   }
 });
 
 const filteredAndSortedPosts = computed(() => {
   let result = [...props.posts];
 
-  if (currentFilter.value !== 'all') {
-    result = result.filter(post => post.category?.toLowerCase() === currentFilter.value);
+  if (currentFilter.value !== "all") {
+    result = result.filter((post) => post.category?.toLowerCase() === currentFilter.value);
   }
 
   switch (currentSort.value) {
-    case 'popular':
+    case "popular":
       result.sort((a, b) => (b.upvotes || 0) - (a.upvotes || 0));
       break;
-    case 'nearby':
+    case "nearby":
       // TODO: Implement location-based sorting
       // For now, just return as-is
       break;
-    case 'recent':
+    case "recent":
     default:
-      result.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+      result.sort(
+        (a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime(),
+      );
       break;
   }
 
@@ -50,27 +52,39 @@ const filteredAndSortedPosts = computed(() => {
 
 <template>
   <div class="sort-dropdown-container">
-    <Dropdown 
-      button-class="sort-posts-button"
-    >
+    <Dropdown button-class="sort-posts-button">
       <template #button>
         <i class="pi pi-sort-amount-down" />
         {{ sortLabel }}
       </template>
       <template #dropdown="{ close }">
         <ul>
-          <li @click="setSort('popular'); close()">
+          <li
+            @click="
+              setSort('popular');
+              close();
+            "
+          >
             Popular
           </li>
-          <li @click="setSort('recent'); close()">
+          <li
+            @click="
+              setSort('recent');
+              close();
+            "
+          >
             Recent
           </li>
-          <li @click="setSort('nearby'); close()">
+          <li
+            @click="
+              setSort('nearby');
+              close();
+            "
+          >
             Nearby
           </li>
         </ul>
       </template>
-
     </Dropdown>
   </div>
   <div class="post-list">
@@ -92,7 +106,6 @@ const filteredAndSortedPosts = computed(() => {
 </template>
 
 <style scoped>
-
 .sort-dropdown-container :deep(.dropdown-menu) {
   right: auto;
 }

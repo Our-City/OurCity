@@ -1,11 +1,11 @@
 <script setup lang="ts">
 interface Props {
-  variant?: 'header' | 'standard'
+  variant?: "header" | "standard";
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  variant: 'standard'
-})
+  variant: "standard",
+});
 </script>
 
 <template>
@@ -68,7 +68,10 @@ const props = withDefaults(defineProps<Props>(), {
   padding: 0.5rem 1rem;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 0.5rem;
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }

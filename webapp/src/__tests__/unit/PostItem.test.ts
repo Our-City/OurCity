@@ -10,13 +10,13 @@ const post = {
   votes: 12,
   commentIds: [101, 102, 103],
   images: [{ url: "https://test.com/image.jpg" }],
-  createdAt: "2023-01-01T00:00:00Z"
+  createdAt: "2023-01-01T00:00:00Z",
 };
 
 describe("PostItem", () => {
   it("renders author, title, votes, and comment count", () => {
     const wrapper = mount(PostItem, {
-      props: { post }
+      props: { post },
     });
 
     expect(wrapper.find(".post-author-date").exists()).toBe(true);
@@ -27,7 +27,7 @@ describe("PostItem", () => {
 
   it("renders post image if available", () => {
     const wrapper = mount(PostItem, {
-      props: { post }
+      props: { post },
     });
     const img = wrapper.find(".post-image");
     expect(img.exists()).toBe(true);
@@ -37,7 +37,7 @@ describe("PostItem", () => {
   it("does not render post image if not available", () => {
     const postNoImage = { ...post, images: [] };
     const wrapper = mount(PostItem, {
-      props: { post: postNoImage }
+      props: { post: postNoImage },
     });
     expect(wrapper.find(".post-image").exists()).toBe(false);
   });

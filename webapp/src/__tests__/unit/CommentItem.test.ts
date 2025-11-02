@@ -10,13 +10,13 @@ const comment = {
   votes: 7,
   isDeleted: false,
   createdAt: "2023-01-01T00:00:00Z",
-  updatedAt: "2023-01-01T00:00:00Z"
+  updatedAt: "2023-01-01T00:00:00Z",
 };
 
 describe("CommentItem", () => {
   it("renders author, content, and votes", () => {
     const wrapper = mount(CommentItem, {
-      props: { props: comment }
+      props: { props: comment },
     });
 
     expect(wrapper.find(".comment-author").text()).toBe(String(comment.authorId));

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
 interface Props {
   username?: string;
@@ -9,11 +9,11 @@ interface Props {
 const router = useRouter();
 
 const props = withDefaults(defineProps<Props>(), {
-  username: 'Username'
+  username: "Username",
 });
 
 const emit = defineEmits<{
-  updateUsername: [username: string]
+  updateUsername: [username: string];
 }>();
 
 const isEditingUsername = ref(false);
@@ -26,7 +26,7 @@ function handleEditUsername() {
 
 function saveUsername() {
   if (editedUsername.value.trim()) {
-    emit('updateUsername', editedUsername.value.trim());
+    emit("updateUsername", editedUsername.value.trim());
     isEditingUsername.value = false;
   }
 }
@@ -37,9 +37,9 @@ function cancelEdit() {
 }
 
 function handleKeyDown(event: KeyboardEvent) {
-  if (event.key === 'Enter') {
+  if (event.key === "Enter") {
     saveUsername();
-  } else if (event.key === 'Escape') {
+  } else if (event.key === "Escape") {
     cancelEdit();
   }
 }
@@ -145,7 +145,10 @@ function handleCreatePost(): void {
   border-radius: 0.5rem;
   font-size: 1rem;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, transform 0.1s;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    transform 0.1s;
 }
 
 .save-button {
@@ -187,7 +190,10 @@ function handleCreatePost(): void {
   border-radius: 0.5rem;
   font-size: 1rem;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, transform 0.1s;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    transform 0.1s;
 }
 
 .edit-username-button {

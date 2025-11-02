@@ -12,8 +12,8 @@ const searchQuery = ref("");
 const { reset } = usePostFilters();
 
 function goToHome(): void {
-    reset();
-    router.push("/");
+  reset();
+  router.push("/");
 }
 
 function handleLogin(): void {
@@ -45,42 +45,45 @@ function isLoggedIn(): boolean {
 <template>
   <Toolbar variant="header">
     <template #start>
-      <h1 class="app-title" @click="goToHome">
-        OurCity
-      </h1>
+      <h1 class="app-title" @click="goToHome">OurCity</h1>
     </template>
-    
+
     <template #center>
       <div class="search-container w-full">
         <span class="p-input-icon-left">
           <i class="pi pi-search" />
-          <InputText
-            v-model="searchQuery"
-            placeholder="Search..."
-            class="search-input"
-          />
+          <InputText v-model="searchQuery" placeholder="Search..." class="search-input" />
         </span>
       </div>
     </template>
-    
+
     <template #end>
       <button v-if="!isLoggedIn()" class="login-button" @click="handleLogin">Login</button>
       <button v-if="!isLoggedIn()" class="signup-button" @click="handleSignUp">Sign Up</button>
-      <button v-if="isLoggedIn()" class="create-post-button" @click="handleCreatePost"><i class="pi pi-plus"></i> Create Post</button>
-      <Dropdown 
-        v-if="isLoggedIn()"
-        button-class="account-button"
-      >
+      <button v-if="isLoggedIn()" class="create-post-button" @click="handleCreatePost">
+        <i class="pi pi-plus"></i> Create Post
+      </button>
+      <Dropdown v-if="isLoggedIn()" button-class="account-button">
         <template #button>
           <i class="pi pi-user" />
           <i class="pi pi-angle-down" />
         </template>
         <template #dropdown="{ close }">
           <ul>
-            <li @click="handleViewProfile(); close()">
+            <li
+              @click="
+                handleViewProfile();
+                close();
+              "
+            >
               <i class="pi pi-user"></i> View Profile
             </li>
-            <li @click="handleLogout(); close()">
+            <li
+              @click="
+                handleLogout();
+                close();
+              "
+            >
               <i class="pi pi-sign-out"></i> Log Out
             </li>
           </ul>

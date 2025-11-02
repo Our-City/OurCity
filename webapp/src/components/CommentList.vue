@@ -9,10 +9,7 @@ defineProps<{ props: CommentResponseDto[] }>();
 
 <template>
   <div class="comments-list">
-    <CommentItem
-      v-for="comment in props"
-      :props="comment"
-    />
+    <CommentItem v-for="comment in props" :props="comment" />
   </div>
 </template>
 

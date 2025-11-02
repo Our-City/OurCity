@@ -1,74 +1,67 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 interface Props {
-  buttonClass?: string
-  dropdownClass?: string
+  buttonClass?: string;
+  dropdownClass?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  buttonClass: 'dropdown-button',
-  dropdownClass: 'dropdown-menu'
-})
+  buttonClass: "dropdown-button",
+  dropdownClass: "dropdown-menu",
+});
 
-const isDropdownVisible = ref(false)
+const isDropdownVisible = ref(false);
 
 const toggleDropdown = () => {
-  isDropdownVisible.value = !isDropdownVisible.value
-}
+  isDropdownVisible.value = !isDropdownVisible.value;
+};
 
 const closeDropdown = () => {
-  isDropdownVisible.value = false
-}
+  isDropdownVisible.value = false;
+};
 
 // Close dropdown when clicking outside
 const handleClickOutside = (event: Event) => {
-  const target = event.target as HTMLElement
-  const dropdown = document.querySelector('.dropdown-container')
+  const target = event.target as HTMLElement;
+  const dropdown = document.querySelector(".dropdown-container");
   if (dropdown && !dropdown.contains(target)) {
-    closeDropdown()
+    closeDropdown();
   }
-}
+};
 
 // Add click outside listener when dropdown is open
 const handleDropdownToggle = () => {
-  toggleDropdown()
+  toggleDropdown();
   if (isDropdownVisible.value) {
-    document.addEventListener('click', handleClickOutside)
+    document.addEventListener("click", handleClickOutside);
   } else {
-    document.removeEventListener('click', handleClickOutside)
+    document.removeEventListener("click", handleClickOutside);
   }
-}
+};
 
 // Cleanup listener when component unmounts
-import { onUnmounted } from 'vue'
+import { onUnmounted } from "vue";
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
+  document.removeEventListener("click", handleClickOutside);
+});
 </script>
 
 <template>
   <div class="dropdown-container">
-    <button 
-      :class="props.buttonClass" 
-      @click="handleDropdownToggle"
-    >
+    <button :class="props.buttonClass" @click="handleDropdownToggle">
       <slot name="button" class="dropdown-button">
         <!-- Default button content -->
         <i class="pi pi-user" />
         <i class="pi pi-angle-down" />
       </slot>
     </button>
-    <div v-show="isDropdownVisible" :class="props.dropdownClass"> 
+    <div v-show="isDropdownVisible" :class="props.dropdownClass">
       <slot name="dropdown" :close="closeDropdown">
         <!-- Default dropdown content -->
         <ul>
-          <li>
-            <i class="pi pi-user"></i> Default Item 1
-          </li>
-          <li>
-            <i class="pi pi-cog"></i> Default Item 2
-          </li>
+          <li><i class="pi pi-user"></i> Default Item 1</li>
+          <li><i class="pi pi-cog"></i> Default Item 2</li>
         </ul>
       </slot>
     </div>

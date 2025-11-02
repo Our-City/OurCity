@@ -11,7 +11,7 @@ const comments = [
     votes: 5,
     isDeleted: false,
     createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-01T00:00:00Z"
+    updatedAt: "2023-01-01T00:00:00Z",
   },
   {
     id: 2,
@@ -21,14 +21,14 @@ const comments = [
     votes: 2,
     isDeleted: false,
     createdAt: "2023-01-02T00:00:00Z",
-    updatedAt: "2023-01-02T00:00:00Z"
-  }
+    updatedAt: "2023-01-02T00:00:00Z",
+  },
 ];
 
 describe("CommentList", () => {
   it("renders the correct number of CommentItem components", () => {
     const wrapper = mount(CommentList, {
-      props: { props: comments }
+      props: { props: comments },
     });
     const items = wrapper.findAllComponents({ name: "CommentItem" });
     expect(items.length).toBe(comments.length);
@@ -36,7 +36,7 @@ describe("CommentList", () => {
 
   it("passes the correct props to CommentItem", () => {
     const wrapper = mount(CommentList, {
-      props: { props: comments }
+      props: { props: comments },
     });
     const items = wrapper.findAllComponents({ name: "CommentItem" });
     items.forEach((item, idx) => {

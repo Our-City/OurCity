@@ -1,170 +1,165 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from "vue";
 
 interface Props {
-  modelValue: string[]
-  options: string[]
-  placeholder?: string
-  disabled?: boolean
-  maxSelected?: number
-  searchable?: boolean
-  maxHeight?: string
+  modelValue: string[];
+  options: string[];
+  placeholder?: string;
+  disabled?: boolean;
+  maxSelected?: number;
+  searchable?: boolean;
+  maxHeight?: string;
 }
 
 interface Emits {
-  'update:modelValue': [value: string[]]
-  'change': [value: string[]]
+  "update:modelValue": [value: string[]];
+  change: [value: string[]];
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  placeholder: 'Select options...',
+  placeholder: "Select options...",
   disabled: false,
   maxSelected: undefined,
   searchable: true,
-  maxHeight: '200px'
-})
+  maxHeight: "200px",
+});
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits<Emits>();
 
-const isOpen = ref(false)
-const searchQuery = ref('')
-const multiSelectRef = ref<HTMLElement>()
-const searchInputRef = ref<HTMLInputElement>()
+const isOpen = ref(false);
+const searchQuery = ref("");
+const multiSelectRef = ref<HTMLElement>();
+const searchInputRef = ref<HTMLInputElement>();
 
 // Computed properties
 const selectedValues = computed({
   get: () => props.modelValue,
   set: (value) => {
-    emit('update:modelValue', value)
-    emit('change', value)
-  }
-})
+    emit("update:modelValue", value);
+    emit("change", value);
+  },
+});
 
 const filteredOptions = computed(() => {
   if (!props.searchable || !searchQuery.value) {
-    return props.options
+    return props.options;
   }
-  
-  return props.options.filter(option =>
-    option.toLowerCase().includes(searchQuery.value.toLowerCase())
-  )
-})
+
+  return props.options.filter((option) =>
+    option.toLowerCase().includes(searchQuery.value.toLowerCase()),
+  );
+});
 
 const displayText = computed(() => {
   if (selectedValues.value.length === 0) {
-    return props.placeholder
+    return props.placeholder;
   }
-  
+
   if (selectedValues.value.length === 1) {
-    return selectedValues.value[0]
+    return selectedValues.value[0];
   }
-  
-  return `${selectedValues.value.length} items selected`
-})
+
+  return `${selectedValues.value.length} items selected`;
+});
 
 const isMaxSelected = computed(() => {
-  return props.maxSelected !== undefined && selectedValues.value.length >= props.maxSelected
-})
+  return props.maxSelected !== undefined && selectedValues.value.length >= props.maxSelected;
+});
 
 // Methods
 const toggleDropdown = () => {
-  if (props.disabled) return
-  
-  isOpen.value = !isOpen.value
-  
+  if (props.disabled) return;
+
+  isOpen.value = !isOpen.value;
+
   if (isOpen.value && props.searchable) {
     // Focus search input when dropdown opens
     setTimeout(() => {
-      searchInputRef.value?.focus()
-    }, 100)
+      searchInputRef.value?.focus();
+    }, 100);
   }
-}
+};
 
 const closeDropdown = () => {
-  isOpen.value = false
-  searchQuery.value = ''
-}
+  isOpen.value = false;
+  searchQuery.value = "";
+};
 
 const selectOption = (option: string) => {
-  if (props.disabled) return
-  
-  const currentValues = [...selectedValues.value]
-  const index = currentValues.indexOf(option)
-  
+  if (props.disabled) return;
+
+  const currentValues = [...selectedValues.value];
+  const index = currentValues.indexOf(option);
+
   if (index > -1) {
     // Remove if already selected
-    currentValues.splice(index, 1)
+    currentValues.splice(index, 1);
   } else {
     // Add if not selected and not at max
     if (!isMaxSelected.value) {
-      currentValues.push(option)
+      currentValues.push(option);
     }
   }
-  
-  selectedValues.value = currentValues
-}
+
+  selectedValues.value = currentValues;
+};
 
 const removeOption = (option: string, event?: Event) => {
   if (event) {
-    event.stopPropagation()
+    event.stopPropagation();
   }
-  
-  if (props.disabled) return
-  
-  const currentValues = [...selectedValues.value]
-  const index = currentValues.indexOf(option)
-  
+
+  if (props.disabled) return;
+
+  const currentValues = [...selectedValues.value];
+  const index = currentValues.indexOf(option);
+
   if (index > -1) {
-    currentValues.splice(index, 1)
-    selectedValues.value = currentValues
+    currentValues.splice(index, 1);
+    selectedValues.value = currentValues;
   }
-}
+};
 
 const clearAll = (event: Event) => {
-  event.stopPropagation()
-  if (props.disabled) return
-  
-  selectedValues.value = []
-}
+  event.stopPropagation();
+  if (props.disabled) return;
+
+  selectedValues.value = [];
+};
 
 const isSelected = (option: string) => {
-  return selectedValues.value.includes(option)
-}
+  return selectedValues.value.includes(option);
+};
 
 // Click outside handler
 const handleClickOutside = (event: Event) => {
   if (multiSelectRef.value && !multiSelectRef.value.contains(event.target as Node)) {
-    closeDropdown()
+    closeDropdown();
   }
-}
+};
 
 // Lifecycle
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
+  document.addEventListener("click", handleClickOutside);
+});
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
+  document.removeEventListener("click", handleClickOutside);
+});
 </script>
 
 <template>
-  <div 
+  <div
     ref="multiSelectRef"
     class="multiselect"
-    :class="{ 
-      'multiselect--open': isOpen, 
+    :class="{
+      'multiselect--open': isOpen,
       'multiselect--disabled': disabled,
-      'multiselect--has-value': selectedValues.length > 0
+      'multiselect--has-value': selectedValues.length > 0,
     }"
   >
     <!-- Main trigger button -->
-    <button
-      type="button"
-      class="multiselect__trigger"
-      :disabled="disabled"
-      @click="toggleDropdown"
-    >
+    <button type="button" class="multiselect__trigger" :disabled="disabled" @click="toggleDropdown">
       <div class="multiselect__content">
         <!-- Selected items display -->
         <div v-if="selectedValues.length > 0" class="multiselect__selected">
@@ -186,13 +181,13 @@ onUnmounted(() => {
             +{{ selectedValues.length - 3 }} more
           </span>
         </div>
-        
+
         <!-- Placeholder -->
         <span v-else class="multiselect__placeholder">
           {{ placeholder }}
         </span>
       </div>
-      
+
       <!-- Actions -->
       <div class="multiselect__actions">
         <button
@@ -203,18 +198,12 @@ onUnmounted(() => {
         >
           ×
         </button>
-        <i class="multiselect__arrow" :class="{ 'multiselect__arrow--up': isOpen }">
-          ▼
-        </i>
+        <i class="multiselect__arrow" :class="{ 'multiselect__arrow--up': isOpen }"> ▼ </i>
       </div>
     </button>
-    
+
     <!-- Dropdown -->
-    <div 
-      v-show="isOpen" 
-      class="multiselect__dropdown"
-      :style="{ maxHeight: maxHeight }"
-    >
+    <div v-show="isOpen" class="multiselect__dropdown" :style="{ maxHeight: maxHeight }">
       <!-- Search input -->
       <div v-if="searchable" class="multiselect__search">
         <input
@@ -226,30 +215,25 @@ onUnmounted(() => {
           @click.stop
         />
       </div>
-      
+
       <!-- Options list -->
       <div class="multiselect__options">
         <div
           v-for="option in filteredOptions"
           :key="option"
           class="multiselect__option"
-          :class="{ 
+          :class="{
             'multiselect__option--selected': isSelected(option),
-            'multiselect__option--disabled': !isSelected(option) && isMaxSelected
+            'multiselect__option--disabled': !isSelected(option) && isMaxSelected,
           }"
           @click="selectOption(option)"
         >
           <div class="multiselect__option-content">
             <span class="multiselect__option-text">{{ option }}</span>
-            <i 
-              v-if="isSelected(option)" 
-              class="multiselect__option-check"
-            >
-              ✓
-            </i>
+            <i v-if="isSelected(option)" class="multiselect__option-check"> ✓ </i>
           </div>
         </div>
-        
+
         <!-- No results -->
         <div v-if="filteredOptions.length === 0" class="multiselect__no-results">
           No options found
@@ -276,7 +260,9 @@ onUnmounted(() => {
   border: 1px solid var(--neutral-color);
   border-radius: 0.375rem;
   cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   text-align: left;
 }
 

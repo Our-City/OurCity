@@ -13,11 +13,11 @@ const router = useRouter();
 
 // Form data
 const formData = ref({
-  title: '',
-  location: '',
-  description: '',
+  title: "",
+  location: "",
+  description: "",
   tags: [] as string[],
-  images: [] as File[]
+  images: [] as File[],
 });
 
 // Form state
@@ -30,34 +30,33 @@ const descriptionTouched = ref(false);
 
 // Available tags for multiselect
 const availableTags = ref([
-  'Construction',
-  'Transportation',
-  'Entertainment',
-  'Shopping',
-  'Food & Dining',
-  'Parks & Recreation',
-  'Safety',
-  'Community Events',
-  'Infrastructure',
-  'Business',
-  'Education',
-  'Healthcare',
-  'Environment',
-  'Sports',
-  'Culture',
-  'Tourism',
-  'Housing',
-  'Technology'
+  "Construction",
+  "Transportation",
+  "Entertainment",
+  "Shopping",
+  "Food & Dining",
+  "Parks & Recreation",
+  "Safety",
+  "Community Events",
+  "Infrastructure",
+  "Business",
+  "Education",
+  "Healthcare",
+  "Environment",
+  "Sports",
+  "Culture",
+  "Tourism",
+  "Housing",
+  "Technology",
 ]);
 
 // Computed properties
 const isFormValid = computed(() => {
-  return formData.value.title.trim() && 
-         formData.value.description.trim();
+  return formData.value.title.trim() && formData.value.description.trim();
 });
 
 const imagePreviewUrls = computed(() => {
-  return formData.value.images.map(file => URL.createObjectURL(file));
+  return formData.value.images.map((file) => URL.createObjectURL(file));
 });
 
 // Computed properties for showing errors only after touch
@@ -76,12 +75,12 @@ const showDescriptionError = computed(() => {
 // Form handlers
 const handleSubmit = async (event: Event) => {
   event.preventDefault();
-  
+
   // Mark all fields as touched on submit
   titleTouched.value = true;
   locationTouched.value = true;
   descriptionTouched.value = true;
-  
+
   if (!isFormValid.value) {
     validateForm();
     return;
@@ -96,22 +95,22 @@ const handleSubmit = async (event: Event) => {
       authorId: 1, // This would come from auth context
       title: formData.value.title.trim(),
       location: formData.value.location.trim(),
-      description: formData.value.description.trim()
+      description: formData.value.description.trim(),
     };
 
     // Here you would make the actual API call
-    console.log('Creating post:', postData);
-    console.log('Tags:', formData.value.tags);
-    console.log('Images:', formData.value.images);
+    console.log("Creating post:", postData);
+    console.log("Tags:", formData.value.tags);
+    console.log("Images:", formData.value.images);
 
     // Simulate delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Redirect to home or post view
-    router.push('/');
+    router.push("/");
   } catch (error) {
-    console.error('Error creating post:', error);
-    errors.value.submit = 'Failed to create post. Please try again.';
+    console.error("Error creating post:", error);
+    errors.value.submit = "Failed to create post. Please try again.";
   } finally {
     isSubmitting.value = false;
   }
@@ -119,11 +118,11 @@ const handleSubmit = async (event: Event) => {
 
 const handleReset = () => {
   formData.value = {
-    title: '',
-    location: '',
-    description: '',
+    title: "",
+    location: "",
+    description: "",
     tags: [],
-    images: []
+    images: [],
   };
   errors.value = {};
   titleTouched.value = false;
@@ -135,13 +134,13 @@ const validateForm = () => {
   errors.value = {};
 
   if (!formData.value.title.trim()) {
-    errors.value.title = 'Title is required';
+    errors.value.title = "Title is required";
   }
 
   if (!formData.value.description.trim()) {
-    errors.value.description = 'Description is required';
+    errors.value.description = "Description is required";
   } else if (formData.value.description.trim().length < 10) {
-    errors.value.description = 'Description must be at least 10 characters';
+    errors.value.description = "Description must be at least 10 characters";
   }
 };
 
@@ -149,22 +148,23 @@ const handleFileUpload = (event: Event) => {
   const target = event.target as HTMLInputElement;
   if (target.files) {
     const newFiles = Array.from(target.files);
-    
+
     // Validate file types and sizes
-    const validFiles = newFiles.filter(file => {
-      if (!file.type.startsWith('image/')) {
+    const validFiles = newFiles.filter((file) => {
+      if (!file.type.startsWith("image/")) {
         return false;
       }
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      if (file.size > 5 * 1024 * 1024) {
+        // 5MB limit
         return false;
       }
       return true;
     });
 
     formData.value.images = [...formData.value.images, ...validFiles];
-    
+
     // Clear the input
-    target.value = '';
+    target.value = "";
   }
 };
 
@@ -180,12 +180,12 @@ const removeImage = (index: number) => {
     </div>
     <div class="create-post-page-layout">
       <div class="side-bar">
-        <SideBar view="home"/>
+        <SideBar view="home" />
       </div>
       <div class="create-post-page-body">
         <div class="create-post-container">
-          <Form 
-            variant="card" 
+          <Form
+            variant="card"
             width="wide"
             title="Create New Post"
             subtitle="Share what you'd like to see in your city"
@@ -208,7 +208,10 @@ const removeImage = (index: number) => {
                 placeholder="Enter a descriptive title for your post"
                 :class="{ 'p-invalid': showTitleError }"
                 maxlength="50"
-                @blur="titleTouched = true; validateForm();"
+                @blur="
+                  titleTouched = true;
+                  validateForm();
+                "
               />
               <div v-if="showTitleError" class="form-error">{{ errors.title }}</div>
               <div class="form-help">{{ formData.title.length }}/50 characters</div>
@@ -224,10 +227,15 @@ const removeImage = (index: number) => {
                 placeholder="e.g., Downtown Winnipeg, University of Manitoba"
                 :class="{ 'p-invalid': showLocationError }"
                 maxlength="50"
-                @blur="locationTouched = true; validateForm();"
+                @blur="
+                  locationTouched = true;
+                  validateForm();
+                "
               />
               <div v-if="showLocationError" class="form-error">{{ errors.location }}</div>
-              <div class="form-help">Where is this post about? {{ formData.location.length }}/50 characters (optional)</div>
+              <div class="form-help">
+                Where is this post about? {{ formData.location.length }}/50 characters (optional)
+              </div>
             </div>
 
             <!-- Description Field -->
@@ -241,7 +249,10 @@ const removeImage = (index: number) => {
                 :class="{ 'p-invalid': showDescriptionError }"
                 rows="6"
                 maxlength="500"
-                @blur="descriptionTouched = true; validateForm();"
+                @blur="
+                  descriptionTouched = true;
+                  validateForm();
+                "
               />
               <div v-if="showDescriptionError" class="form-error">{{ errors.description }}</div>
               <div class="form-help">{{ formData.description.length }}/500 characters</div>
@@ -258,7 +269,9 @@ const removeImage = (index: number) => {
                 :max-selected="5"
                 :searchable="true"
               />
-              <div class="form-help">Choose tags that best describe your post (max 5, optional)</div>
+              <div class="form-help">
+                Choose tags that best describe your post (max 5, optional)
+              </div>
             </div>
 
             <!-- Image Upload Field -->
@@ -278,8 +291,10 @@ const removeImage = (index: number) => {
                   Choose Images
                 </div>
               </div>
-              <div class="form-help">Upload images to illustrate your post (max 5MB each, optional)</div>
-              
+              <div class="form-help">
+                Upload images to illustrate your post (max 5MB each, optional)
+              </div>
+
               <!-- Image previews -->
               <div v-if="formData.images.length > 0" class="form-file-preview">
                 <div
@@ -305,33 +320,32 @@ const removeImage = (index: number) => {
 
             <!-- Form Actions -->
             <template #actions="{ loading }">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 class="form-button form-button--outline"
                 @click="$router.push('/')"
                 :disabled="loading"
               >
                 Cancel
               </button>
-              <button 
-                type="reset" 
-                class="form-button form-button--secondary"
-                :disabled="loading"
-              >
+              <button type="reset" class="form-button form-button--secondary" :disabled="loading">
                 Clear Form
               </button>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 class="form-button form-button--primary"
                 :disabled="loading || !isFormValid"
               >
-                {{ loading ? 'Creating Post...' : 'Create Post' }}
+                {{ loading ? "Creating Post..." : "Create Post" }}
               </button>
             </template>
 
             <!-- Footer -->
             <template #footer>
-              <p>Your post will be visible to all users in the community. Please follow community guidelines.</p>
+              <p>
+                Your post will be visible to all users in the community. Please follow community
+                guidelines.
+              </p>
             </template>
           </Form>
         </div>
@@ -342,7 +356,7 @@ const removeImage = (index: number) => {
 
 <style scoped>
 .create-post-page-layout {
-  display: flex; 
+  display: flex;
   height: 100vh;
   overflow: hidden;
 }
@@ -383,15 +397,15 @@ const removeImage = (index: number) => {
   .create-post-page-body {
     padding: 1rem;
   }
-  
+
   .create-post-page-layout {
     flex-direction: column;
   }
-  
+
   .side-bar {
     order: 2;
   }
-  
+
   .create-post-page-body {
     order: 1;
   }

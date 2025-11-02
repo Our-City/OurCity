@@ -7,7 +7,7 @@ const props = defineProps<{
     src: string;
     alt: string;
     title: string;
-  }>
+  }>;
 }>();
 
 const imgIndex = ref(0);
@@ -18,7 +18,8 @@ function nextImage() {
 }
 
 function prevImage() {
-  imgIndex.value = ((imgIndex.value - 1) % props.images.length + props.images.length) % props.images.length;
+  imgIndex.value =
+    (((imgIndex.value - 1) % props.images.length) + props.images.length) % props.images.length;
 }
 
 function openImageModal() {
@@ -28,7 +29,6 @@ function openImageModal() {
 function closeImageModal() {
   showImageModal.value = false;
 }
-
 </script>
 
 <template>

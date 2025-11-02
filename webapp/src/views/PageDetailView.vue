@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router"; 
+import { useRouter } from "vue-router";
 import { ref, onMounted } from "vue";
 import Textarea from "primevue/textarea";
 import PageHeader from "@/components/PageHeader.vue";
@@ -14,17 +14,11 @@ const comments = ref(mockComments);
 
 const commentText = ref("");
 
-function submitComment() {
+function submitComment() {}
 
-}
+function handleUpvote() {}
 
-function handleUpvote() {
-
-}
-
-function handleDownvote() {
-  
-}
+function handleDownvote() {}
 
 onMounted(() => {
   images.value = [
@@ -47,7 +41,7 @@ onMounted(() => {
       src: "https://images.unsplash.com/photo-1574294116096-dc5d5015b42a?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=870",
       alt: "Image 4 Description",
       title: "Image 4 Title",
-    }
+    },
   ];
 });
 </script>
@@ -58,21 +52,15 @@ onMounted(() => {
   </div>
   <div class="post-detail-layout">
     <div class="side-bar">
-        <SideBar view="home"/>
+      <SideBar view="home" />
     </div>
     <div class="post-detail-body">
       <div class="post-detail-content-layout">
         <div class="post-content">
           <div class="post-card">
-            <div class="post-tags">
-              Tags Placeholder
-            </div>
-            <h1 class="post-title">
-              Exploring the City Streets
-            </h1>
-            <div class="post-author">
-              @username · 6 days ago
-            </div>
+            <div class="post-tags">Tags Placeholder</div>
+            <h1 class="post-title">Exploring the City Streets</h1>
+            <div class="post-author">@username · 6 days ago</div>
 
             <div class="post-images">
               <div v-if="images" class="post-images">
@@ -81,20 +69,31 @@ onMounted(() => {
             </div>
 
             <div class="post-description">
-              Post description 
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum mattis vehicula sagittis. Nunc ut suscipit justo. Praesent ut enim vel elit fringilla iaculis quis at est. Nullam augue nunc, auctor eget dolor quis, sodales vehicula erat. In hac habitasse platea dictumst. Curabitur id diam a est lobortis sollicitudin eget eget dui. Praesent mattis ullamcorper purus a pellentesque. Phasellus quis risus ut ligula hendrerit finibus. Pellentesque interdum ligula nec egestas varius. Fusce erat nibh, suscipit et aliquam nec, ornare ac lectus. Fusce eu erat scelerisque, luctus ante a, volutpat leo. Donec congue nibh odio, eget viverra odio commodo ac.
-              Fusce eleifend tincidunt convallis. Suspendisse potenti. Curabitur molestie dolor ac suscipit consequat. Proin eu lacus nec tortor sodales semper. Nulla diam tellus, posuere quis lectus id, malesuada rhoncus tellus. Duis libero metus, mollis sed aliquam rhoncus, suscipit eu dui. Aliquam vel elit porttitor diam bibendum rutrum. Nam posuere purus ligula, sed fermentum sapien condimentum non. Aenean rutrum sagittis eros, at dapibus augue ullamcorper vitae. Cras porttitor vulputate erat non faucibus. Nunc volutpat, augue fringilla commodo aliquam, elit neque fermentum dolor, tempus tempus nisi odio sed ipsum. 
+              Post description Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum
+              mattis vehicula sagittis. Nunc ut suscipit justo. Praesent ut enim vel elit fringilla
+              iaculis quis at est. Nullam augue nunc, auctor eget dolor quis, sodales vehicula erat.
+              In hac habitasse platea dictumst. Curabitur id diam a est lobortis sollicitudin eget
+              eget dui. Praesent mattis ullamcorper purus a pellentesque. Phasellus quis risus ut
+              ligula hendrerit finibus. Pellentesque interdum ligula nec egestas varius. Fusce erat
+              nibh, suscipit et aliquam nec, ornare ac lectus. Fusce eu erat scelerisque, luctus
+              ante a, volutpat leo. Donec congue nibh odio, eget viverra odio commodo ac. Fusce
+              eleifend tincidunt convallis. Suspendisse potenti. Curabitur molestie dolor ac
+              suscipit consequat. Proin eu lacus nec tortor sodales semper. Nulla diam tellus,
+              posuere quis lectus id, malesuada rhoncus tellus. Duis libero metus, mollis sed
+              aliquam rhoncus, suscipit eu dui. Aliquam vel elit porttitor diam bibendum rutrum. Nam
+              posuere purus ligula, sed fermentum sapien condimentum non. Aenean rutrum sagittis
+              eros, at dapibus augue ullamcorper vitae. Cras porttitor vulputate erat non faucibus.
+              Nunc volutpat, augue fringilla commodo aliquam, elit neque fermentum dolor, tempus
+              tempus nisi odio sed ipsum.
             </div>
             <div class="post-footer">
               <div class="post-voting">
-                <VoteBox :votes="318" @upvote="handleUpvote" @downvote="handleDownvote"/>
+                <VoteBox :votes="318" @upvote="handleUpvote" @downvote="handleDownvote" />
               </div>
             </div>
           </div>
           <div class="comment-card">
-            <h1 class="comment-header">
-              Comments ({{ comments.length }})
-            </h1>
+            <h1 class="comment-header">Comments ({{ comments.length }})</h1>
             <div class="comment-input-container">
               <TextArea
                 class="comment-input"
@@ -102,10 +101,7 @@ onMounted(() => {
                 placeholder="Add your thoughts here..."
                 rows="3"
               ></TextArea>
-              <button
-                class="comment-submit-button"
-                @click="submitComment"
-              >Submit</button>
+              <button class="comment-submit-button" @click="submitComment">Submit</button>
             </div>
             <CommentList :props="comments" />
           </div>
@@ -117,13 +113,11 @@ onMounted(() => {
       </div>
     </div>
   </div>
-  
 </template>
 
 <style scoped>
-
 .post-detail-layout {
-  display: flex; 
+  display: flex;
   height: 100vh;
   overflow: hidden;
 }
@@ -137,14 +131,14 @@ onMounted(() => {
 }
 
 .post-detail-content-layout {
-  display: flex; 
+  display: flex;
   gap: 1rem;
   margin: 1rem 1.5rem 1rem 1rem;
   padding: 1rem 0 0 1rem;
 }
 
 .post-content {
-  display: flex; 
+  display: flex;
   flex: 1;
   flex-direction: column;
 }
@@ -187,7 +181,7 @@ onMounted(() => {
 }
 
 .post-footer {
-  display: flex; 
+  display: flex;
   justify-content: flex-start;
   align-items: center;
 }
@@ -226,7 +220,6 @@ onMounted(() => {
   margin-right: 2rem;
   color: var(--secondary-text-color);
   background: var(--neutral-color);
-  
 }
 
 .comment-submit-button:hover {
@@ -234,14 +227,14 @@ onMounted(() => {
 }
 
 .map-overview {
-  display: flex; 
+  display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center; 
+  align-items: center;
   gap: 0.5rem;
-  width: 30rem; 
-  height: 65rem; 
-  background: var(--primary-background-color); 
+  width: 30rem;
+  height: 65rem;
+  background: var(--primary-background-color);
   border: 0.1rem solid var(--border-color);
 }
 
@@ -256,7 +249,8 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
-
 </style>

@@ -3,139 +3,101 @@ import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import Form from "@/components/utils/Form.vue";
 import InputText from "primevue/inputtext";
-
 const router = useRouter();
-
 // Form data
 const formData = ref({
-  username: '',
-  password: ''
+  username: "",
+  password: "",
 });
-
 // Form state
 const isSubmitting = ref(false);
 const errors = ref<Record<string, string>>({});
 const showPassword = ref(false);
-
 const usernameTouched = ref(false);
 const passwordTouched = ref(false);
-
 // Computed properties
 const isFormValid = computed(() => {
-  return formData.value.username.trim() && 
-         formData.value.password.trim();
+  return formData.value.username.trim() && formData.value.password.trim();
 });
-
 // Computed properties for showing errors only after touch
 const showUsernameError = computed(() => {
   return usernameTouched.value && errors.value.username;
 });
-
 const showPasswordError = computed(() => {
   return passwordTouched.value && errors.value.password;
 });
-
 // Form handlers
 const handleSubmit = async (event: Event) => {
   event.preventDefault();
-  
+
   // Mark all fields as touched on submit
   usernameTouched.value = true;
   passwordTouched.value = true;
-  
+
   if (!isFormValid.value) {
     validateForm();
     return;
   }
-
   isSubmitting.value = true;
   errors.value = {};
-
   try {
     // Simulate API call for login
     const loginData = {
       username: formData.value.username.trim(),
-      password: formData.value.password
+      password: formData.value.password,
     };
-
     // Here you would make the actual API call
-    console.log('Logging in with:', loginData);
-
+    console.log("Logging in with:", loginData);
     // Simulate success - redirect to home
-    router.push('/');
+    router.push("/");
   } catch (error) {
-    console.error('Login error:', error);
-    errors.value.submit = 'Invalid credentials. Please try again.';
+    console.error("Login error:", error);
+    errors.value.submit = "Invalid credentials. Please try again.";
   } finally {
     isSubmitting.value = false;
   }
 };
-
 const handleReset = () => {
   formData.value = {
-    username: '',
-    password: ''
+    username: "",
+    password: "",
   };
   errors.value = {};
   usernameTouched.value = false;
   passwordTouched.value = false;
 };
-
 const validateForm = () => {
   errors.value = {};
-
   // Username validation
   if (!formData.value.username.trim()) {
-    errors.value.username = 'Username is required';
+    errors.value.username = "Username is required";
   }
-
   // Password validation
   if (!formData.value.password.trim()) {
-    errors.value.password = 'Password is required';
+    errors.value.password = "Password is required";
   } else if (formData.value.password.length < 6) {
-    errors.value.password = 'Password must be at least 6 characters';
+    errors.value.password = "Password must be at least 6 characters";
   }
 };
-
-import "@/assets/styles/forms.css";
-import WipMessage from "@/components/WipMessage.vue";
-
-type LoginFormValues = {
-  username: "";
-};
-
-const initialValues = {
-  username: "",
-};
-
-const resolver = toTypedSchema(
-  z.object({
-    username: z.string().min(1, { message: "Username is required" }).nonempty(),
-  }),
-);
-
 const navigateToRegister = () => {
-  router.push('/register');
+  router.push("/register");
 };
-
 const navigateToForgotPassword = () => {
-//   router.push('/forgot-password');
+  //   router.push('/forgot-password');
 };
-
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value;
 };
-
 const handleCancel = () => {
-  router.push('/');
+  router.push("/");
 };
 </script>
 
 <template>
   <div class="login-page">
     <div class="login-container">
-      <Form 
-        variant="card" 
+      <Form
+        variant="card"
         width="narrow"
         title="Welcome Back"
         subtitle="Sign in to your OurCity account"
@@ -159,7 +121,10 @@ const handleCancel = () => {
             placeholder="Enter your username"
             :class="{ 'p-invalid': showUsernameError }"
             autocomplete="username"
-            @blur="usernameTouched = true; validateForm();"
+            @blur="
+              usernameTouched = true;
+              validateForm();
+            "
           />
           <div v-if="showUsernameError" class="form-error">{{ errors.username }}</div>
         </div>
@@ -173,10 +138,13 @@ const handleCancel = () => {
               v-model="formData.password"
               :type="showPassword ? 'text' : 'password'"
               class="form-input password-input"
-              :class="{ 'invalid': showPasswordError }"
+              :class="{ invalid: showPasswordError }"
               placeholder="Enter your password"
               autocomplete="current-password"
-              @blur="passwordTouched = true; validateForm();"
+              @blur="
+                passwordTouched = true;
+                validateForm();
+              "
             />
             <button
               type="button"
@@ -193,11 +161,7 @@ const handleCancel = () => {
         <!-- Additional Options -->
         <template #between>
           <div class="login-options">
-            <button 
-              type="button" 
-              class="link-button"
-              @click="navigateToForgotPassword"
-            >
+            <button type="button" class="link-button" @click="navigateToForgotPassword">
               Forgot your password?
             </button>
           </div>
@@ -205,20 +169,20 @@ const handleCancel = () => {
 
         <!-- Form Actions -->
         <template #actions="{ loading }">
-          <button 
-            type="button" 
+          <button
+            type="button"
             class="form-button form-button--outline"
             @click="handleCancel"
             :disabled="loading"
           >
             Cancel
           </button>
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             class="form-button form-button--primary login-button"
             :disabled="loading || !isFormValid"
           >
-            {{ loading ? 'Signing In...' : 'Sign In' }}
+            {{ loading ? "Signing In..." : "Sign In" }}
           </button>
         </template>
 
@@ -226,27 +190,11 @@ const handleCancel = () => {
         <template #footer>
           <div class="login-footer">
             <p>
-              Don't have an account? 
-              <button 
-                type="button" 
-                class="link-button"
-                @click="navigateToRegister"
-              >
+              Don't have an account?
+              <button type="button" class="link-button" @click="navigateToRegister">
                 Sign up here
               </button>
             </p>
-        <template #content>
-          <Form :initialValues="initialValues" :resolver="resolver" @submit="onFormSubmit">
-            <div class="field-common">
-              <label id="username-label" for="username">username</label>
-              <Field id="username-field" name="username" v-slot="{ field }">
-                <InputText id="uesrname-inputText" v-bind="field" placeholder="John Doe" />
-              </Field>
-            </div>
-            <Button id="login-btn" type="submit" label="Log in" class="mt-2" />
-          </Form>
-          <div class="card-footer">
-            <span>New here? </span><router-link to="/register">Create an account</router-link>
           </div>
         </template>
       </Form>
@@ -260,7 +208,11 @@ const handleCancel = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--neutral-color) 0%, var(--secondary-background-color) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--neutral-color) 0%,
+    var(--secondary-background-color) 100%
+  );
   padding: 2rem;
 }
 .login-container {
@@ -313,7 +265,9 @@ const handleCancel = () => {
   cursor: pointer;
   padding: 0.25rem;
   border-radius: 0.25rem;
-  transition: color 0.2s ease, background-color 0.2s ease;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -338,7 +292,7 @@ const handleCancel = () => {
   .login-page {
     padding: 1rem;
   }
-  
+
   .login-container {
     max-width: 100%;
   }

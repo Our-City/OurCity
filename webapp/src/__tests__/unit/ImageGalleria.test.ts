@@ -5,7 +5,7 @@ import ImageGalleria from "@/components/ImageGalleria.vue";
 const images = [
   { src: "https://test.com/img1.jpg", alt: "Image 1", title: "Title 1" },
   { src: "https://test.com/img2.jpg", alt: "Image 2", title: "Title 2" },
-  { src: "https://test.com/img3.jpg", alt: "Image 3", title: "Title 3" }
+  { src: "https://test.com/img3.jpg", alt: "Image 3", title: "Title 3" },
 ];
 
 describe("ImageGalleria", () => {

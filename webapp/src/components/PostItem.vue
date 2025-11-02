@@ -4,7 +4,7 @@ import { computed } from "vue";
 import type { PostResponseDto } from "@/types/posts";
 import { mockUsers } from "@/data/mockData";
 
-const props = defineProps<{post: PostResponseDto}>();
+const props = defineProps<{ post: PostResponseDto }>();
 
 const emit = defineEmits<{
   (e: "upvote"): void;
@@ -21,7 +21,7 @@ function downvote() {
 
 // Get the username from the author ID
 const authorUsername = computed(() => {
-  const author = mockUsers.find(user => user.id === props.post.authorId);
+  const author = mockUsers.find((user) => user.id === props.post.authorId);
   if (!author) {
     return `User #${props.post.authorId}`;
   }
@@ -44,7 +44,6 @@ const commentCount = computed(() => {
 const postImage = computed(() => {
   return props.post.images?.[0]?.url || null;
 });
-
 </script>
 
 <template>
@@ -63,15 +62,11 @@ const postImage = computed(() => {
         <i class="pi pi-sort-alt"></i>
         <div class="post-number-stats">{{ post.votes }}</div>
         <i class="pi pi-comments"></i>
-        <div class="post-number-stats">{{ commentCount }}</div> 
+        <div class="post-number-stats">{{ commentCount }}</div>
       </div>
     </div>
     <div v-if="postImage" class="post-card-right">
-      <img 
-        :src="postImage" 
-        alt="Post Image" 
-        class="post-image"
-      />
+      <img :src="postImage" alt="Post Image" class="post-image" />
     </div>
   </div>
 </template>

@@ -1,26 +1,23 @@
-
 import { describe, it, expect } from "vitest";
 import { mount } from "@vue/test-utils";
 import PageHeader from "@/components/PageHeader.vue";
 
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory } from "vue-router";
 
 const router = createRouter({
   history: createWebHistory(),
-  routes: [
-    { path: '/', component: { template: '<div />' } }
-  ]
+  routes: [{ path: "/", component: { template: "<div />" } }],
 });
 
 const mountOptions = {
   global: {
     plugins: [router],
     stubs: {
-      'InputText': { template: '<input class="search-input" />' },
-      'Dropdown': true
+      InputText: { template: '<input class="search-input" />' },
+      Dropdown: true,
       // Do not stub Toolbar so slot content is rendered
-    }
-  }
+    },
+  },
 };
 
 describe("PageHeader", () => {

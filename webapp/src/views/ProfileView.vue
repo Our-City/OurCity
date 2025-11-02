@@ -8,7 +8,6 @@ import ProfileToolbar from "@/components/profile/ProfileToolbar.vue";
 import SideBar from "@/components/SideBar.vue";
 
 const posts = ref(mockPosts);
-
 </script>
 
 <template>
@@ -17,13 +16,13 @@ const posts = ref(mockPosts);
       <PageHeader />
     </div>
     <div class="profile-page-layout">
-      <SideBar view="profile"/>
+      <SideBar view="profile" />
       <div class="profile-page-body">
         <ProfileHeader username="JohnDoe" />
         <ProfileToolbar />
         <div class="profile-page-content-layout">
           <div class="post-list">
-            <PostList :posts="posts"/>
+            <PostList :posts="posts" />
           </div>
         </div>
       </div>
@@ -33,7 +32,7 @@ const posts = ref(mockPosts);
 
 <style scoped>
 .profile-page-layout {
-  display: flex; 
+  display: flex;
   height: 100vh;
 }
 
@@ -71,7 +70,9 @@ const posts = ref(mockPosts);
   border: none;
   border-radius: 0.75rem;
   padding: 0.75rem 2rem;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 
 .create-post-button:hover {
@@ -80,7 +81,7 @@ const posts = ref(mockPosts);
 }
 
 .profile-page-content-layout {
-  display: flex; 
+  display: flex;
   gap: 1rem;
   margin: 1rem 1.5rem 1rem 1rem;
 }
@@ -91,14 +92,14 @@ const posts = ref(mockPosts);
 }
 
 .map-overview {
-  display: flex; 
+  display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center; 
+  align-items: center;
   gap: 0.5rem;
-  width: 20rem; 
-  height: 56.5vh; 
-  background: var(--test-color); 
+  width: 20rem;
+  height: 56.5vh;
+  background: var(--test-color);
 }
 
 .spinner {
@@ -112,6 +113,8 @@ const posts = ref(mockPosts);
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

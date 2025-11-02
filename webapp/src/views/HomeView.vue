@@ -14,7 +14,6 @@ const router = useRouter();
 function handleCreatePost(): void {
   router.push("/create-post");
 }
-
 </script>
 
 <template>
@@ -24,14 +23,12 @@ function handleCreatePost(): void {
     </div>
     <div class="home-page-layout">
       <div class="side-bar">
-        <SideBar view="home"/>
+        <SideBar view="home" />
       </div>
       <div class="home-page-body">
         <Card class="create-post-card">
           <template #title>
-            <h1 class="create-post-title">
-              A community for Winnipeg residents
-            </h1>
+            <h1 class="create-post-title">A community for Winnipeg residents</h1>
           </template>
           <template #content>
             <div class="create-post-description">
@@ -44,8 +41,7 @@ function handleCreatePost(): void {
         </Card>
         <div class="home-page-content-layout">
           <div class="post-list">
-
-            <PostList :posts="posts"/>
+            <PostList :posts="posts" />
           </div>
           <div class="map-overview">
             Map Overview Coming Soon
@@ -59,7 +55,7 @@ function handleCreatePost(): void {
 
 <style scoped>
 .home-page-layout {
-  display: flex; 
+  display: flex;
   height: 100vh;
   overflow: hidden;
 }
@@ -101,7 +97,9 @@ function handleCreatePost(): void {
   border: none;
   border-radius: 0.75rem;
   padding: 0.75rem 2rem;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 
 .create-post-button:hover {
@@ -110,7 +108,7 @@ function handleCreatePost(): void {
 }
 
 .home-page-content-layout {
-  display: flex; 
+  display: flex;
   gap: 1rem;
   margin: 1rem 1.5rem 1rem 1rem;
   min-width: 0;
@@ -126,14 +124,14 @@ function handleCreatePost(): void {
 }
 
 .map-overview {
-  display: flex; 
+  display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center; 
+  align-items: center;
   gap: 0.5rem;
-  width: 20rem; 
-  height: 65rem; 
-  background: var(--primary-background-color); 
+  width: 20rem;
+  height: 65rem;
+  background: var(--primary-background-color);
   border: 0.1rem solid var(--border-color);
 }
 
@@ -148,6 +146,8 @@ function handleCreatePost(): void {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

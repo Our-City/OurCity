@@ -1,42 +1,42 @@
 <script setup lang="ts">
 interface Props {
-  title?: string
-  subtitle?: string
-  variant?: 'default' | 'card' | 'modal' | 'inline'
-  width?: 'narrow' | 'medium' | 'wide' | 'full'
-  loading?: boolean
-  disabled?: boolean
+  title?: string;
+  subtitle?: string;
+  variant?: "default" | "card" | "modal" | "inline";
+  width?: "narrow" | "medium" | "wide" | "full";
+  loading?: boolean;
+  disabled?: boolean;
 }
 
 interface Emits {
-  submit: [event: Event]
-  reset: [event: Event]
+  submit: [event: Event];
+  reset: [event: Event];
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  variant: 'default',
-  width: 'medium',
+  variant: "default",
+  width: "medium",
   loading: false,
-  disabled: false
-})
+  disabled: false,
+});
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits<Emits>();
 
 const handleSubmit = (event: Event) => {
   if (props.disabled || props.loading) {
-    event.preventDefault()
-    return
+    event.preventDefault();
+    return;
   }
-  emit('submit', event)
-}
+  emit("submit", event);
+};
 
 const handleReset = (event: Event) => {
   if (props.disabled || props.loading) {
-    event.preventDefault()
-    return
+    event.preventDefault();
+    return;
   }
-  emit('reset', event)
-}
+  emit("reset", event);
+};
 </script>
 
 <template>
@@ -50,7 +50,7 @@ const handleReset = (event: Event) => {
     </div>
 
     <!-- Form Content -->
-    <form 
+    <form
       :class="['form', { 'form--loading': loading, 'form--disabled': disabled }]"
       @submit.prevent="handleSubmit"
       @reset.prevent="handleReset"
@@ -266,7 +266,7 @@ const handleReset = (event: Event) => {
 }
 
 .form :deep(.form-label--required)::after {
-  content: ' *';
+  content: " *";
   color: var(--error-color);
 }
 
@@ -275,7 +275,9 @@ const handleReset = (event: Event) => {
   border: 1px solid var(--neutral-color);
   border-radius: 0.375rem;
   font-size: 1rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .form :deep(.form-input:focus) {
@@ -308,7 +310,9 @@ const handleReset = (event: Event) => {
   font-family: inherit;
   resize: vertical;
   min-height: 100px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .form :deep(.form-textarea:focus) {
@@ -340,7 +344,9 @@ const handleReset = (event: Event) => {
   background: var(--secondary-background-color);
   color: var(--primary-text-color);
   cursor: pointer;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .form :deep(.form-file-button:hover) {
@@ -422,7 +428,9 @@ const handleReset = (event: Event) => {
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
 }
 
 .form :deep(.form-button:hover) {
@@ -476,20 +484,20 @@ const handleReset = (event: Event) => {
   .form-container--modal {
     padding: 1rem;
   }
-  
+
   .form-header {
     margin-bottom: 1.5rem;
   }
-  
+
   .form-title {
     font-size: 1.5rem;
   }
-  
+
   .form-actions {
     flex-direction: column-reverse;
     gap: 0.75rem;
   }
-  
+
   .form :deep(.form-button) {
     width: 100%;
   }
