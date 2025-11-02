@@ -5,11 +5,6 @@ import { mockUsers } from "@/data/mockData";
 
 const props = defineProps<{ post: PostResponseDto }>();
 
-const emit = defineEmits<{
-  (e: "upvote"): void;
-  (e: "downvote"): void;
-}>();
-
 // Get the username from the author ID
 const authorUsername = computed(() => {
   const author = mockUsers.find((user) => user.id === props.post.authorId);
