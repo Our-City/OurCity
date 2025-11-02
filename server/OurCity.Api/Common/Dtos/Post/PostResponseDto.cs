@@ -1,15 +1,22 @@
-using OurCity.Api.Common.Dtos.Image;
+using OurCity.Api.Common.Dtos.Tag;
+using OurCity.Api.Common.Enum;
 
 namespace OurCity.Api.Common.Dtos.Post;
 
 public class PostResponseDto
 {
-    public int Id { get; set; }
-    public int AuthorId { get; set; }
+    public Guid Id { get; set; }
+    public Guid AuthorId { get; set; }
     public required string Title { get; set; }
     public required string Description { get; set; }
-    public required int Votes { get; set; }
-    public required string? Location { get; set; }
-    public required List<ImageDto> Images { get; set; } = new();
-    public List<int> CommentIds { get; set; } = new();
+    public string? Location { get; set; }
+    public int UpvoteCount { get; set; }
+    public int DownvoteCount { get; set; }
+    public int CommentCount { get; set; }
+    public PostVisibility Visibility { get; set; }
+    public required List<TagResponseDto> Tags { get; set; }
+    public VoteType VoteStatus { get; set; }
+    public bool IsDeleted { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
 }
