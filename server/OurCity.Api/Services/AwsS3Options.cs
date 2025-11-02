@@ -5,8 +5,8 @@ public class AwsS3Options
 
     // These property names (Region, BucketName, etc.) need to match the names
     // in the .env file after the "AWS__" prefix.
-    public string Region { get; set; }
-    public string BucketName { get; set; }
-    public string AccessKey { get; set; }
-    public string SecretKey { get; set; }
+    public required string Region { get; set; }
+    public required string BucketName { get; set; }
+    public required string AccessKey { get; set; }
+    public required string SecretKey { get; set; }
 }
