@@ -6,7 +6,12 @@ using OurCity.Api.Services.Mappings;
 
 public interface IMediaService
 {
-    Task<Result<MediaResponseDto>> UploadMediaAsync(Guid userId, Guid postId, Stream fileStream, string fileName);
+    Task<Result<MediaResponseDto>> UploadMediaAsync(
+        Guid userId,
+        Guid postId,
+        Stream fileStream,
+        string fileName
+    );
     Task<Result<MediaResponseDto>> GetMediaForPostAsync(Guid postId);
     Task<Result<MediaResponseDto>> GetMediaByIdAsync(Guid mediaId);
     Task<Result<MediaResponseDto>> DeleteMediaAsync(Guid userId, Guid mediaId);
@@ -16,16 +21,25 @@ public class MediaService
 {
     private readonly AwsS3Service _s3Service;
     private readonly IMediaRepository _mediaRepository;
-    private readonly IPostRepository _postRepository; 
+    private readonly IPostRepository _postRepository;
 
-    public MediaService(AwsS3Service s3Service, IMediaRepository mediaRepository, IPostRepository postRepository)
+    public MediaService(
+        AwsS3Service s3Service,
+        IMediaRepository mediaRepository,
+        IPostRepository postRepository
+    )
     {
         _s3Service = s3Service;
         _mediaRepository = mediaRepository;
         _postRepository = postRepository;
     }
 
-    public async Task<Result<MediaResponseDto>> UploadMediaAsync(Guid userId, Guid postId, Stream fileStream, string fileName)
+    public async Task<Result<MediaResponseDto>> UploadMediaAsync(
+        Guid userId,
+        Guid postId,
+        Stream fileStream,
+        string fileName
+    )
     {
         var post = await _postRepository.GetSlimPostbyId(postId);
 
@@ -52,7 +66,7 @@ public class MediaService
 
         var savedMedia = await _mediaRepository.AddMediaAsync(media);
 
-        return Result<MediaResponseDto>.Success(savedMedia.ToDto()); 
+        return Result<MediaResponseDto>.Success(savedMedia.ToDto());
     }
 
     public async Task<Result<IEnumerable<MediaResponseDto>>> GetMediaForPostAsync(Guid postId)
@@ -70,7 +84,7 @@ public class MediaService
             return Result<MediaResponseDto>.Failure(ErrorMessages.MediaNotFound);
         }
 
-        return Result<MediaResponseDto>.Success(media.ToDto()); 
+        return Result<MediaResponseDto>.Success(media.ToDto());
     }
 
     public async Task<Result<MediaResponseDto>> DeleteMediaAsync(Guid userId, Guid mediaId)
@@ -88,10 +102,11 @@ public class MediaService
         {
             return Result<MediaResponseDto>.Failure(ErrorMessages.MediaNotFound);
         }
- 
+
         if (userId != post.AuthorId)
         {
-            return Result<MediaResponseDto>.Failure(ErrorMessages.MediaUnauthorized);;
+            return Result<MediaResponseDto>.Failure(ErrorMessages.MediaUnauthorized);
+            ;
         }
 
         // 2. Extracting the S3 object key from the URL.

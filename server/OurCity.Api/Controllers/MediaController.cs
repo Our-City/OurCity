@@ -30,19 +30,23 @@ public class MediaController : ControllerBase
 
         if (file == null || file.Length == 0)
         {
-            return Problem(
-                statusCode: StatusCodes.Status400BadRequest,
-                detail: "No file uploaded"
-            );
+            return Problem(statusCode: StatusCodes.Status400BadRequest, detail: "No file uploaded");
         }
 
         using var stream = file.OpenReadStream();
-        var result = await _mediaService.UploadMediaAsync(userId.Value, postId, stream, file.FileName);
+        var result = await _mediaService.UploadMediaAsync(
+            userId.Value,
+            postId,
+            stream,
+            file.FileName
+        );
 
         if (!result.IsSuccess)
         {
             return Problem(
-                statusCode: (result.Error != null && result.Error.Equals(ErrorMessages.MediaNotFound))
+                statusCode: (
+                    result.Error != null && result.Error.Equals(ErrorMessages.MediaNotFound)
+                )
                     ? StatusCodes.Status404NotFound
                     : StatusCodes.Status403Forbidden,
                 detail: result.Error
@@ -98,7 +102,9 @@ public class MediaController : ControllerBase
         if (!result.IsSuccess)
         {
             return Problem(
-                statusCode: (result.Error != null && result.Error.Equals(ErrorMessages.MediaNotFound))
+                statusCode: (
+                    result.Error != null && result.Error.Equals(ErrorMessages.MediaNotFound)
+                )
                     ? StatusCodes.Status404NotFound
                     : StatusCodes.Status403Forbidden,
                 detail: result.Error

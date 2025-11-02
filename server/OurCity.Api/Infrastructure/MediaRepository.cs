@@ -26,7 +26,7 @@ public class MediaRepository : IMediaRepository
     {
         return await _dbContext.Media.Where(m => m.PostId == postId).ToListAsync();
     }
-    
+
     public async Task<Media?> GetMediaByIdAsync(Guid mediaId)
     {
         return await _dbContext.Media.FindAsync(mediaId);

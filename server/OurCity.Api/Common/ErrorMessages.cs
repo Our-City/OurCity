@@ -22,7 +22,8 @@ public static class ErrorMessages
 
     // Posts
     public const string MediaNotFound = "Media attachment not found";
-    public const string MediaUnauthorized = "You do not have permission to modify this media attachment";
+    public const string MediaUnauthorized =
+        "You do not have permission to modify this media attachment";
 
     // Tags
     public const string TagNotFound = "Tag not found";
