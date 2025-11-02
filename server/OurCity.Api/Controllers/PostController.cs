@@ -45,29 +45,16 @@ public class PostController : ControllerBase
     }
 
     [HttpGet]
-    [EndpointSummary("Get all posts")]
-    [EndpointDescription("Gets a list of all posts")]
+    [EndpointSummary("Get posts")]
+    [EndpointDescription("Gets a list of posts according to the set sort and filter options (if there are any)")]
     [ProducesResponseType(typeof(PaginatedResponseDto<PostResponseDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetPosts([FromQuery] Guid? cursor, [FromQuery] int limit = 25)
+    public async Task<IActionResult> GetPosts([FromQuery] PostGetAllRequestDto postGetAllRequest)
     {
         var userId = User.GetUserId();
-        var res = await _postService.GetPosts(userId, cursor, limit);
+        var res = await _postService.GetPosts(userId, postGetAllRequest);
 
         return Ok(res.Data);
     }
-
-
-    // [HttpGet]
-    // [EndpointSummary("Get all posts")]
-    // [EndpointDescription("Gets a list of all posts")]
-    // [ProducesResponseType(typeof(List<PostResponseDto>), StatusCodes.Status200OK)]
-    // public async Task<IActionResult> GetPosts()
-    // {
-    //     var userId = User.GetUserId();
-    //     var res = await _postService.GetPosts(userId);
-
-    //     return Ok(res.Data);
-    // }
 
     [HttpGet]
     [Route("{postId}")]

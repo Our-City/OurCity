@@ -10,7 +10,7 @@ namespace OurCity.Api.Services;
 
 public interface IPostService
 {
-    Task<Result<PaginatedResponseDto<PostResponseDto>>> GetPosts(Guid? userId, Guid? cursor, int limit);
+    Task<Result<PaginatedResponseDto<PostResponseDto>>> GetPosts(Guid? userId, PostGetAllRequestDto postGetAllRequestDto);
     Task<Result<PostResponseDto>> GetPostById(Guid? userId, Guid postId);
     Task<Result<PostResponseDto>> CreatePost(Guid userId, PostCreateRequestDto postRequestDto);
     Task<Result<PostResponseDto>> UpdatePost(
@@ -45,10 +45,15 @@ public class PostService : IPostService
 
     
 
-    public async Task<Result<PaginatedResponseDto<PostResponseDto>>> GetPosts(Guid? userId, Guid? cursor, int limit)
+    public async Task<Result<PaginatedResponseDto<PostResponseDto>>> GetPosts(Guid? userId, PostGetAllRequestDto postGetAllRequestDto)
     {
+        var limit = postGetAllRequestDto.Limit;
+        var cursor = postGetAllRequestDto.Cursor;
+        
         // Fetch one extra item to determine if there's a next page.
-        var posts = await _postRepository.GetAllPosts(cursor, limit + 1);
+        postGetAllRequestDto.Limit++;
+        var posts = await _postRepository.GetAllPosts(postGetAllRequestDto);
+        postGetAllRequestDto.Limit--;
 
         var hasNextPage = posts.Count() > limit;
         var pageItems = posts.Take(limit);
@@ -61,12 +66,6 @@ public class PostService : IPostService
 
         return Result<PaginatedResponseDto<PostResponseDto>>.Success(response);
     }
-
-    // public async Task<Result<IEnumerable<PostResponseDto>>> GetPosts(Guid? userId)
-    // {
-    //     var posts = await _postRepository.GetAllPosts();
-    //     return Result<IEnumerable<PostResponseDto>>.Success(posts.ToDtos(userId));
-    // }
 
     public async Task<Result<PostResponseDto>> GetPostById(Guid? userId, Guid postId)
     {
