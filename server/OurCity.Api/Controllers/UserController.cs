@@ -1,3 +1,6 @@
+/// Generative AI - CoPilot was used to assist in the creation of this file.
+///  CoPilot assisted by generating boilerplate code for standard CRUD operations
+///  and routing attributes based on common patterns in ASP.NET API developmeent.
 using Microsoft.AspNetCore.Mvc;
 using OurCity.Api.Common.Dtos.User;
 using OurCity.Api.Services;

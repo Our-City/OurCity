@@ -1,7 +1,6 @@
 using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos.User;
 using OurCity.Api.Infrastructure;
-using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Services.Mappings;
 
 namespace OurCity.Api.Services;
@@ -52,9 +51,17 @@ public class UserService : IUserService
 
     public async Task<Result<UserResponseDto>> CreateUser(UserCreateRequestDto userCreateRequestDto)
     {
+        // check if the username already exists in db
+        var existingUser = await _userRepository.GetUserByUsername(userCreateRequestDto.Username);
+        if (existingUser != null)
+        {
+            return Result<UserResponseDto>.Failure("Username already exists.");
+        }
+
         var createdUser = await _userRepository.CreateUser(
             userCreateRequestDto.CreateDtoToEntity()
         );
+
         return Result<UserResponseDto>.Success(createdUser.ToDto());
     }
 
@@ -63,8 +70,8 @@ public class UserService : IUserService
         UserUpdateRequestDto userUpdateRequestDto
     )
     {
-        // check if the user id exists in db
         var existingUser = await _userRepository.GetUserById(id);
+
         if (existingUser == null)
         {
             return Result<UserResponseDto>.Failure("User not found.");

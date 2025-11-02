@@ -4,6 +4,12 @@ using OurCity.Api.Services.Authorization.CanMutateThisPost;
 
 namespace OurCity.Api.Services.Authorization;
 
+/// <summary>
+/// Registers the authorization policies for the OurCity application
+/// </summary>
+/// <credits>
+/// Code inspired from my (Andre) WT3
+/// </credits>
 public class Policy
 {
     public static readonly Policy CanCreatePosts = new("CanCreatePosts");
@@ -33,7 +39,3 @@ public static class PolicyRegistry
         return options;
     }
 }
-
-//CanCreatePosts
-//CanEditThisPost
-//CanDeleteThisPost

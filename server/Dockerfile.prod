@@ -1,3 +1,5 @@
+# Modified from ChatGPT response asking how to have multi stage dockerfile for dotnet web app
+
 # Build stage
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 

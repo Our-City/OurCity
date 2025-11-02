@@ -1,5 +1,8 @@
 namespace OurCity.Api.Common;
 
+/// <summary>
+/// Adapted from asking ChatGPT for a generic Result class for structured/explicit response handling
+/// </summary>
 public class Result<T>
 {
     public bool IsSuccess { get; }

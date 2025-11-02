@@ -1,3 +1,6 @@
+/// Generative AI - CoPilot was used to assist in the creation of this file.
+/// CoPilot assisted by generating boilerplate code for standard repository functions
+/// based on common patterns in C# for repository implementations
 using Microsoft.EntityFrameworkCore;
 using OurCity.Api.Infrastructure.Database;
 

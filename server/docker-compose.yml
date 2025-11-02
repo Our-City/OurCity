@@ -1,4 +1,5 @@
-﻿services:
+﻿# ChatGPT used to guide various parts of docker compose setup
+services:
   ourcity.api.dev:
     container_name: ourcity.api.dev
     build:

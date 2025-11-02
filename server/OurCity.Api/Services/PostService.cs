@@ -1,3 +1,14 @@
+////Supported by generative AI - Claude
+/// Prompt: I have a logic for voting, where we receive a vote, either upvote, or downvote.:
+/// if vote type = upvote:
+/// target list = upvoteUserIdList
+/// opposite list = downvoteUserIdList
+/// if user id in target list:
+/// remove user id from target list
+/// if user id is NOT in target list:
+/// add user id to target list
+/// attempt to remove user id from the opposite list (nothing happens if it's not in this list)
+/// help me make this logic more efficient in C#
 using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos;
 using OurCity.Api.Common.Dtos.Post;

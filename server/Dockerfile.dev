@@ -1,4 +1,6 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:9.0
+﻿# Modified from ChatGPT response asking how to have hot reload docker container for .net 
+
+FROM mcr.microsoft.com/dotnet/sdk:9.0
 
 WORKDIR /app
 

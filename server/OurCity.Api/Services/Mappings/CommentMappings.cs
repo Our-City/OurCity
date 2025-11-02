@@ -1,3 +1,6 @@
+/// Generative AI - CoPilot was used to assist in the creation of this file.
+/// CoPilot assisted by generating boilerplate code for standard mapping functions
+/// based on common patterns in C# for mapping between entities and DTOs
 using OurCity.Api.Common.Dtos.Comments;
 using OurCity.Api.Infrastructure.Database;
 

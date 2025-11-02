@@ -97,6 +97,23 @@ const validateForm = () => {
   }
 };
 
+import "@/assets/styles/forms.css";
+import WipMessage from "@/components/WipMessage.vue";
+
+type LoginFormValues = {
+  username: "";
+};
+
+const initialValues = {
+  username: "",
+};
+
+const resolver = toTypedSchema(
+  z.object({
+    username: z.string().min(1, { message: "Username is required" }).nonempty(),
+  }),
+);
+
 const navigateToRegister = () => {
   router.push('/register');
 };
@@ -218,6 +235,18 @@ const handleCancel = () => {
                 Sign up here
               </button>
             </p>
+        <template #content>
+          <Form :initialValues="initialValues" :resolver="resolver" @submit="onFormSubmit">
+            <div class="field-common">
+              <label id="username-label" for="username">username</label>
+              <Field id="username-field" name="username" v-slot="{ field }">
+                <InputText id="uesrname-inputText" v-bind="field" placeholder="John Doe" />
+              </Field>
+            </div>
+            <Button id="login-btn" type="submit" label="Log in" class="mt-2" />
+          </Form>
+          <div class="card-footer">
+            <span>New here? </span><router-link to="/register">Create an account</router-link>
           </div>
         </template>
       </Form>
@@ -234,23 +263,19 @@ const handleCancel = () => {
   background: linear-gradient(135deg, var(--neutral-color) 0%, var(--secondary-background-color) 100%);
   padding: 2rem;
 }
-
 .login-container {
   width: 100%;
   max-width: 400px;
 }
-
 .login-options {
   display: flex;
   justify-content: flex-end;
   margin-top: 0.5rem;
 }
-
 .login-footer {
   color: var(--primary-text-color);
   text-align: center;
 }
-
 .link-button {
   background: none;
   border: none;
@@ -262,28 +287,23 @@ const handleCancel = () => {
   margin: 0;
   transition: color 0.2s ease;
 }
-
 .link-button:hover {
   color: var(--link-color-hover);
 }
-
 .login-button {
   flex: 1;
   justify-content: center;
 }
-
 /* Custom password input styling */
 .password-input-container {
   position: relative;
   display: flex;
   align-items: center;
 }
-
 .password-input {
   padding-right: 3rem !important;
   width: 100%;
 }
-
 .password-toggle {
   position: absolute;
   right: 0.75rem;
@@ -298,26 +318,21 @@ const handleCancel = () => {
   align-items: center;
   justify-content: center;
 }
-
 .password-toggle:hover {
   color: var(--primary-text-color);
   background: var(--primary-background-color-hover);
 }
-
 .password-toggle:focus {
   outline: 2px solid var(--neutral-color);
   outline-offset: 2px;
 }
-
 .password-input.invalid {
   border-color: var(--error-color);
 }
-
 /* Remove PrimeVue Password component styles */
 :deep(.p-inputtext.p-invalid) {
   border-color: var(--error-color);
 }
-
 /* Responsive design */
 @media (max-width: 768px) {
   .login-page {
@@ -328,5 +343,4 @@ const handleCancel = () => {
     max-width: 100%;
   }
 }
-
 </style>

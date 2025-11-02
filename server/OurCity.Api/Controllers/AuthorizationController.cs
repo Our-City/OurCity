@@ -4,10 +4,8 @@ using OurCity.Api.Services.Authorization;
 namespace OurCity.Api.Controllers;
 
 /// <summary>
+/// AuthorizationController has endpoints that lets end users check what policies they have for OurCity
 /// </summary>
-/// <credits>
-/// Code taken largely from ChatGPT prompt asking for AuthenticationController to take DI'd auth provider so I can switch between Dev and Auth0 authentication
-/// </credits>
 [ApiController]
 [Route("[controller]")]
 public class AuthorizationController : ControllerBase

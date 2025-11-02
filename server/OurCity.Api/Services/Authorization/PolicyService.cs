@@ -5,6 +5,12 @@ using OurCity.Api.Infrastructure;
 
 namespace OurCity.Api.Services.Authorization;
 
+/// <summary>
+/// Checks policies using Microsoft's AuthorizationService
+/// </summary>
+/// <credits>
+/// Code was refined by ChatGPT
+/// </credits>
 public interface IPolicyService
 {
     Task<bool> CheckPolicy(ClaimsPrincipal user, Policy policy);

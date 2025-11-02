@@ -1,3 +1,8 @@
+/// Generative AI - CoPilot was used to assist in the creation of this file.
+///   CoPilot was asked to help write tests for the PostService by being given
+///   a description of what exactly should be tested for this service layer and giving
+///   back the needed functions and syntax to implement the tests.
+///   The code was then reviewed and edited by the author of this file to ensure correctness.
 using Microsoft.EntityFrameworkCore;
 using OurCity.Api.Common.Dtos.Post;
 using OurCity.Api.Common.Enum;
@@ -15,7 +20,7 @@ public class PostIntegrationTests : IAsyncLifetime
     private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder()
         .WithImage("postgres:16.10")
         .Build();
-    private AppDbContext _dbContext = null!; //null! -> tell compiler to trust it will be initialized
+    private AppDbContext _dbContext = null!;
     private User _testUser = null!;
 
     public async Task InitializeAsync()

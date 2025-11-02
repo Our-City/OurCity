@@ -1,3 +1,6 @@
+/// Generative AI - CoPilot GPT was used to assist in the creation of this file.
+/// CoPilot assisted by generating boilerplate code for standard repository functions
+/// based on common patterns in C# for repository implementations
 using Microsoft.EntityFrameworkCore;
 using OurCity.Api.Infrastructure.Database;
 
@@ -25,7 +28,7 @@ public class UserRepository : IUserRepository
     public async Task<IEnumerable<User>> GetAllUsers()
     {
         return await _appDbContext
-            .Users.Where(u => !u.IsDeleted) // exclude soft-deleted users
+            .Users.Where(u => !u.IsDeleted)
             .Include(u => u.Posts)
             .OrderBy(u => u.Id)
             .ToListAsync();
@@ -34,7 +37,7 @@ public class UserRepository : IUserRepository
     public async Task<User?> GetUserById(int id)
     {
         return await _appDbContext
-            .Users.Where(u => u.Id == id && !u.IsDeleted) // exclude soft-deleted users
+            .Users.Where(u => u.Id == id && !u.IsDeleted)
             .Include(u => u.Posts)
             .FirstOrDefaultAsync();
     }
@@ -42,7 +45,7 @@ public class UserRepository : IUserRepository
     public async Task<User?> GetUserByUsername(string username)
     {
         return await _appDbContext
-            .Users.Where(u => u.Username == username && !u.IsDeleted) // exclude soft-deleted users
+            .Users.Where(u => u.Username == username && !u.IsDeleted)
             .FirstOrDefaultAsync();
     }
 

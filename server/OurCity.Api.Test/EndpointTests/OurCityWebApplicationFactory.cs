@@ -7,6 +7,12 @@ using Testcontainers.PostgreSql;
 
 namespace OurCity.Api.Test.EndpointTests;
 
+/// <summary>
+/// Setup a WebApplicationFactory for the OurCity app, using Docker for Postgres DB
+/// </summary>
+/// <credits>
+/// Code modified from ChatGPT response just asking how to call API endpoints for testing
+/// </credits>
 public class OurCityWebApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private readonly PostgreSqlContainer _postgres;

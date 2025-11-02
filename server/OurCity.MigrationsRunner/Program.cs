@@ -1,6 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OurCity.Api.Infrastructure.Database;
 
+/*
+ * Code taken largely from ChatGPT, asking how to run migrations for a docker postgres container
+ * This should work for any DB through connection string, but thats where it came from
+ */
+
 try
 {
     Console.WriteLine("Migrating...");

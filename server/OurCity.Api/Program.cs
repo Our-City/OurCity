@@ -11,6 +11,10 @@ using OurCity.Api.Services.Authorization.CanMutateThisPost;
 using Scalar.AspNetCore;
 using Serilog;
 
+/*
+ * Lots of code setup from ChatGPT, asking for various things at various points (e.g. how to set up cookie auth, how to setup serilog, etc)
+ */
+
 var builder = WebApplication.CreateBuilder(args);
 
 //Logging

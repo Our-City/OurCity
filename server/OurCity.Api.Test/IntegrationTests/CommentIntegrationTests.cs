@@ -9,6 +9,8 @@ using Testcontainers.PostgreSql;
 
 namespace OurCity.Api.Test.IntegrationTests;
 
+/// Generative AI - CoPilot was used to assist in the creation of this file,
+/// as it was largely based off of PostIntegrationTests.cs (see that file)
 [Trait("Type", "Integration")]
 [Trait("Domain", "Comment")]
 public class CommentIntegrationTests : IAsyncLifetime

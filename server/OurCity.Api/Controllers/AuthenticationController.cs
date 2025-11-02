@@ -10,10 +10,10 @@ using OurCity.Api.Services;
 namespace OurCity.Api.Controllers;
 
 /// <summary>
-/// NOTE: THIS IS FULLY STUBBED RIGHT NOW
+/// NOTE: THIS IS JUST A FULL STUB FOR THE ACTUAL AUTHENTICATION
 /// </summary>
 /// <credits>
-/// Code taken largely from ChatGPT prompt asking for authentication where it just takes the user submitted name for the identity
+/// Code taken largely from ChatGPT prompt asking for cookie authentication where it just takes the user submitted name for the identity
 /// </credits>
 [ApiController]
 [Route("[controller]")]

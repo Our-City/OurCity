@@ -3,6 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace OurCity.Api.Middlewares;
 
+/// <summary>
+/// Handles unhandled exceptions in HTTP requests
+/// </summary>
+/// <credits>
+/// Code taken from combination of Microsoft docs + ChatGPT asking for global exception handler middleware
+/// </credits>
 public class GlobalExceptionHandler : IExceptionHandler
 {
     private readonly ILogger<GlobalExceptionHandler> _logger;

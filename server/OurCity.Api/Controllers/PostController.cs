@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using OurCity.Api.Common.Dtos;
 using OurCity.Api.Common.Dtos.Post;
-using OurCity.Api.Common.Enum;
 using OurCity.Api.Services;
 
 namespace OurCity.Api.Controllers;

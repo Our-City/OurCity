@@ -1,9 +1,8 @@
+# ChatGPT used to guide various parts of docker compose setup
 services:
   ourcity.api.prod:
     container_name: ourcity.api.prod
-    build:
-      context: .
-      dockerfile: Dockerfile.prod
+    image: itsmannpatel/ourcity-backend:${TAG}  # Use the pushed backend image tag
     ports:
       - "9000:9000"
     env_file:
@@ -12,6 +11,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
     depends_on:
       - ourcity.postgres.prod
+
   ourcity.postgres.prod:
     container_name: ourcity.postgres.prod
     image: postgres:16.10
@@ -29,17 +29,15 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
   ourcity.migrate.prod:
     container_name: ourcity.migrate.prod
+    image: itsmannpatel/ourcity-migrate:${TAG}  # Use the pushed migration image tag
     profiles: [ "migrate" ]
-    build:
-      context: .
-      dockerfile: Dockerfile.migrate
     depends_on:
       ourcity.postgres.prod:
         condition: service_healthy
     environment:
-      #TODO: I dont like this
       CONNECTION_STRING: "Host=ourcity.postgres.prod;Port=5432;Username=postgres;Password=postgres;Database=ourcity"
     restart: no
 
