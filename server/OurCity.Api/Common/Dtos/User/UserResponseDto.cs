@@ -10,11 +10,11 @@ public class UserResponseDto
 
     public required List<Guid> PostIds { get; set; } = new();
 
+    public required List<Guid> CommentIds { get; set; } = new();
+
     public required bool IsAdmin { get; set; }
 
     public required bool IsBanned { get; set; }
-
-    public required bool IsDeleted { get; set; }
 
     public required DateTime CreatedAt { get; set; }
 
