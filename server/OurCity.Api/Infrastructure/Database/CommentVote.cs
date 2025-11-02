@@ -14,7 +14,6 @@ public class CommentVote
 
     // Navigation Properties
     public User? Voter { get; set; }
-    
-    public Comment? Comment { get; set; }
 
+    public Comment? Comment { get; set; }
 }
