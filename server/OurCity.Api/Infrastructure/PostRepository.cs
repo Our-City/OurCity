@@ -1,11 +1,13 @@
 using Microsoft.EntityFrameworkCore;
+using OurCity.Api.Common.Dtos.Post;
+using OurCity.Api.Common.Enum;
 using OurCity.Api.Infrastructure.Database;
 
 namespace OurCity.Api.Infrastructure;
 
 public interface IPostRepository
 {
-    Task<IEnumerable<Post>> GetAllPosts(Guid? cursor, int limit);
+    Task<IEnumerable<Post>> GetAllPosts(PostGetAllRequestDto postGetAllRequest);
     Task<Post?> GetFatPostById(Guid postId);
     Task<Post?> GetSlimPostbyId(Guid postId);
     Task<Post> CreatePost(Post post);
@@ -21,14 +23,41 @@ public class PostRepository : IPostRepository
         _appDbContext = appDbContext;
     }
 
-    public async Task<IEnumerable<Post>> GetAllPosts(Guid? cursor, int limit)
+    public async Task<IEnumerable<Post>> GetAllPosts(PostGetAllRequestDto postGetAllRequest)
     {
+        var cursor = postGetAllRequest.Cursor;
+        var limit = postGetAllRequest.Limit;
+
         IQueryable<Post> query = _appDbContext
             .Posts.Include(p => p.Votes)
             .Include(p => p.Comments)
-            .Include(p => p.Tags)
-            .OrderByDescending(p => p.CreatedAt)
-            .ThenByDescending(p => p.Id);
+            .Include(p => p.Tags);
+
+        if (postGetAllRequest.SearchTerm is not null)
+            query = query.Where(p =>
+                p.Title.ToLower().Contains(postGetAllRequest.SearchTerm.ToLower())
+                || p.Description.ToLower().Contains(postGetAllRequest.SearchTerm.ToLower())
+            );
+
+        if (postGetAllRequest.Tags is not null)
+            query = query.Where(p =>
+                p.Tags.Select(t => t.Id).Intersect(postGetAllRequest.Tags).Any()
+            );
+
+        query = (postGetAllRequest.SortBy?.ToLower(), postGetAllRequest.SortOrder) switch
+        {
+            ("votes", SortOrder.Asc) => query.OrderBy(p =>
+                p.Votes.Count(v => v.VoteType == VoteType.Upvote)
+                - p.Votes.Count(v => v.VoteType == VoteType.Downvote)
+            ),
+            ("date", SortOrder.Asc) => query.OrderBy(p => p.CreatedAt),
+            ("votes", SortOrder.Desc) => query.OrderByDescending(p =>
+                p.Votes.Count(v => v.VoteType == VoteType.Upvote)
+                - p.Votes.Count(v => v.VoteType == VoteType.Downvote)
+            ),
+            ("date", SortOrder.Desc) => query.OrderByDescending(p => p.CreatedAt),
+            _ => query.OrderByDescending(p => p.CreatedAt).ThenByDescending(p => p.Id),
+        };
 
         if (cursor.HasValue)
         {

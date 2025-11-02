@@ -12,8 +12,7 @@ public interface IPostService
 {
     Task<Result<PaginatedResponseDto<PostResponseDto>>> GetPosts(
         Guid? userId,
-        Guid? cursor,
-        int limit
+        PostGetAllRequestDto postGetAllRequestDto
     );
     Task<Result<PostResponseDto>> GetPostById(Guid? userId, Guid postId);
     Task<Result<PostResponseDto>> CreatePost(Guid userId, PostCreateRequestDto postRequestDto);
@@ -49,12 +48,16 @@ public class PostService : IPostService
 
     public async Task<Result<PaginatedResponseDto<PostResponseDto>>> GetPosts(
         Guid? userId,
-        Guid? cursor,
-        int limit
+        PostGetAllRequestDto postGetAllRequestDto
     )
     {
+        var limit = postGetAllRequestDto.Limit;
+        var cursor = postGetAllRequestDto.Cursor;
+
         // Fetch one extra item to determine if there's a next page.
-        var posts = await _postRepository.GetAllPosts(cursor, limit + 1);
+        postGetAllRequestDto.Limit++;
+        var posts = await _postRepository.GetAllPosts(postGetAllRequestDto);
+        postGetAllRequestDto.Limit--;
 
         var hasNextPage = posts.Count() > limit;
         var pageItems = posts.Take(limit);
