@@ -56,18 +56,6 @@ public class PostController : ControllerBase
         return Ok(res.Data);
     }
 
-    // [HttpGet]
-    // [EndpointSummary("Get all posts")]
-    // [EndpointDescription("Gets a list of all posts")]
-    // [ProducesResponseType(typeof(List<PostResponseDto>), StatusCodes.Status200OK)]
-    // public async Task<IActionResult> GetPosts()
-    // {
-    //     var userId = User.GetUserId();
-    //     var res = await _postService.GetPosts(userId);
-
-    //     return Ok(res.Data);
-    // }
-
     [HttpGet]
     [Route("{postId}")]
     [EndpointSummary("Get a post by ID")]

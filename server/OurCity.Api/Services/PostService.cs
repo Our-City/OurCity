@@ -47,11 +47,7 @@ public class PostService : IPostService
         _postVoteRepository = postVoteRepository;
     }
 
-    public async Task<Result<PaginatedResponseDto<PostResponseDto>>> GetPosts(
-        Guid? userId,
-        Guid? cursor,
-        int limit
-    )
+    public async Task<Result<PaginatedResponseDto<PostResponseDto>>> GetPosts(Guid? userId, Guid? cursor, int limit)
     {
         // Fetch one extra item to determine if there's a next page.
         var posts = await _postRepository.GetAllPosts(cursor, limit + 1);
@@ -67,13 +63,7 @@ public class PostService : IPostService
 
         return Result<PaginatedResponseDto<PostResponseDto>>.Success(response);
     }
-
-    // public async Task<Result<IEnumerable<PostResponseDto>>> GetPosts(Guid? userId)
-    // {
-    //     var posts = await _postRepository.GetAllPosts();
-    //     return Result<IEnumerable<PostResponseDto>>.Success(posts.ToDtos(userId));
-    // }
-
+    
     public async Task<Result<PostResponseDto>> GetPostById(Guid? userId, Guid postId)
     {
         var post = await _postRepository.GetFatPostById(postId);
