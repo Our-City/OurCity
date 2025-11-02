@@ -2,192 +2,189 @@
 /// CoPilot assisted by generating boilerplate code for standard mapping functions
 /// based on common patterns in C# for mapping between entities and DTOs
 using OurCity.Api.Common;
+using OurCity.Api.Common.Dtos;
 using OurCity.Api.Common.Dtos.Comments;
 using OurCity.Api.Common.Enum;
 using OurCity.Api.Infrastructure;
+using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Services.Mappings;
 
 namespace OurCity.Api.Services;
 
 public interface ICommentService
 {
-    Task<IEnumerable<CommentResponseDto>> GetCommentsByPostId(int postId);
-    Task<Result<CommentResponseDto>> GetCommentById(int postId, int commentId);
-    Task<Result<CommentUpvoteResponseDto>> GetUserUpvoteStatus(
-        int postId,
-        int commentId,
-        int userId
-    );
-    Task<Result<CommentDownvoteResponseDto>> GetUserDownvoteStatus(
-        int postId,
-        int commentId,
-        int userId
+    Task<Result<PaginatedResponseDto<CommentResponseDto>>> GetCommentsForPost(
+        Guid? userId,
+        Guid postId,
+        Guid? cursor,
+        int limit
     );
     Task<Result<CommentResponseDto>> CreateComment(
-        int postId,
-        CommentCreateRequestDto commentCreateRequestDto
+        Guid userId,
+        Guid postId,
+        CommentRequestDto commentCreateRequestDto
     );
     Task<Result<CommentResponseDto>> UpdateComment(
-        int postId,
-        int commentId,
-        CommentUpdateRequestDto commentUpdateRequestDto
+        Guid userId,
+        Guid commentId,
+        CommentRequestDto commentUpdateRequestDto
     );
     Task<Result<CommentResponseDto>> VoteComment(
-        int postId,
-        int commentId,
-        int userId,
-        VoteType voteType
+        Guid userId,
+        Guid commentId,
+        CommentVoteRequestDto commentVoteRequestDto
     );
-    Task<Result<CommentResponseDto>> DeleteComment(int postId, int commentId);
+    Task<Result<CommentResponseDto>> DeleteComment(Guid userId, Guid commentId);
 }
 
 public class CommentService : ICommentService
 {
     private readonly ICommentRepository _commentRepository;
+    private readonly ICommentVoteRepository _commentVoteRepository;
 
-    public CommentService(ICommentRepository commentRepository)
+    public CommentService(
+        ICommentRepository commentRepository,
+        ICommentVoteRepository commentVoteRepository
+    )
     {
         _commentRepository = commentRepository;
+        _commentVoteRepository = commentVoteRepository;
     }
 
-    public async Task<IEnumerable<CommentResponseDto>> GetCommentsByPostId(int postId)
-    {
-        return (await _commentRepository.GetCommentsByPostId(postId)).ToDtos();
-    }
-
-    public async Task<Result<CommentResponseDto>> GetCommentById(int postId, int commentId)
-    {
-        var comment = await _commentRepository.GetCommentById(postId, commentId);
-
-        if (comment == null)
-        {
-            return Result<CommentResponseDto>.Failure("Comment does not exist");
-        }
-
-        return Result<CommentResponseDto>.Success(comment.ToDto());
-    }
-
-    public async Task<Result<CommentUpvoteResponseDto>> GetUserUpvoteStatus(
-        int postId,
-        int commentId,
-        int userId
+    public async Task<Result<PaginatedResponseDto<CommentResponseDto>>> GetCommentsForPost(
+        Guid? userId,
+        Guid postId,
+        Guid? cursor,
+        int limit
     )
     {
-        var comment = await _commentRepository.GetCommentById(postId, commentId);
+        var comments = await _commentRepository.GetCommentsForPost(postId, cursor, limit + 1);
 
-        if (comment == null)
+        var hasNextPage = comments.Count() > limit;
+        var pageItems = comments.Take(limit);
+
+        var response = new PaginatedResponseDto<CommentResponseDto>
         {
-            return Result<CommentUpvoteResponseDto>.Failure("Comment does not exist");
-        }
+            Items = pageItems.ToDtos(userId),
+            NextCursor = hasNextPage ? pageItems.LastOrDefault()?.Id : null,
+        };
 
-        var isUpvoted = comment.UpvotedUserIds.Contains(userId);
-        return Result<CommentUpvoteResponseDto>.Success(
-            new CommentUpvoteResponseDto
-            {
-                Id = comment.Id,
-                PostId = comment.PostId,
-                AuthorId = comment.AuthorId,
-                Upvoted = isUpvoted,
-            }
-        );
+        return Result<PaginatedResponseDto<CommentResponseDto>>.Success(response);
     }
 
-    public async Task<Result<CommentDownvoteResponseDto>> GetUserDownvoteStatus(
-        int postId,
-        int commentId,
-        int userId
-    )
-    {
-        var comment = await _commentRepository.GetCommentById(postId, commentId);
+    // public async Task<Result<IEnumerable<CommentResponseDto>>> GetCommentsByPostId(
+    //     Guid? userId,
+    //     Guid postId
+    // )
+    // {
+    //     var comments = await _commentRepository.GetCommentsByPostId(postId);
 
-        if (comment == null)
-        {
-            return Result<CommentDownvoteResponseDto>.Failure("Comment does not exist");
-        }
-
-        var isDownvoted = comment.DownvotedUserIds.Contains(userId);
-        return Result<CommentDownvoteResponseDto>.Success(
-            new CommentDownvoteResponseDto
-            {
-                Id = comment.Id,
-                PostId = comment.PostId,
-                AuthorId = comment.AuthorId,
-                Downvoted = isDownvoted,
-            }
-        );
-    }
+    //     return Result<IEnumerable<CommentResponseDto>>.Success(comments.ToDtos(userId));
+    // }
 
     public async Task<Result<CommentResponseDto>> CreateComment(
-        int postId,
-        CommentCreateRequestDto commentCreateRequestDto
+        Guid userId,
+        Guid postId,
+        CommentRequestDto commentRequestDto
     )
     {
         var createdComment = await _commentRepository.CreateComment(
-            commentCreateRequestDto.ToEntity(postId)
+            commentRequestDto.CreateRequestToEntity(userId, postId)
         );
-        return Result<CommentResponseDto>.Success(createdComment.ToDto());
+
+        return Result<CommentResponseDto>.Success(createdComment.ToDto(userId));
     }
 
     public async Task<Result<CommentResponseDto>> UpdateComment(
-        int postId,
-        int commentId,
-        CommentUpdateRequestDto commentUpdateRequestDto
+        Guid userId,
+        Guid commentId,
+        CommentRequestDto commentRequestDto
     )
     {
-        var comment = await _commentRepository.GetCommentById(postId, commentId);
+        var comment = await _commentRepository.GetCommentById(commentId);
 
         if (comment == null)
         {
-            return Result<CommentResponseDto>.Failure("Comment does not exist");
+            return Result<CommentResponseDto>.Failure(ErrorMessages.CommentNotFound);
         }
 
-        var updatedComment = await _commentRepository.UpdateComment(
-            commentUpdateRequestDto.ToEntity(comment)
-        );
+        if (userId != comment.AuthorId)
+        {
+            return Result<CommentResponseDto>.Failure(ErrorMessages.CommentUnauthorized);
+        }
 
-        return Result<CommentResponseDto>.Success(updatedComment.ToDto());
+        comment.Content = commentRequestDto.Content ?? comment.Content;
+        comment.UpdatedAt = DateTime.UtcNow;
+        await _commentRepository.SaveChangesAsync();
+
+        return Result<CommentResponseDto>.Success(comment.ToDto(userId));
     }
 
     public async Task<Result<CommentResponseDto>> VoteComment(
-        int postId,
-        int commentId,
-        int userId,
-        VoteType voteType
+        Guid userId,
+        Guid commentId,
+        CommentVoteRequestDto commentVoteRequestDto
     )
     {
-        var comment = await _commentRepository.GetCommentById(postId, commentId);
+        var comment = await _commentRepository.GetCommentById(commentId);
 
         if (comment == null)
         {
-            return Result<CommentResponseDto>.Failure("Comment does not exist");
+            return Result<CommentResponseDto>.Failure(ErrorMessages.CommentNotFound);
         }
 
-        var targetList =
-            (voteType == VoteType.Upvote) ? comment.UpvotedUserIds : comment.DownvotedUserIds;
-        var oppositeList =
-            (voteType == VoteType.Upvote) ? comment.DownvotedUserIds : comment.UpvotedUserIds;
+        var existingVote = await _commentVoteRepository.GetVoteByCommentAndUserId(
+            commentId,
+            userId
+        );
+        var requestedVoteType = commentVoteRequestDto.VoteType;
 
-        if (!targetList.Remove(userId))
+        if (existingVote != null && requestedVoteType == VoteType.NoVote)
         {
-            targetList.Add(userId);
-            oppositeList.Remove(userId);
+            await _commentVoteRepository.Remove(existingVote);
+        }
+        else if (existingVote == null && requestedVoteType != VoteType.NoVote)
+        {
+            await _commentVoteRepository.Add(
+                new CommentVote
+                {
+                    Id = Guid.NewGuid(),
+                    CommentId = commentId,
+                    VoterId = userId,
+                    VoteType = requestedVoteType,
+                }
+            );
+        }
+        else if (existingVote != null && requestedVoteType != VoteType.NoVote)
+        {
+            existingVote.VoteType = requestedVoteType;
         }
 
         comment.UpdatedAt = DateTime.UtcNow;
+        await _commentRepository.SaveChangesAsync();
 
-        var updatedComment = await _commentRepository.UpdateComment(comment);
-        return Result<CommentResponseDto>.Success(updatedComment.ToDto());
+        return Result<CommentResponseDto>.Success(comment.ToDto(userId));
     }
 
-    public async Task<Result<CommentResponseDto>> DeleteComment(int postId, int commentId)
+    public async Task<Result<CommentResponseDto>> DeleteComment(Guid userId, Guid commentId)
     {
-        var existingComment = await _commentRepository.GetCommentById(postId, commentId);
-        if (existingComment == null)
+        var comment = await _commentRepository.GetCommentById(commentId);
+
+        if (comment == null)
         {
-            return Result<CommentResponseDto>.Failure("Comment not found.");
+            return Result<CommentResponseDto>.Failure(ErrorMessages.CommentNotFound);
         }
 
-        await _commentRepository.DeleteComment(existingComment);
-        return Result<CommentResponseDto>.Success(existingComment.ToDto());
+        if (userId != comment.AuthorId)
+        {
+            return Result<CommentResponseDto>.Failure(ErrorMessages.CommentUnauthorized);
+        }
+
+        // soft deletion in db  (mark Comment as deleted)
+        comment.IsDeleted = true;
+        comment.UpdatedAt = DateTime.UtcNow;
+        await _commentRepository.SaveChangesAsync();
+
+        return Result<CommentResponseDto>.Success(comment.ToDto(userId));
     }
 }

@@ -8,11 +8,10 @@ namespace OurCity.Api.Infrastructure;
 
 public interface ICommentRepository
 {
-    Task<IEnumerable<Comment>> GetCommentsByPostId(int postId);
-    Task<Comment?> GetCommentById(int postId, int commentId);
+    Task<IEnumerable<Comment>> GetCommentsForPost(Guid postId, Guid? cursor, int limit);
+    Task<Comment?> GetCommentById(Guid commentId);
     Task<Comment> CreateComment(Comment comment);
-    Task<Comment> UpdateComment(Comment comment);
-    Task<Comment> DeleteComment(Comment comment);
+    Task SaveChangesAsync();
 }
 
 public class CommentRepository : ICommentRepository
@@ -24,18 +23,47 @@ public class CommentRepository : ICommentRepository
         _appDbContext = appDbContext;
     }
 
-    public async Task<IEnumerable<Comment>> GetCommentsByPostId(int postId)
+    public async Task<IEnumerable<Comment>> GetCommentsForPost(Guid postId, Guid? cursor, int limit)
+    {
+        IQueryable<Comment> query = _appDbContext
+            .Comments.Where(c => c.PostId == postId)
+            .Include(c => c.Author)
+            .Include(c => c.Votes)
+            .OrderByDescending(c => c.CreatedAt)
+            .ThenByDescending(c => c.Id);
+
+        if (cursor.HasValue)
+        {
+            var cursorComment = await _appDbContext.Comments.FindAsync(cursor.Value);
+            if (cursorComment != null)
+            {
+                query = query.Where(c =>
+                    c.CreatedAt < cursorComment.CreatedAt
+                    || (
+                        c.CreatedAt == cursorComment.CreatedAt
+                        && c.Id.CompareTo(cursorComment.Id) < 0
+                    )
+                );
+            }
+        }
+
+        return await query.Take(limit).ToListAsync();
+    }
+
+    public async Task<IEnumerable<Comment>> GetCommentsByPostId(Guid postId)
     {
         return await _appDbContext
-            .Comments.Where(c => c.PostId == postId && !c.IsDeleted)
+            .Comments.Include(c => c.Votes)
+            .Where(c => c.PostId == postId)
             .ToListAsync();
     }
 
-    public async Task<Comment?> GetCommentById(int postId, int commentId)
+    public async Task<Comment?> GetCommentById(Guid commentId)
     {
         return await _appDbContext
-            .Comments.Where(c => c.PostId == postId && c.Id == commentId && !c.IsDeleted)
-            .FirstOrDefaultAsync();
+            .Comments.Include(c => c.Votes)
+            .Where(c => c.Id == commentId)
+            .FirstOrDefaultAsync(c => c.Id == commentId);
     }
 
     public async Task<Comment> CreateComment(Comment comment)
@@ -45,20 +73,8 @@ public class CommentRepository : ICommentRepository
         return comment;
     }
 
-    public async Task<Comment> UpdateComment(Comment comment)
+    public async Task SaveChangesAsync()
     {
-        _appDbContext.Comments.Update(comment);
         await _appDbContext.SaveChangesAsync();
-        return comment;
-    }
-
-    public async Task<Comment> DeleteComment(Comment comment)
-    {
-        // soft deletion in db  (mark Comment as deleted)
-        comment.IsDeleted = true;
-        comment.UpdatedAt = DateTime.UtcNow;
-        _appDbContext.Comments.Update(comment);
-        await _appDbContext.SaveChangesAsync();
-        return comment;
     }
 }

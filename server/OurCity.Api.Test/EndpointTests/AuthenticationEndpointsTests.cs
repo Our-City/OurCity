@@ -1,4 +1,6 @@
 using System.Net;
+using System.Net.Http.Json;
+using OurCity.Api.Common.Dtos.User;
 
 namespace OurCity.Api.Test.EndpointTests;
 
@@ -10,48 +12,96 @@ namespace OurCity.Api.Test.EndpointTests;
 /// </credits>
 [Trait("Type", "Endpoint")]
 [Trait("Domain", "Authentication")]
-public class AuthenticationEndpointsTests : IClassFixture<OurCityWebApplicationFactory>
+public class AuthenticationEndpointsTests
+    : IAsyncLifetime,
+        IClassFixture<OurCityWebApplicationFactory>
 {
-    private readonly OurCityWebApplicationFactory _factory;
+    private OurCityWebApplicationFactory _ourCityApi = null!;
 
-    public AuthenticationEndpointsTests(OurCityWebApplicationFactory factory)
+    public async Task InitializeAsync()
     {
-        _factory = factory;
+        _ourCityApi = new OurCityWebApplicationFactory();
+        await _ourCityApi.StartDbAsync();
+    }
+
+    public async Task DisposeAsync()
+    {
+        await _ourCityApi.StopDbAsync();
     }
 
     [Fact]
     public async Task GetMeWithoutLogin()
     {
-        using var client = _factory.CreateClient();
+        using var client = _ourCityApi.CreateClient();
 
         var response = await client.GetAsync("/Authentication/Me");
 
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact]
-    public async Task GetMeWithLogin()
+    public async Task LoggingInToExistentAccountWorks()
     {
-        using var client = _factory.CreateClient();
+        using var client = _ourCityApi.CreateClient();
 
-        await client.PostAsync("/Authentication/Login/username", null);
+        var userRequest = new UserCreateRequestDto
+        {
+            Username = _ourCityApi.StubUsername,
+            Password = _ourCityApi.StubPassword,
+        };
 
-        var response = await client.GetAsync("/Authentication/Me");
+        await client.PostAsJsonAsync("/Authentication/Register", userRequest);
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var loginResponse = await client.PostAsJsonAsync("/Authentication/Login", userRequest);
+        var meResponse = await client.GetAsync("/Authentication/Me");
+
+        Assert.Equal(HttpStatusCode.NoContent, loginResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, meResponse.StatusCode);
     }
 
     [Fact]
-    public async Task GetMeWithLoginThenLogout()
+    public async Task LoggingInToNonexistentAccountWorks()
     {
-        using var client = _factory.CreateClient();
+        using var client = _ourCityApi.CreateClient();
 
-        await client.PostAsync("/Authentication/Login/username", null);
-        var loginMeResponse = await client.GetAsync("/Authentication/Me");
-        Assert.Equal(HttpStatusCode.OK, loginMeResponse.StatusCode);
+        var nonExistentUserRequest = new UserCreateRequestDto
+        {
+            Username = "IDontExist",
+            Password = "Femsi1!fm",
+        };
 
-        await client.PostAsync("/Authentication/Logout", null);
-        var logoutMeResponse = await client.GetAsync("/Authentication/Me");
-        Assert.Equal(HttpStatusCode.Unauthorized, logoutMeResponse.StatusCode);
+        var loginResponse = await client.PostAsJsonAsync(
+            "/Authentication/Login",
+            nonExistentUserRequest
+        );
+        var meResponse = await client.GetAsync("/Authentication/Me");
+
+        Assert.Equal(HttpStatusCode.Unauthorized, loginResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, meResponse.StatusCode);
+    }
+
+    [Fact]
+    public async Task LoggingInThenLoggingOut()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        var userRequest = new UserCreateRequestDto
+        {
+            Username = _ourCityApi.StubUsername,
+            Password = _ourCityApi.StubPassword,
+        };
+
+        await client.PostAsJsonAsync("/Authentication/Register", userRequest);
+
+        var loginResponse = await client.PostAsJsonAsync("/Authentication/Login", userRequest);
+        var meAfterLoginResponse = await client.GetAsync("/Authentication/Me");
+
+        var logoutResponse = await client.PostAsync("/Authentication/Logout", null);
+        var meAfterLogoutResponse = await client.GetAsync("/Authentication/Me");
+
+        Assert.Equal(HttpStatusCode.NoContent, loginResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, meAfterLoginResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, logoutResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, meAfterLogoutResponse.StatusCode);
     }
 }
