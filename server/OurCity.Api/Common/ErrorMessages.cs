@@ -20,6 +20,10 @@ public static class ErrorMessages
     public const string CommentNotFound = "Comment not found";
     public const string CommentUnauthorized = "You do not have permission to modify this Comment";
 
+    // Posts
+    public const string MediaNotFound = "Media attachment not found";
+    public const string MediaUnauthorized = "You do not have permission to modify this media attachment";
+
     // Tags
     public const string TagNotFound = "Tag not found";
 
