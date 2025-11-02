@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
-import Form from "@/components/utils/Form.vue";
+import Form from "@/components/utils/FormCmp.vue";
 import InputText from "primevue/inputtext";
 
 const router = useRouter();

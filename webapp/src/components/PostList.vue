@@ -3,7 +3,7 @@ import { computed } from "vue";
 import PostItem from "./PostItem.vue";
 import type { PostResponseDto } from "@/types/posts";
 import { usePostFilters } from "@/composables/usePostFilters";
-import Dropdown from "./utils/Dropdown.vue";
+import Dropdown from "./utils/DropdownMenu.vue";
 
 const props = defineProps<{
   posts: PostResponseDto[];

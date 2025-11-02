@@ -50,18 +50,6 @@ const filteredOptions = computed(() => {
   );
 });
 
-const displayText = computed(() => {
-  if (selectedValues.value.length === 0) {
-    return props.placeholder;
-  }
-
-  if (selectedValues.value.length === 1) {
-    return selectedValues.value[0];
-  }
-
-  return `${selectedValues.value.length} items selected`;
-});
-
 const isMaxSelected = computed(() => {
   return props.maxSelected !== undefined && selectedValues.value.length >= props.maxSelected;
 });
@@ -164,7 +152,7 @@ onUnmounted(() => {
         <!-- Selected items display -->
         <div v-if="selectedValues.length > 0" class="multiselect__selected">
           <span
-            v-for="(item, index) in selectedValues.slice(0, 3)"
+            v-for="(item) in selectedValues.slice(0, 3)"
             :key="item"
             class="multiselect__tag"
           >

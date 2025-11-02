@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Card from "primevue/card";
 import { computed } from "vue";
 import type { PostResponseDto } from "@/types/posts";
 import { mockUsers } from "@/data/mockData";
@@ -10,14 +9,6 @@ const emit = defineEmits<{
   (e: "upvote"): void;
   (e: "downvote"): void;
 }>();
-
-function upvote() {
-  emit("upvote");
-}
-
-function downvote() {
-  emit("downvote");
-}
 
 // Get the username from the author ID
 const authorUsername = computed(() => {

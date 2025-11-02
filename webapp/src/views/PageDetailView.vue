@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router";
 import { ref, onMounted } from "vue";
-import Textarea from "primevue/textarea";
+import TextArea from "primevue/textarea";
 import PageHeader from "@/components/PageHeader.vue";
 import SideBar from "@/components/SideBar.vue";
 import ImageGalleria from "@/components/ImageGalleria.vue";
@@ -214,6 +213,7 @@ onMounted(() => {
   resize: vertical;
   box-sizing: border-box;
   width: calc(100% - 4rem);
+  border: 0.1rem solid var(--border-color);
 }
 
 .comment-submit-button {

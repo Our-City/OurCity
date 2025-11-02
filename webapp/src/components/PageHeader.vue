@@ -2,8 +2,8 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import InputText from "primevue/inputtext";
-import Dropdown from "./utils/Dropdown.vue";
-import Toolbar from "./utils/Toolbar.vue";
+import Dropdown from "./utils/DropdownMenu.vue";
+import Toolbar from "./utils/ToolbarCmp.vue";
 import { usePostFilters } from "@/composables/usePostFilters";
 
 const router = useRouter();

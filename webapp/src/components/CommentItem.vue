@@ -1,7 +1,7 @@
 <!-- Generative AI - CoPilot was used to assist in the creation of this file.
   CoPilot was asked to provide help with CSS styling and for help with syntax -->
 <script setup lang="ts">
-import CommentList from "./CommentList.vue";
+// import CommentList from "./CommentList.vue";
 import type { CommentResponseDto } from "@/types/comments.ts";
 import VoteBox from "@/components/VoteBox.vue";
 

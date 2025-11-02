@@ -14,7 +14,7 @@ const mountOptions = {
     plugins: [router],
     stubs: {
       InputText: { template: '<input class="search-input" />' },
-      Dropdown: true,
+      DropdownMenu: true,
       // Do not stub Toolbar so slot content is rendered
     },
   },
