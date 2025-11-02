@@ -30,31 +30,10 @@ public class AuthenticationController : ControllerBase
     }
 
     [HttpPost]
-    [Route("Register")]
-    [EndpointSummary("Register")]
-    [EndpointDescription("Register an account in the OurCity application")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> Register([FromBody] UserCreateRequestDto createUserRequest)
-    {
-        var newUser = new User { Id = Guid.NewGuid(), UserName = createUserRequest.Username };
-
-        var registerResult = await _userManager.CreateAsync(newUser, createUserRequest.Password);
-
-        return registerResult.Succeeded
-            ? NoContent()
-            : Problem(
-                statusCode: StatusCodes.Status400BadRequest,
-                extensions: new Dictionary<string, object?>
-                {
-                    ["errors"] = registerResult.Errors.Select(error => error.Description).ToList(),
-                }
-            );
-    }
-
-    [HttpPost]
     [Route("Login")]
     [EndpointSummary("Login")]
     [EndpointDescription("Login to the OurCity application")]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Login([FromBody] UserCreateRequestDto createUserRequest)
     {
@@ -62,7 +41,7 @@ public class AuthenticationController : ControllerBase
 
         if (user == null)
             return Problem(
-                statusCode: StatusCodes.Status400BadRequest,
+                statusCode: StatusCodes.Status401Unauthorized,
                 detail: "Invalid credentials"
             );
 
@@ -75,7 +54,7 @@ public class AuthenticationController : ControllerBase
 
         return loginResult.Succeeded
             ? NoContent()
-            : Problem(statusCode: StatusCodes.Status400BadRequest, detail: "Invalid credentials");
+            : Problem(statusCode: StatusCodes.Status401Unauthorized, detail: "Invalid credentials");
     }
 
     [HttpPost]
@@ -96,7 +75,7 @@ public class AuthenticationController : ControllerBase
     [EndpointSummary("Me")]
     [EndpointDescription("Get the information of the current user")]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult Me()
     {
         return Ok(

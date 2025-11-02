@@ -28,7 +28,6 @@ builder.Services.AddDbContextPool<AppDbContext>(options =>
 
 //Repository
 builder.Services.AddScoped<IPostRepository, PostRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<IPostVoteRepository, PostVoteRepository>();

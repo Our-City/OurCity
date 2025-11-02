@@ -20,11 +20,11 @@ public static class UserMappings
             Id = user.Id,
             Username = user.UserName ?? "",
             PostIds = user.Posts.Select(p => p.Id).ToList(),
+            CommentIds = user.Comments.Select(c => c.Id).ToList(),
             CreatedAt = user.CreatedAt,
             UpdatedAt = user.UpdatedAt,
             IsAdmin = user.IsDeleted,
             IsBanned = user.IsBanned,
-            IsDeleted = user.IsDeleted,
         };
     }
 
