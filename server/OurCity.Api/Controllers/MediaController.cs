@@ -1,14 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
+using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos.Media;
-using OurCity.Api.Services;
+using OurCity.Api.Extensions;
 
 [ApiController]
 [Route("media")]
 public class MediaController : ControllerBase
 {
-    private readonly MediaService _mediaService;
+    private readonly IMediaService _mediaService;
 
-    public MediaController(MediaService mediaService)
+    public MediaController(IMediaService mediaService)
     {
         _mediaService = mediaService;
     }
@@ -17,13 +18,38 @@ public class MediaController : ControllerBase
     [ProducesResponseType(typeof(MediaResponseDto), StatusCodes.Status201Created)]
     public async Task<IActionResult> UploadMedia([FromRoute] Guid postId, IFormFile file)
     {
+        var userId = User.GetUserId();
+
+        if (userId == null)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status401Unauthorized,
+                detail: "User not authenticated"
+            );
+        }
+
         if (file == null || file.Length == 0)
-            return BadRequest("No file uploaded.");
+        {
+            return Problem(
+                statusCode: StatusCodes.Status400BadRequest,
+                detail: "No file uploaded"
+            );
+        }
 
         using var stream = file.OpenReadStream();
-        var result = await _mediaService.UploadMediaAsync(postId, stream, file.FileName);
+        var result = await _mediaService.UploadMediaAsync(userId.Value, postId, stream, file.FileName);
 
-        return CreatedAtAction(nameof(UploadMedia), new { id = result.Id }, result);
+        if (!result.IsSuccess)
+        {
+            return Problem(
+                statusCode: (result.Error != null && result.Error.Equals(ErrorMessages.MediaNotFound))
+                    ? StatusCodes.Status404NotFound
+                    : StatusCodes.Status403Forbidden,
+                detail: result.Error
+            );
+        }
+
+        return CreatedAtAction(nameof(UploadMedia), new { id = result.Data?.Id }, result.Data);
     }
 
     [HttpGet("post/{postId}")]
@@ -31,7 +57,7 @@ public class MediaController : ControllerBase
     public async Task<IActionResult> GetMediaForPost([FromRoute] Guid postId)
     {
         var result = await _mediaService.GetMediaForPostAsync(postId);
-        return Ok(result);
+        return Ok(result.Data);
     }
 
     [HttpGet("{mediaId:guid}", Name = "GetMediaById")]
@@ -41,12 +67,15 @@ public class MediaController : ControllerBase
     {
         var result = await _mediaService.GetMediaByIdAsync(mediaId);
 
-        if (result == null)
+        if (!result.IsSuccess)
         {
-            return NotFound();
+            return Problem(
+                statusCode: StatusCodes.Status404NotFound,
+                detail: ErrorMessages.MediaNotFound
+            );
         }
 
-        return Ok(result);
+        return Ok(result.Data);
     }
 
     [HttpDelete("{mediaId:guid}")]
@@ -54,11 +83,26 @@ public class MediaController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteMedia([FromRoute] Guid mediaId)
     {
-        var success = await _mediaService.DeleteMediaAsync(mediaId);
+        var userId = User.GetUserId();
 
-        if (!success)
+        if (userId == null)
         {
-            return NotFound();
+            return Problem(
+                statusCode: StatusCodes.Status401Unauthorized,
+                detail: "User not authenticated"
+            );
+        }
+
+        var result = await _mediaService.DeleteMediaAsync(userId.Value, mediaId);
+
+        if (!result.IsSuccess)
+        {
+            return Problem(
+                statusCode: (result.Error != null && result.Error.Equals(ErrorMessages.MediaNotFound))
+                    ? StatusCodes.Status404NotFound
+                    : StatusCodes.Status403Forbidden,
+                detail: result.Error
+            );
         }
 
         return NoContent(); // This is a standard response for a successful DELETE

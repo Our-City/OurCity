@@ -5,7 +5,7 @@ public interface IMediaRepository
 {
     Task<Media> AddMediaAsync(Media media);
     Task<IEnumerable<Media>> GetMediaByPostIdAsync(Guid postId);
-    Task<Media> GetMediaByIdAsync(Guid mediaId);
+    Task<Media?> GetMediaByIdAsync(Guid mediaId);
     Task DeleteMediaAsync(Media media);
 }
 
@@ -26,8 +26,8 @@ public class MediaRepository : IMediaRepository
     {
         return await _dbContext.Media.Where(m => m.PostId == postId).ToListAsync();
     }
-
-    public async Task<Media> GetMediaByIdAsync(Guid mediaId)
+    
+    public async Task<Media?> GetMediaByIdAsync(Guid mediaId)
     {
         return await _dbContext.Media.FindAsync(mediaId);
     }

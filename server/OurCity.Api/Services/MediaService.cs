@@ -1,25 +1,44 @@
+using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos.Media;
 using OurCity.Api.Infrastructure;
 using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Services.Mappings;
 
+public interface IMediaService
+{
+    Task<Result<MediaResponseDto>> UploadMediaAsync(Guid userId, Guid postId, Stream fileStream, string fileName);
+    Task<Result<MediaResponseDto>> GetMediaForPostAsync(Guid postId);
+    Task<Result<MediaResponseDto>> GetMediaByIdAsync(Guid mediaId);
+    Task<Result<MediaResponseDto>> DeleteMediaAsync(Guid userId, Guid mediaId);
+}
+
 public class MediaService
 {
     private readonly AwsS3Service _s3Service;
     private readonly IMediaRepository _mediaRepository;
+    private readonly IPostRepository _postRepository; 
 
-    public MediaService(AwsS3Service s3Service, IMediaRepository mediaRepository)
+    public MediaService(AwsS3Service s3Service, IMediaRepository mediaRepository, IPostRepository postRepository)
     {
         _s3Service = s3Service;
         _mediaRepository = mediaRepository;
+        _postRepository = postRepository;
     }
 
-    public async Task<MediaResponseDto> UploadMediaAsync(
-        Guid postId,
-        Stream fileStream,
-        string fileName
-    )
+    public async Task<Result<MediaResponseDto>> UploadMediaAsync(Guid userId, Guid postId, Stream fileStream, string fileName)
     {
+        var post = await _postRepository.GetSlimPostbyId(postId);
+
+        if (post == null)
+        {
+            return Result<MediaResponseDto>.Failure(ErrorMessages.MediaNotFound);
+        }
+
+        if (userId != post.AuthorId)
+        {
+            return Result<MediaResponseDto>.Failure(ErrorMessages.MediaUnauthorized);
+        }
+
         var url = await _s3Service.UploadFileAsync(fileStream, fileName);
 
         var media = new Media
@@ -33,36 +52,46 @@ public class MediaService
 
         var savedMedia = await _mediaRepository.AddMediaAsync(media);
 
-        return new MediaResponseDto
-        {
-            Id = savedMedia.Id,
-            PostId = savedMedia.PostId,
-            Url = savedMedia.Url,
-            CreatedAt = savedMedia.CreatedAt,
-            UpdatedAt = savedMedia.UpdatedAt,
-        };
+        return Result<MediaResponseDto>.Success(savedMedia.ToDto()); 
     }
 
-    public async Task<IEnumerable<MediaResponseDto>> GetMediaForPostAsync(Guid postId)
+    public async Task<Result<IEnumerable<MediaResponseDto>>> GetMediaForPostAsync(Guid postId)
     {
         var media = await _mediaRepository.GetMediaByPostIdAsync(postId);
-        return media.ToDtos();
+        return Result<IEnumerable<MediaResponseDto>>.Success(media.ToDtos());
     }
 
-    public async Task<MediaResponseDto> GetMediaByIdAsync(Guid mediaId)
+    public async Task<Result<MediaResponseDto>> GetMediaByIdAsync(Guid mediaId)
     {
         var media = await _mediaRepository.GetMediaByIdAsync(mediaId);
 
-        return media?.ToDto();
+        if (media == null)
+        {
+            return Result<MediaResponseDto>.Failure(ErrorMessages.MediaNotFound);
+        }
+
+        return Result<MediaResponseDto>.Success(media.ToDto()); 
     }
 
-    public async Task<bool> DeleteMediaAsync(Guid mediaId)
+    public async Task<Result<MediaResponseDto>> DeleteMediaAsync(Guid userId, Guid mediaId)
     {
         // 1. Finding the media record in the database.
         var media = await _mediaRepository.GetMediaByIdAsync(mediaId);
         if (media == null)
         {
-            return false; // Not found
+            return Result<MediaResponseDto>.Failure(ErrorMessages.MediaNotFound); // Not found
+        }
+
+        var post = await _postRepository.GetSlimPostbyId(media.PostId);
+
+        if (post == null)
+        {
+            return Result<MediaResponseDto>.Failure(ErrorMessages.MediaNotFound);
+        }
+ 
+        if (userId != post.AuthorId)
+        {
+            return Result<MediaResponseDto>.Failure(ErrorMessages.MediaUnauthorized);;
         }
 
         // 2. Extracting the S3 object key from the URL.
@@ -76,6 +105,6 @@ public class MediaService
         // 4. Deleting the record from the database.
         await _mediaRepository.DeleteMediaAsync(media);
 
-        return true; // Success
+        return Result<MediaResponseDto>.Success(media.ToDto()); // Success
     }
 }
