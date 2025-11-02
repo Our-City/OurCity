@@ -33,6 +33,7 @@ builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<IPostVoteRepository, PostVoteRepository>();
 builder.Services.AddScoped<ICommentVoteRepository, CommentVoteRepository>();
+builder.Services.AddScoped<IMediaRepository, MediaRepository>();
 
 //Service
 builder.Services.AddScoped<IPostService, PostService>();
@@ -40,9 +41,10 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IPolicyService, PolicyService>();
 builder.Services.AddScoped<ITagService, TagService>();
+builder.Services.AddScoped<IMediaService, MediaService>();
 builder.Services.AddSingleton<AwsS3Service>();
-builder.Services.AddScoped<IMediaRepository, MediaRepository>();
-builder.Services.AddScoped<MediaService>();
+
+//Configruation
 builder.Services.Configure<AwsS3Options>(builder.Configuration.GetSection(AwsS3Options.AWS));
 
 //Controller

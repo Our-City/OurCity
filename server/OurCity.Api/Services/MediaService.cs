@@ -12,12 +12,12 @@ public interface IMediaService
         Stream fileStream,
         string fileName
     );
-    Task<Result<MediaResponseDto>> GetMediaForPostAsync(Guid postId);
+    Task<Result<IEnumerable<MediaResponseDto>>> GetMediaForPostAsync(Guid postId);
     Task<Result<MediaResponseDto>> GetMediaByIdAsync(Guid mediaId);
     Task<Result<MediaResponseDto>> DeleteMediaAsync(Guid userId, Guid mediaId);
 }
 
-public class MediaService
+public class MediaService : IMediaService
 {
     private readonly AwsS3Service _s3Service;
     private readonly IMediaRepository _mediaRepository;
