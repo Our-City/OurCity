@@ -7,6 +7,7 @@
 /// </credits>
 
 using System.Security.Claims;
+using Castle.Components.DictionaryAdapter.Xml;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -182,6 +183,12 @@ public class PostControllerTests
             }
         };
 
+        var postGetAllRequestDto = new PostGetAllRequestDto
+        {
+            Cursor = null,
+            Limit = _defaultPaginationLimit,
+        }; 
+
         var paginatedResponse = new PaginatedResponseDto<PostResponseDto>
         {
             Items = posts,
@@ -189,11 +196,11 @@ public class PostControllerTests
         };
 
         _mockPostService
-            .Setup(s => s.GetPosts(_testUserId, null, _defaultPaginationLimit))
+            .Setup(s => s.GetPosts(_testUserId, postGetAllRequestDto))
             .ReturnsAsync(Result<PaginatedResponseDto<PostResponseDto>>.Success(paginatedResponse));
 
         // Act
-        var result = await _controller.GetPosts(null, _defaultPaginationLimit);
+        var result = await _controller.GetPosts(postGetAllRequestDto);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
@@ -202,7 +209,7 @@ public class PostControllerTests
         Assert.Null(returnedData.NextCursor);
         
         _mockPostService.Verify(
-            s => s.GetPosts(_testUserId, null, _defaultPaginationLimit),
+            s => s.GetPosts(_testUserId, postGetAllRequestDto),
             Times.Once
         );
     }
@@ -230,6 +237,12 @@ public class PostControllerTests
             }
         };
 
+        var postGetAllRequestDto = new PostGetAllRequestDto
+        {
+            Cursor = null,
+            Limit = _defaultPaginationLimit,
+        }; 
+
         var paginatedResponse = new PaginatedResponseDto<PostResponseDto>
         {
             Items = posts,
@@ -237,11 +250,11 @@ public class PostControllerTests
         };
 
         _mockPostService
-            .Setup(s => s.GetPosts(null, null, _defaultPaginationLimit))
+            .Setup(s => s.GetPosts(null, postGetAllRequestDto))
             .ReturnsAsync(Result<PaginatedResponseDto<PostResponseDto>>.Success(paginatedResponse));
 
         // Act
-        var result = await _controller.GetPosts(null, _defaultPaginationLimit);
+        var result = await _controller.GetPosts(postGetAllRequestDto);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
@@ -250,7 +263,7 @@ public class PostControllerTests
         Assert.Null(returnedData.NextCursor);
         
         _mockPostService.Verify(
-            s => s.GetPosts(null, null, _defaultPaginationLimit),
+            s => s.GetPosts(null, postGetAllRequestDto),
             Times.Once
         );
     }
@@ -265,12 +278,18 @@ public class PostControllerTests
             NextCursor = null
         };
 
+        var postGetAllRequestDto = new PostGetAllRequestDto
+        {
+            Cursor = null,
+            Limit = _defaultPaginationLimit,
+        }; 
+
         _mockPostService
-            .Setup(s => s.GetPosts(_testUserId, null, _defaultPaginationLimit))
+            .Setup(s => s.GetPosts(_testUserId, postGetAllRequestDto))
             .ReturnsAsync(Result<PaginatedResponseDto<PostResponseDto>>.Success(paginatedResponse));
 
         // Act
-        var result = await _controller.GetPosts(null, _defaultPaginationLimit);
+        var result = await _controller.GetPosts(postGetAllRequestDto);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
@@ -279,7 +298,7 @@ public class PostControllerTests
         Assert.Null(returnedData.NextCursor);
         
         _mockPostService.Verify(
-            s => s.GetPosts(_testUserId, null, _defaultPaginationLimit),
+            s => s.GetPosts(_testUserId, postGetAllRequestDto),
             Times.Once
         );
     }
@@ -308,6 +327,12 @@ public class PostControllerTests
             }
         };
 
+        var postGetAllRequestDto = new PostGetAllRequestDto
+        {
+            Cursor = cursor,
+            Limit = _defaultPaginationLimit,
+        }; 
+
         var paginatedResponse = new PaginatedResponseDto<PostResponseDto>
         {
             Items = posts,
@@ -315,11 +340,11 @@ public class PostControllerTests
         };
 
         _mockPostService
-            .Setup(s => s.GetPosts(_testUserId, cursor, _defaultPaginationLimit))
+            .Setup(s => s.GetPosts(_testUserId, postGetAllRequestDto))
             .ReturnsAsync(Result<PaginatedResponseDto<PostResponseDto>>.Success(paginatedResponse));
 
         // Act
-        var result = await _controller.GetPosts(cursor, _defaultPaginationLimit);
+        var result = await _controller.GetPosts(postGetAllRequestDto);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
@@ -328,7 +353,7 @@ public class PostControllerTests
         Assert.Equal(nextCursor, returnedData.NextCursor);
         
         _mockPostService.Verify(
-            s => s.GetPosts(_testUserId, cursor, _defaultPaginationLimit),
+            s => s.GetPosts(_testUserId, postGetAllRequestDto),
             Times.Once
         );
     }
@@ -355,6 +380,12 @@ public class PostControllerTests
             })
             .ToList();
 
+        var postGetAllRequestDto = new PostGetAllRequestDto
+        {
+            Cursor = null,
+            Limit = _defaultPaginationLimit,
+        }; 
+
         var paginatedResponse = new PaginatedResponseDto<PostResponseDto>
         {
             Items = posts,
@@ -362,11 +393,11 @@ public class PostControllerTests
         };
 
         _mockPostService
-            .Setup(s => s.GetPosts(_testUserId, null, customLimit))
+            .Setup(s => s.GetPosts(_testUserId, postGetAllRequestDto))
             .ReturnsAsync(Result<PaginatedResponseDto<PostResponseDto>>.Success(paginatedResponse));
 
         // Act
-        var result = await _controller.GetPosts(null, customLimit);
+        var result = await _controller.GetPosts(postGetAllRequestDto);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
@@ -375,7 +406,7 @@ public class PostControllerTests
         Assert.NotNull(returnedData.NextCursor);
         
         _mockPostService.Verify(
-            s => s.GetPosts(_testUserId, null, customLimit),
+            s => s.GetPosts(_testUserId, postGetAllRequestDto),
             Times.Once
         );
     }
@@ -402,6 +433,12 @@ public class PostControllerTests
             }
         };
 
+        var postGetAllRequestDto = new PostGetAllRequestDto
+        {
+            Cursor = null,
+            Limit = _defaultPaginationLimit,
+        }; 
+
         var paginatedResponse = new PaginatedResponseDto<PostResponseDto>
         {
             Items = posts,
@@ -409,11 +446,11 @@ public class PostControllerTests
         };
 
         _mockPostService
-            .Setup(s => s.GetPosts(_testUserId, null, _defaultPaginationLimit))
+            .Setup(s => s.GetPosts(_testUserId, postGetAllRequestDto))
             .ReturnsAsync(Result<PaginatedResponseDto<PostResponseDto>>.Success(paginatedResponse));
 
         // Act - Not passing limit parameter, should use default (25)
-        var result = await _controller.GetPosts(null);
+        var result = await _controller.GetPosts(postGetAllRequestDto);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
@@ -421,7 +458,7 @@ public class PostControllerTests
         Assert.Single(returnedData.Items);
         
         _mockPostService.Verify(
-            s => s.GetPosts(_testUserId, null, 25),
+            s => s.GetPosts(_testUserId, postGetAllRequestDto),
             Times.Once
         );
     }

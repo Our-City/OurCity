@@ -44,13 +44,19 @@ public class PostServiceTests
     [Fact]
     public async Task GetPosts_WithNoPosts_ReturnsEmptyPaginatedResponse()
     {
+        var postGetAllRequestDto = new PostGetAllRequestDto
+        {
+            Cursor = null,
+            Limit = _defaultPaginationLimit,
+        }; 
+
         // Arrange
         _mockPostRepository
-            .Setup(r => r.GetAllPosts(null, _defaultPaginationLimit + 1))
+            .Setup(r => r.GetAllPosts(postGetAllRequestDto))
             .ReturnsAsync(new List<Post>());
 
         // Act
-        var result = await _service.GetPosts(_testUserId, null, _defaultPaginationLimit);
+        var result = await _service.GetPosts(_testUserId, postGetAllRequestDto);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -58,7 +64,7 @@ public class PostServiceTests
         Assert.Empty(result.Data.Items);
         Assert.Null(result.Data.NextCursor);
         
-        _mockPostRepository.Verify(r => r.GetAllPosts(null, _defaultPaginationLimit + 1), Times.Once);
+        _mockPostRepository.Verify(r => r.GetAllPosts(postGetAllRequestDto), Times.Once);
     }
 
     [Fact]
@@ -71,12 +77,18 @@ public class PostServiceTests
             CreateTestFatPost(Guid.NewGuid(), _testUserId, "Post 2")
         };
 
+        var postGetAllRequestDto = new PostGetAllRequestDto
+        {
+            Cursor = null,
+            Limit = _defaultPaginationLimit,
+        }; 
+
         _mockPostRepository
-            .Setup(r => r.GetAllPosts(null, _defaultPaginationLimit + 1))
+            .Setup(r => r.GetAllPosts(postGetAllRequestDto))
             .ReturnsAsync(posts);
 
         // Act
-        var result = await _service.GetPosts(_testUserId, null, _defaultPaginationLimit);
+        var result = await _service.GetPosts(_testUserId, postGetAllRequestDto);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -95,12 +107,18 @@ public class PostServiceTests
             posts.Add(CreateTestFatPost(Guid.NewGuid(), _testUserId, $"Post {i}"));
         }
 
+        var postGetAllRequestDto = new PostGetAllRequestDto
+        {
+            Cursor = null,
+            Limit = _defaultPaginationLimit,
+        }; 
+
         _mockPostRepository
-            .Setup(r => r.GetAllPosts(null, _defaultPaginationLimit + 1))
+            .Setup(r => r.GetAllPosts(postGetAllRequestDto))
             .ReturnsAsync(posts);
 
         // Act
-        var result = await _service.GetPosts(_testUserId, null, _defaultPaginationLimit);
+        var result = await _service.GetPosts(_testUserId, postGetAllRequestDto);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -120,16 +138,22 @@ public class PostServiceTests
             CreateTestFatPost(Guid.NewGuid(), _testUserId, "Post 1")
         };
 
+        var postGetAllRequestDto = new PostGetAllRequestDto
+        {
+            Cursor = cursor,
+            Limit = _defaultPaginationLimit,
+        }; 
+
         _mockPostRepository
-            .Setup(r => r.GetAllPosts(cursor, _defaultPaginationLimit + 1))
+            .Setup(r => r.GetAllPosts(postGetAllRequestDto))
             .ReturnsAsync(posts);
 
         // Act
-        var result = await _service.GetPosts(_testUserId, cursor, _defaultPaginationLimit);
+        var result = await _service.GetPosts(_testUserId, postGetAllRequestDto);
 
         // Assert
         Assert.True(result.IsSuccess);
-        _mockPostRepository.Verify(r => r.GetAllPosts(cursor, _defaultPaginationLimit + 1), Times.Once);
+        _mockPostRepository.Verify(r => r.GetAllPosts(postGetAllRequestDto), Times.Once);
     }
 
     [Fact]
@@ -141,12 +165,18 @@ public class PostServiceTests
             CreateTestPostWithVote(_testPostId, _testUserId, Guid.NewGuid(), VoteType.Upvote)
         };
 
+        var postGetAllRequestDto = new PostGetAllRequestDto
+        {
+            Cursor = null,
+            Limit = _defaultPaginationLimit,
+        }; 
+
         _mockPostRepository
-            .Setup(r => r.GetAllPosts(null, _defaultPaginationLimit + 1))
+            .Setup(r => r.GetAllPosts(postGetAllRequestDto))
             .ReturnsAsync(posts);
 
         // Act
-        var result = await _service.GetPosts(_testUserId, null, _defaultPaginationLimit);
+        var result = await _service.GetPosts(_testUserId, postGetAllRequestDto);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -164,12 +194,18 @@ public class PostServiceTests
             CreateTestFatPost(_testPostId, Guid.NewGuid(), "Post 1")
         };
 
+        var postGetAllRequestDto = new PostGetAllRequestDto
+        {
+            Cursor = null,
+            Limit = _defaultPaginationLimit,
+        }; 
+
         _mockPostRepository
-            .Setup(r => r.GetAllPosts(null, _defaultPaginationLimit + 1))
+            .Setup(r => r.GetAllPosts(postGetAllRequestDto))
             .ReturnsAsync(posts);
 
         // Act
-        var result = await _service.GetPosts(null, null, _defaultPaginationLimit);
+        var result = await _service.GetPosts(null, postGetAllRequestDto);
 
         // Assert
         Assert.True(result.IsSuccess);

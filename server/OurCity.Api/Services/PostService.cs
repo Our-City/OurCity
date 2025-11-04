@@ -52,7 +52,6 @@ public class PostService : IPostService
     )
     {
         var limit = postGetAllRequestDto.Limit;
-        var cursor = postGetAllRequestDto.Cursor;
 
         // Fetch one extra item to determine if there's a next page.
         postGetAllRequestDto.Limit++;
