@@ -4,7 +4,6 @@
 ///   back the needed functions and syntax to implement the tests.
 import { describe, it, expect, vi } from "vitest";
 import { mount } from "@vue/test-utils";
-import { setActivePinia, createPinia } from "pinia";
 import VoteBox from "@/components/VoteBox.vue";
 
 // mock authentication store to simulate logged-in user
