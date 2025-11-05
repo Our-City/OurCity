@@ -41,14 +41,11 @@ async function loadPosts(initial = false) {
 }
 
 function handleCreatePost(): void {
-  if(isLoggedIn) {
+  if (isLoggedIn) {
     router.push("/create-post");
-  }
-  else
-  {
+  } else {
     router.push("/login");
   }
-  
 }
 
 onMounted(() => {
