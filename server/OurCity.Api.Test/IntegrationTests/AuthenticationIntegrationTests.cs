@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using OurCity.Api.Common.Dtos.User;
 
-namespace OurCity.Api.Test.EndpointTests;
+namespace OurCity.Api.Test.IntegrationTests;
 
 /// <summary>
 /// Test the /authentication endpoints
@@ -10,9 +10,9 @@ namespace OurCity.Api.Test.EndpointTests;
 /// <credits>
 /// Code modified from ChatGPT response just asking how to call API endpoints for testing
 /// </credits>
-[Trait("Type", "Endpoint")]
+[Trait("Type", "Integration")]
 [Trait("Domain", "Authentication")]
-public class AuthenticationEndpointsTests
+public class AuthenticationIntegrationTests
     : IAsyncLifetime,
         IClassFixture<OurCityWebApplicationFactory>
 {

@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using OurCity.Api.Infrastructure.Database;
 using Testcontainers.PostgreSql;
 
-namespace OurCity.Api.Test.EndpointTests;
+namespace OurCity.Api.Test.IntegrationTests;
 
 /// <summary>
 /// Setup a WebApplicationFactory for the OurCity app, using Docker for Postgres DB

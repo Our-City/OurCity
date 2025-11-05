@@ -2,11 +2,11 @@
 using System.Net.Http.Json;
 using OurCity.Api.Common.Dtos.User;
 
-namespace OurCity.Api.Test.EndpointTests;
+namespace OurCity.Api.Test.IntegrationTests;
 
-[Trait("Type", "Endpoint")]
+[Trait("Type", "Integration")]
 [Trait("Domain", "User")]
-public class UserEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebApplicationFactory>
+public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebApplicationFactory>
 {
     private OurCityWebApplicationFactory _ourCityApi = null!;
     private readonly string _baseUrl = "/apis/v1";
