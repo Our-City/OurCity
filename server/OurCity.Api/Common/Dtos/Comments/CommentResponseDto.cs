@@ -8,6 +8,7 @@ public class CommentResponseDto
     public required Guid PostId { get; set; }
     public required Guid AuthorId { get; set; }
     public required string Content { get; set; }
+    public string? AuthorName { get; set; }
     public required int UpvoteCount { get; set; }
     public required int DownvoteCount { get; set; }
     public required VoteType VoteStatus { get; set; }

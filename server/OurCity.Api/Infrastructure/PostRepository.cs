@@ -31,7 +31,8 @@ public class PostRepository : IPostRepository
         IQueryable<Post> query = _appDbContext
             .Posts.Include(p => p.Votes)
             .Include(p => p.Comments)
-            .Include(p => p.Tags);
+            .Include(p => p.Tags)
+            .Include(p => p.Author);
 
         if (postGetAllRequest.SearchTerm is not null)
             query = query.Where(p =>
@@ -80,6 +81,7 @@ public class PostRepository : IPostRepository
             .Posts.Include(p => p.Votes)
             .Include(p => p.Comments)
             .Include(p => p.Tags)
+            .Include(p => p.Author)
             .FirstOrDefaultAsync(p => p.Id == postId);
     }
 

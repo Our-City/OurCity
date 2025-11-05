@@ -23,6 +23,7 @@ public static class PostMappings
             Title = post.Title,
             Description = post.Description,
             Location = post.Location,
+            AuthorName = post.Author?.UserName, 
             UpvoteCount = post.Votes.Count(vote => vote.VoteType == VoteType.Upvote),
             DownvoteCount = post.Votes.Count(vote => vote.VoteType == VoteType.Downvote),
             CommentCount = post.Comments?.Count ?? 0,

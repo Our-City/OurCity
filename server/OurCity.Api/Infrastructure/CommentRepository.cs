@@ -61,7 +61,9 @@ public class CommentRepository : ICommentRepository
     public async Task<Comment?> GetCommentById(Guid commentId)
     {
         return await _appDbContext
-            .Comments.Include(c => c.Votes)
+            .Comments
+            .Include(c => c.Votes)
+            .Include(c => c.Author)
             .Where(c => c.Id == commentId)
             .FirstOrDefaultAsync(c => c.Id == commentId);
     }
