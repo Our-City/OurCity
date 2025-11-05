@@ -1,3 +1,5 @@
+/// Generative AI - CoPilot was used to assist in the creation of this file.
+/// 
 public class AwsS3Options
 {
     // This constant is used as a single, reliable name for the config section.

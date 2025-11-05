@@ -1,3 +1,4 @@
+/// Generative AI - CoPilot was used to assist in the creation of this file.
 using Microsoft.AspNetCore.Mvc;
 using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos.Media;
