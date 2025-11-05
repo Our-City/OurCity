@@ -94,7 +94,7 @@ const filteredAndSortedPosts = computed(() => {
     </Dropdown>
   </div>
 
-  <div class="post-list">
+  <div class="post-list" data-testid="post-list">
     <div v-if="filteredAndSortedPosts.length === 0" class="empty-message">
       <i class="pi pi-inbox"></i>
       <p>No posts found</p>

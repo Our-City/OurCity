@@ -147,8 +147,8 @@ onMounted(loadPostData);
                 </span>
               </div>
 
-              <h1 class="post-title">{{ post.title }}</h1>
-              <div class="post-author">
+              <h1 class="post-title" data-testid="post-title">{{ post.title }}</h1>
+              <div class="post-author" data-testid="post-author">
                 @{{ post.authorName }} ·
                 {{ post.createdAt.toLocaleDateString() }}
               </div>
