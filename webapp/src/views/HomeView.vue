@@ -41,7 +41,7 @@ async function loadPosts(initial = false) {
 }
 
 function handleCreatePost(): void {
-  if (isLoggedIn) {
+  if (isLoggedIn.value) {
     router.push("/create-post");
   } else {
     router.push("/login");
