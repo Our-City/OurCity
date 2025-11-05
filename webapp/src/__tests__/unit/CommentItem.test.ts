@@ -36,7 +36,9 @@ describe("CommentItem.vue", () => {
 
   beforeEach(() => {
     mockAuthStore = { user: { id: 1, name: "Tester" } };
-    (useAuthStore as unknown as { mockReturnValue: (store: MockAuthStore) => void }).mockReturnValue(mockAuthStore);
+    (
+      useAuthStore as unknown as { mockReturnValue: (store: MockAuthStore) => void }
+    ).mockReturnValue(mockAuthStore);
     vi.clearAllMocks();
   });
 
