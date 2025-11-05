@@ -16,8 +16,8 @@ export function toUser(dto: UserResponseDto): User {
   return {
     id: dto.id,
     username: dto.username,
-    posts: dto.posts ?? [],
-    comments: dto.comments ?? [],
+    posts: dto.postIds ?? [],
+    comments: dto.commentIds ?? [],
     isAdmin: dto.isAdmin,
     isBanned: dto.isBanned,
     createdAt: new Date(dto.createdAt),

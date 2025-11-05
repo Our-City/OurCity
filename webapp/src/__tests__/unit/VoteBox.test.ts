@@ -2,9 +2,8 @@
 ///   CoPilot was asked to help write unit tests for the components by being given
 ///   a description of what exactly should be tested for this component and giving
 ///   back the needed functions and syntax to implement the tests.
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { mount } from "@vue/test-utils";
-import { setActivePinia, createPinia } from "pinia";
 import VoteBox from "@/components/VoteBox.vue";
 
 // mock authentication store to simulate logged-in user
@@ -20,10 +19,6 @@ vi.mock("vue-router", () => ({
     push: vi.fn(), // avoid navigation errors
   }),
 }));
-
-beforeEach(() => {
-  setActivePinia(createPinia());
-});
 
 describe("VoteBox", () => {
   it("renders the vote count", () => {

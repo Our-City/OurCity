@@ -7,6 +7,7 @@ import { useRouter } from "vue-router";
 import { updateCurrentUser } from "@/api/userService";
 import { useAuthStore } from "@/stores/authenticationStore";
 import { resolveErrorMessage } from "@/utils/error";
+import { useToast } from "primevue/usetoast";
 
 interface Props {
   username?: string;
@@ -14,6 +15,7 @@ interface Props {
 
 const router = useRouter();
 const auth = useAuthStore();
+const toast = useToast();
 
 const props = withDefaults(defineProps<Props>(), {
   username: "Username",
@@ -62,6 +64,8 @@ async function saveUsername() {
 
     // update local auth store
     auth.user = updatedUser;
+
+    toast.add({ severity: "secondary", summary: "Username updated successfully.", life: 4000 });
 
     isEditingUsername.value = false;
   } catch (err: unknown) {
