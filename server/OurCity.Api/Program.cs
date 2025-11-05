@@ -21,6 +21,19 @@ var builder = WebApplication.CreateBuilder(args);
 //Logging
 builder.Host.UseSerilog((ctx, config) => config.ReadFrom.Configuration(builder.Configuration));
 
+//CORS
+builder.Services.AddCors(options =>
+    options.AddDefaultPolicy(policy =>
+        policy
+            .WithOrigins(
+                builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? []
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()
+    )
+);
+
 //Database
 builder.Services.AddDbContextPool<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres"))
