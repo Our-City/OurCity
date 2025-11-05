@@ -10,7 +10,6 @@ import PageHeader from "@/components/PageHeader.vue";
 import SideBar from "@/components/SideBar.vue";
 import Form from "@/components/utils/FormCmp.vue";
 import MultiSelect from "@/components/utils/MultiSelect.vue";
-import { useToast } from "primevue/usetoast";
 
 import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
@@ -28,7 +27,6 @@ import { PostVisibility } from "@/types/enums";
 
 const router = useRouter();
 const auth = useAuthStore();
-const toast = useToast();
 
 // Form data
 const formData = ref({
@@ -161,13 +159,6 @@ const handleReset = () => {
   titleTouched.value = false;
   locationTouched.value = false;
   descriptionTouched.value = false;
-
-  toast.add({
-    severity: "secondary",
-    summary: "Form Reset",
-    detail: "The form has been cleared.",
-    life: 3000,
-  });
 };
 
 const validateForm = () => {
