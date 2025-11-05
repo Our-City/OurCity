@@ -39,12 +39,10 @@ async function loadPostData() {
   try {
     isLoading.value = true;
 
-    console.log("Loading post data for postId:", postId);
     post.value = await getPostById(postId);
     images.value = await getMediaByPostId(postId);
     const { items } = await getCommentsByPostId(postId);
     comments.value = items;
-    console.log("Loaded post data:", post.value, images.value, comments.value);
   } catch (err) {
     console.error("Failed to load post details:", err);
     errorMessage.value = "Failed to load post details.";

@@ -73,7 +73,6 @@ const handleSubmit = async (event: Event) => {
     const password = formData.value.password;
 
     const newUser = await createUser(username, password);
-    console.log("User registered successfully:", newUser);
 
     // auto login after registration
     try {

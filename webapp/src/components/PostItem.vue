@@ -16,7 +16,6 @@ onMounted(async () => {
   try {
     isLoading.value = true;
     const res = await getMediaByPostId(props.post.id);
-    console.log("Fetched media for post", props.post.id, res);
     media.value = res;
   } catch (error) {
     console.error("Failed to fetch post media:", error);
