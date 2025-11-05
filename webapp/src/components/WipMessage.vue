@@ -1,3 +1,6 @@
+<!-- Generative AI - CoPilot was used to assist in the creation of this file.
+  CoPilot was asked to provide help with CSS styling and for help with syntax.
+  It also assisted with error handling.-->
 <script setup lang="ts">
 const props = defineProps({
   message: String,

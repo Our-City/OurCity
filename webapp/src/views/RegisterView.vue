@@ -1,4 +1,5 @@
 <!-- Generative AI was used to assist in the creation of this file.
+  CoPilot was asked to provide help with CSS styling and for help with syntax, and error handling.
   ChatGPT was asked to generate code to help integrate the User service layer API calls.
   Also assisted with integrating the Pinia authentication store.
   Copilot assisted with error handling.-->
