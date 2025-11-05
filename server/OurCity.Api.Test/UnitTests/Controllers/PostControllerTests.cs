@@ -7,7 +7,6 @@
 /// </credits>
 
 using System.Security.Claims;
-using Castle.Components.DictionaryAdapter.Xml;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -19,7 +18,7 @@ using OurCity.Api.Common.Enum;
 using OurCity.Api.Controllers;
 using OurCity.Api.Services;
 
-namespace OurCity.Api.Tests.Controllers;
+namespace OurCity.Api.Test.Controllers;
 
 public class PostControllerTests
 {

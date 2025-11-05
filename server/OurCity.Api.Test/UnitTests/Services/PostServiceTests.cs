@@ -14,7 +14,7 @@ using OurCity.Api.Infrastructure;
 using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Services;
 
-namespace OurCity.Api.Tests.Services;
+namespace OurCity.Api.Test.Services;
 
 public class PostServiceTests
 {
