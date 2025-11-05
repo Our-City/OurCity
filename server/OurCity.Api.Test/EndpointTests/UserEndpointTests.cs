@@ -9,6 +9,7 @@ namespace OurCity.Api.Test.EndpointTests;
 public class UserEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebApplicationFactory>
 {
     private OurCityWebApplicationFactory _ourCityApi = null!;
+    private readonly string _baseUrl = "/apis/v1";
 
     public async Task InitializeAsync()
     {
@@ -32,7 +33,7 @@ public class UserEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebApplica
             Password = "Femsi1!fm",
         };
 
-        var response = await client.PostAsJsonAsync("/Users", userRequest);
+        var response = await client.PostAsJsonAsync($"{_baseUrl}/users", userRequest);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -48,7 +49,7 @@ public class UserEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebApplica
             Password = "femsi1!fm",
         };
 
-        var response = await client.PostAsJsonAsync("/Users", userRequest);
+        var response = await client.PostAsJsonAsync($"{_baseUrl}/users", userRequest);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -64,7 +65,7 @@ public class UserEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebApplica
             Password = "FEMSI1!FM",
         };
 
-        var response = await client.PostAsJsonAsync("/Users", userRequest);
+        var response = await client.PostAsJsonAsync($"{_baseUrl}/users", userRequest);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -80,7 +81,7 @@ public class UserEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebApplica
             Password = "Femsi!fm",
         };
 
-        var response = await client.PostAsJsonAsync("/Users", userRequest);
+        var response = await client.PostAsJsonAsync($"{_baseUrl}/users", userRequest);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -96,7 +97,7 @@ public class UserEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebApplica
             Password = "Femsi1fm",
         };
 
-        var response = await client.PostAsJsonAsync("/Users", userRequest);
+        var response = await client.PostAsJsonAsync($"{_baseUrl}/users", userRequest);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -112,7 +113,7 @@ public class UserEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebApplica
             Password = "Femsi1!fm",
         };
 
-        var response = await client.PostAsJsonAsync("/Users", userRequest);
+        var response = await client.PostAsJsonAsync($"{_baseUrl}/users", userRequest);
         var responseMessage = await response.Content.ReadFromJsonAsync<UserResponseDto>();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -126,7 +127,7 @@ public class UserEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebApplica
 
         var userRequest = new UserUpdateRequestDto { Username = "ThisShouldNotWork" };
 
-        var response = await client.PutAsJsonAsync($"/Users/{Guid.Empty}", userRequest);
+        var response = await client.PutAsJsonAsync($"{_baseUrl}/users/{Guid.Empty}", userRequest);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -141,7 +142,7 @@ public class UserEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebApplica
             Username = "SubterraneanHomesickAlienSubterraneanHomesickAlien1",
         };
 
-        var response = await client.PutAsJsonAsync($"/Users/{_ourCityApi.StubUserId}", userRequest);
+        var response = await client.PutAsJsonAsync($"{_baseUrl}/users/{_ourCityApi.StubUserId}", userRequest);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -153,7 +154,7 @@ public class UserEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebApplica
 
         var userRequest = new UserUpdateRequestDto { Username = "NewUserNameWhoDis" };
 
-        var response = await client.PutAsJsonAsync($"/Users/{_ourCityApi.StubUserId}", userRequest);
+        var response = await client.PutAsJsonAsync($"{_baseUrl}/users/{_ourCityApi.StubUserId}", userRequest);
         var responseMessage = await response.Content.ReadFromJsonAsync<UserResponseDto>();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -165,7 +166,7 @@ public class UserEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebApplica
     {
         using var client = _ourCityApi.CreateClient();
 
-        var response = await client.DeleteAsync($"/Users/{Guid.Empty}");
+        var response = await client.DeleteAsync($"{_baseUrl}/users/{Guid.Empty}");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -175,7 +176,7 @@ public class UserEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebApplica
     {
         using var client = _ourCityApi.CreateClient();
 
-        var response = await client.DeleteAsync($"/Users/{_ourCityApi.StubUserId}");
+        var response = await client.DeleteAsync($"{_baseUrl}/users/{_ourCityApi.StubUserId}");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
