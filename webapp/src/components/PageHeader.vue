@@ -47,65 +47,71 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
 </script>
 
 <template>
-  <Toolbar variant="header">
-    <template #start>
-      <h1 class="app-title" @click="goToHome">OurCity</h1>
-    </template>
+  <div class="page-header">
+    <Toolbar variant="header">
+      <template #start>
+        <h1 class="app-title" @click="goToHome">OurCity</h1>
+      </template>
 
-    <template #center>
-      <div class="search-container w-full">
-        <span class="p-input-icon-left">
-          <i class="pi pi-search" />
-          <InputText v-model="searchQuery" placeholder="Search..." class="search-input" />
-        </span>
-      </div>
-    </template>
+      <template #center>
+        <div class="search-container w-full">
+          <span class="p-input-icon-left">
+            <i class="pi pi-search" />
+            <InputText v-model="searchQuery" placeholder="Search..." class="search-input" />
+          </span>
+        </div>
+      </template>
 
-    <template #end>
-      <!-- Not logged in -->
-      <button v-if="!isLoggedIn" class="login-button" @click="handleLogin">Login</button>
+      <template #end>
+        <!-- Not logged in -->
+        <button v-if="!isLoggedIn" class="login-button" @click="handleLogin">Login</button>
 
-      <button v-if="!isLoggedIn" class="signup-button" @click="handleSignUp">Sign Up</button>
+        <button v-if="!isLoggedIn" class="signup-button" @click="handleSignUp">Sign Up</button>
 
-      <button v-if="isLoggedIn" class="create-post-button" @click="handleCreatePost">
-        <i class="pi pi-plus"></i>
-        Create Post
-      </button>
+        <button v-if="isLoggedIn" class="create-post-button" @click="handleCreatePost">
+          <i class="pi pi-plus"></i>
+          Create Post
+        </button>
 
-      <Dropdown v-if="isLoggedIn" button-class="account-button">
-        <template #button>
-          <i class="pi pi-user" />
-          <i class="pi pi-angle-down" />
-        </template>
+        <Dropdown v-if="isLoggedIn" button-class="account-button">
+          <template #button>
+            <i class="pi pi-user" />
+            <i class="pi pi-angle-down" />
+          </template>
 
-        <template #dropdown="{ close }">
-          <ul>
-            <li
-              @click="
-                handleViewProfile();
-                close();
-              "
-            >
-              <i class="pi pi-user"></i>
-              View Profile
-            </li>
-            <li
-              @click="
-                handleLogout();
-                close();
-              "
-            >
-              <i class="pi pi-sign-out"></i>
-              Log Out
-            </li>
-          </ul>
-        </template>
-      </Dropdown>
-    </template>
-  </Toolbar>
+          <template #dropdown="{ close }">
+            <ul>
+              <li
+                @click="
+                  handleViewProfile();
+                  close();
+                "
+              >
+                <i class="pi pi-user"></i>
+                View Profile
+              </li>
+              <li
+                @click="
+                  handleLogout();
+                  close();
+                "
+              >
+                <i class="pi pi-sign-out"></i>
+                Log Out
+              </li>
+            </ul>
+          </template>
+        </Dropdown>
+      </template>
+    </Toolbar>
+  </div>
 </template>
 
 <style scoped>
+.page-header {
+  border-bottom: 1px solid var(--border-color);
+}
+
 .app-title {
   height: 100%;
   display: flex;

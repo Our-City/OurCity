@@ -39,7 +39,6 @@ const handleSubmit = async (event: Event) => {
   event.preventDefault();
   try {
     await auth.loginUser(formData.value.username, formData.value.password);
-    console.log("Auth store after login:", auth.user);
     router.push("/");
   } catch {
     errors.value.submit = "Invalid username or password";

@@ -6,6 +6,7 @@
 import type { Comment } from "@/models/comment";
 import type { CommentResponseDto } from "@/types/dtos/comment";
 import type { CommentRequestDto } from "@/types/dtos/comment";
+import { parseVoteType } from "@/utils/voteUtils";
 
 // DTOs -> Models:
 // maps a CommentResponseDto to a Comment model
@@ -19,7 +20,7 @@ export function toComment(dto: CommentResponseDto): Comment {
     upvoteCount: dto.upvoteCount,
     downvoteCount: dto.downvoteCount,
     voteCount: dto.upvoteCount - dto.downvoteCount,
-    voteStatus: dto.voteStatus,
+    voteStatus: parseVoteType(dto.voteStatus),
     isDeleted: dto.isDeleted,
     createdAt: new Date(dto.createdAt),
     updatedAt: new Date(dto.updatedAt),

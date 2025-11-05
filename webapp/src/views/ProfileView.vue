@@ -51,7 +51,7 @@ onMounted(fetchProfileData);
 </script>
 
 <template>
-  <div>
+  <div class="profile-page">
     <div class="page-header">
       <PageHeader />
     </div>
@@ -82,6 +82,10 @@ onMounted(fetchProfileData);
 </template>
 
 <style scoped>
+.profile-page {
+  padding: 1rem;
+}
+
 .profile-page-layout {
   display: flex;
   height: 100vh;

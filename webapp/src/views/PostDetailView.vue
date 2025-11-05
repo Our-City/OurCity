@@ -1,6 +1,7 @@
 <!-- Generative AI was used to assist in the creation of this file.
   ChatGPT was asked to generate code to help integrate the Post service layer API calls.
-  e.g, loading posts, creating new posts, etc.-->
+  e.g, loading posts, creating new posts, etc.
+  Also assisted with handling comment updates from child CommentList. -->
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
@@ -39,12 +40,10 @@ async function loadPostData() {
   try {
     isLoading.value = true;
 
-    console.log("Loading post data for postId:", postId);
     post.value = await getPostById(postId);
     images.value = await getMediaByPostId(postId);
     const { items } = await getCommentsByPostId(postId);
     comments.value = items;
-    console.log("Loaded post data:", post.value, images.value, comments.value);
   } catch (err) {
     console.error("Failed to load post details:", err);
     errorMessage.value = "Failed to load post details.";
@@ -55,7 +54,6 @@ async function loadPostData() {
 
 // submit a new comment on the post
 async function submitComment() {
-  // replace with authorization endpoint
   if (!auth.user) {
     alert("You must be logged in to comment.");
     return;
@@ -84,23 +82,33 @@ async function submitComment() {
 
     const created = await createComment(postId, newComment);
 
-    // Optimistically prepend
+    // Remove the reload, just update the local state
     comments.value.unshift(created);
     commentText.value = "";
   } catch (err) {
     console.error("Failed to create comment:", err);
+    alert("Failed to submit comment. Please try again.");
   } finally {
     isSubmitting.value = false;
   }
+}
+
+// handle updated comment from CommentList
+function handleCommentUpdated(updated: Comment) {
+  const idx = comments.value.findIndex((c) => c.id === updated.id);
+  if (idx !== -1) comments.value.splice(idx, 1, updated);
 }
 
 // handle voting on the post
 async function handleVote(voteType: VoteType) {
   if (!post.value) return;
   try {
-    post.value = await voteOnPost(post.value.id, voteType);
+    const updatedPost = await voteOnPost(post.value.id, voteType);
+    // Update the entire post to ensure voteCount and voteStatus are in sync
+    post.value = updatedPost;
   } catch (err) {
     console.error("Vote failed:", err);
+    alert("Failed to register vote. Please try again.");
   }
 }
 
@@ -108,88 +116,90 @@ onMounted(loadPostData);
 </script>
 
 <template>
-  <div class="page-header">
-    <PageHeader />
-  </div>
-
-  <div class="post-detail-layout">
-    <div class="side-bar">
-      <SideBar view="home" />
+  <div class="post-detail">
+    <div class="page-header">
+      <PageHeader />
     </div>
 
-    <div class="post-detail-body">
-      <div v-if="isLoading" class="loading-state">Loading post...</div>
-      <div v-else-if="errorMessage" class="error-state">{{ errorMessage }}</div>
+    <div class="post-detail-layout">
+      <div class="side-bar">
+        <SideBar view="home" />
+      </div>
 
-      <div v-else-if="post" class="post-detail-content-layout">
-        <div class="post-content">
-          <div class="post-card">
-            <div class="post-tags">
-              <span v-for="tag in post.tags" :key="tag.id" class="tag-pill">
-                {{ tag.name }}
-              </span>
-            </div>
+      <div class="post-detail-body">
+        <div v-if="isLoading" class="loading-state">Loading post...</div>
+        <div v-else-if="errorMessage" class="error-state">{{ errorMessage }}</div>
 
-            <h1 class="post-title">{{ post.title }}</h1>
-            <div class="post-author">
-              @{{ post.authorName }} ·
-              {{ post.createdAt.toLocaleDateString() }}
-            </div>
+        <div v-else-if="post" class="post-detail-content-layout">
+          <div class="post-content">
+            <div class="post-card">
+              <div class="post-tags">
+                <span v-for="tag in post.tags" :key="tag.id" class="tag-pill">
+                  {{ tag.name }}
+                </span>
+              </div>
 
-            <div v-if="post.location" class="post-location">
-              {{ post.location }}
-            </div>
+              <h1 class="post-title">{{ post.title }}</h1>
+              <div class="post-author">
+                @{{ post.authorName }} ·
+                {{ post.createdAt.toLocaleDateString() }}
+              </div>
 
-            <div v-if="images.length" class="post-images">
-              <ImageGalleria
-                :images="
-                  images.map((m) => ({
-                    src: m.url,
-                  }))
-                "
-              />
-            </div>
+              <div v-if="post.location" class="post-location">
+                {{ post.location }}
+              </div>
 
-            <div class="post-description">
-              {{ post.description }}
-            </div>
+              <div v-if="images.length" class="post-images">
+                <ImageGalleria
+                  :images="
+                    images.map((m) => ({
+                      src: m.url,
+                    }))
+                  "
+                />
+              </div>
 
-            <div class="post-footer">
-              <div class="post-voting">
-                <VoteBox :votes="post.voteCount" :userVote="post.voteStatus" @vote="handleVote" />
+              <div class="post-description">
+                {{ post.description }}
+              </div>
+
+              <div class="post-footer">
+                <div class="post-voting">
+                  <VoteBox :votes="post.voteCount" :userVote="post.voteStatus" @vote="handleVote" />
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="comment-card">
-            <h1 class="comment-header">Comments ({{ comments.length }})</h1>
+            <div class="comment-card">
+              <h1 class="comment-header">Comments ({{ comments.length }})</h1>
 
-            <div class="comment-input-container">
-              <TextArea
-                class="comment-input"
-                v-model="commentText"
-                placeholder="Add your thoughts here..."
-                rows="3"
-                :disabled="isSubmitting"
-              ></TextArea>
+              <div class="comment-input-container">
+                <TextArea
+                  class="comment-input"
+                  v-model="commentText"
+                  placeholder="Add your thoughts here..."
+                  rows="3"
+                  :disabled="isSubmitting"
+                ></TextArea>
 
-              <button
-                class="comment-submit-button"
-                :disabled="isSubmitting || !commentText.trim()"
-                @click="submitComment"
-              >
-                {{ isSubmitting ? "Submitting..." : "Submit" }}
-              </button>
+                <button
+                  class="comment-submit-button"
+                  :disabled="isSubmitting || !commentText.trim()"
+                  @click="submitComment"
+                >
+                  {{ isSubmitting ? "Submitting..." : "Submit" }}
+                </button>
+              </div>
+
+              <CommentList :comments="comments" @updated="handleCommentUpdated" />
             </div>
-
-            <CommentList :comments="comments" />
           </div>
-        </div>
 
-        <!-- Sidebar -->
-        <div class="map-overview">
-          Map Overview Coming Soon
-          <div class="spinner"></div>
+          <!-- Sidebar -->
+          <div class="map-overview">
+            Map Overview Coming Soon
+            <div class="spinner"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -197,6 +207,10 @@ onMounted(loadPostData);
 </template>
 
 <style scoped>
+.post-detail {
+  padding: 1rem;
+}
+
 .post-detail-layout {
   display: flex;
   height: 100vh;
