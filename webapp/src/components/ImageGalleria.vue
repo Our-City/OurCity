@@ -37,7 +37,7 @@ function closeImageModal() {
         <i class="pi pi-arrow-up-right-and-arrow-down-left-from-center"></i>
       </div>
       <button
-        v-if="images"
+        v-if="images.length > 1"
         class="image-btn image-prev"
         @click="prevImage()"
         aria-label="Previous image"
@@ -45,7 +45,7 @@ function closeImageModal() {
         <i class="pi pi-chevron-left"></i>
       </button>
       <button
-        v-if="images"
+        v-if="images.length > 1"
         class="image-btn image-next"
         @click="nextImage()"
         aria-label="Next image"

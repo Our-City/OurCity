@@ -205,7 +205,7 @@ const removeImage = (index: number) => {
 </script>
 
 <template>
-  <div>
+  <div class="create-post">
     <div class="page-header">
       <PageHeader />
     </div>
@@ -392,6 +392,10 @@ const removeImage = (index: number) => {
 </template>
 
 <style scoped>
+.create-post {
+  padding: 1rem;
+}
+
 .create-post-page-layout {
   display: flex;
   height: 100vh;

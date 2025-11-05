@@ -108,88 +108,90 @@ onMounted(loadPostData);
 </script>
 
 <template>
-  <div class="page-header">
-    <PageHeader />
-  </div>
-
-  <div class="post-detail-layout">
-    <div class="side-bar">
-      <SideBar view="home" />
+  <div class="post-detail">
+    <div class="page-header">
+      <PageHeader />
     </div>
 
-    <div class="post-detail-body">
-      <div v-if="isLoading" class="loading-state">Loading post...</div>
-      <div v-else-if="errorMessage" class="error-state">{{ errorMessage }}</div>
+    <div class="post-detail-layout">
+      <div class="side-bar">
+        <SideBar view="home" />
+      </div>
 
-      <div v-else-if="post" class="post-detail-content-layout">
-        <div class="post-content">
-          <div class="post-card">
-            <div class="post-tags">
-              <span v-for="tag in post.tags" :key="tag.id" class="tag-pill">
-                {{ tag.name }}
-              </span>
-            </div>
+      <div class="post-detail-body">
+        <div v-if="isLoading" class="loading-state">Loading post...</div>
+        <div v-else-if="errorMessage" class="error-state">{{ errorMessage }}</div>
 
-            <h1 class="post-title">{{ post.title }}</h1>
-            <div class="post-author">
-              @{{ post.authorName }} ·
-              {{ post.createdAt.toLocaleDateString() }}
-            </div>
+        <div v-else-if="post" class="post-detail-content-layout">
+          <div class="post-content">
+            <div class="post-card">
+              <div class="post-tags">
+                <span v-for="tag in post.tags" :key="tag.id" class="tag-pill">
+                  {{ tag.name }}
+                </span>
+              </div>
 
-            <div v-if="post.location" class="post-location">
-              {{ post.location }}
-            </div>
+              <h1 class="post-title">{{ post.title }}</h1>
+              <div class="post-author">
+                @{{ post.authorName }} ·
+                {{ post.createdAt.toLocaleDateString() }}
+              </div>
 
-            <div v-if="images.length" class="post-images">
-              <ImageGalleria
-                :images="
-                  images.map((m) => ({
-                    src: m.url,
-                  }))
-                "
-              />
-            </div>
+              <div v-if="post.location" class="post-location">
+                {{ post.location }}
+              </div>
 
-            <div class="post-description">
-              {{ post.description }}
-            </div>
+              <div v-if="images.length" class="post-images">
+                <ImageGalleria
+                  :images="
+                    images.map((m) => ({
+                      src: m.url,
+                    }))
+                  "
+                />
+              </div>
 
-            <div class="post-footer">
-              <div class="post-voting">
-                <VoteBox :votes="post.voteCount" :userVote="post.voteStatus" @vote="handleVote" />
+              <div class="post-description">
+                {{ post.description }}
+              </div>
+
+              <div class="post-footer">
+                <div class="post-voting">
+                  <VoteBox :votes="post.voteCount" :userVote="post.voteStatus" @vote="handleVote" />
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="comment-card">
-            <h1 class="comment-header">Comments ({{ comments.length }})</h1>
+            <div class="comment-card">
+              <h1 class="comment-header">Comments ({{ comments.length }})</h1>
 
-            <div class="comment-input-container">
-              <TextArea
-                class="comment-input"
-                v-model="commentText"
-                placeholder="Add your thoughts here..."
-                rows="3"
-                :disabled="isSubmitting"
-              ></TextArea>
+              <div class="comment-input-container">
+                <TextArea
+                  class="comment-input"
+                  v-model="commentText"
+                  placeholder="Add your thoughts here..."
+                  rows="3"
+                  :disabled="isSubmitting"
+                ></TextArea>
 
-              <button
-                class="comment-submit-button"
-                :disabled="isSubmitting || !commentText.trim()"
-                @click="submitComment"
-              >
-                {{ isSubmitting ? "Submitting..." : "Submit" }}
-              </button>
+                <button
+                  class="comment-submit-button"
+                  :disabled="isSubmitting || !commentText.trim()"
+                  @click="submitComment"
+                >
+                  {{ isSubmitting ? "Submitting..." : "Submit" }}
+                </button>
+              </div>
+
+              <CommentList :comments="comments" />
             </div>
-
-            <CommentList :comments="comments" />
           </div>
-        </div>
 
-        <!-- Sidebar -->
-        <div class="map-overview">
-          Map Overview Coming Soon
-          <div class="spinner"></div>
+          <!-- Sidebar -->
+          <div class="map-overview">
+            Map Overview Coming Soon
+            <div class="spinner"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -197,6 +199,10 @@ onMounted(loadPostData);
 </template>
 
 <style scoped>
+.post-detail {
+  padding: 1rem;
+}
+
 .post-detail-layout {
   display: flex;
   height: 100vh;

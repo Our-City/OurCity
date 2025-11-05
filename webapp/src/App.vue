@@ -16,7 +16,6 @@
 
 body {
   background: var(--secondary-background-color);
-  padding: 1rem;
   min-height: 100vh;
 }
 
