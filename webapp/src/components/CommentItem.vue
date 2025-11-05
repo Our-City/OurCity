@@ -1,5 +1,6 @@
 <!-- Generative AI - CoPilot was used to assist in the creation of this file.
-  CoPilot was asked to provide help with CSS styling and for help with syntax -->
+  CoPilot was asked to provide help with CSS styling and for help with syntax.
+  Also assisted with voting logic. -->
 <script setup lang="ts">
 import { ref } from "vue";
 import VoteBox from "@/components/VoteBox.vue";
@@ -26,10 +27,14 @@ async function handleVote(voteType: VoteType) {
   }
 
   try {
-    const updated = await voteOnComment(props.comment.id, { voteType });
-    emit("updated", updated);
+    // backend to register vote
+    const updatedComment = await voteOnComment(props.comment.id, { voteType });
+
+    // emit the updated comment object so the parent can refresh its local list
+    emit("updated", updatedComment);
   } catch (err) {
     console.error("Failed to vote on comment:", err);
+    error.value = "Failed to register vote. Please try again.";
   }
 }
 </script>
@@ -49,12 +54,17 @@ async function handleVote(voteType: VoteType) {
     </div>
 
     <div class="comment-actions">
-      <VoteBox :votes="comment.voteCount" :userVote="comment.voteStatus" @vote="handleVote" />
+      <VoteBox
+        :votes="comment.voteCount"
+        :userVote="comment.voteStatus"
+        @vote="handleVote"
+      />
     </div>
 
     <div v-if="error" class="comment-error">{{ error }}</div>
   </div>
 </template>
+
 
 <style scoped>
 .comment-item {

@@ -1,6 +1,7 @@
 <!-- Generative AI was used to assist in the creation of this file.
   ChatGPT was asked to generate code to help integrate the Post service layer API calls.
-  e.g, loading posts, creating new posts, etc.-->
+  e.g, loading posts, creating new posts, etc.
+  Also assisted with handling comment updates from child CommentList. -->
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
@@ -53,7 +54,6 @@ async function loadPostData() {
 
 // submit a new comment on the post
 async function submitComment() {
-  // replace with authorization endpoint
   if (!auth.user) {
     alert("You must be logged in to comment.");
     return;
@@ -81,26 +81,34 @@ async function submitComment() {
     };
 
     const created = await createComment(postId, newComment);
-
-    window.location.reload();
-
-    // Optimistically prepend
+    
+    // Remove the reload, just update the local state
     comments.value.unshift(created);
     commentText.value = "";
   } catch (err) {
     console.error("Failed to create comment:", err);
+    alert("Failed to submit comment. Please try again.");
   } finally {
     isSubmitting.value = false;
   }
+}
+
+// handle updated comment from CommentList
+function handleCommentUpdated(updated: Comment) {
+  const idx = comments.value.findIndex((c) => c.id === updated.id);
+  if (idx !== -1) comments.value.splice(idx, 1, updated);
 }
 
 // handle voting on the post
 async function handleVote(voteType: VoteType) {
   if (!post.value) return;
   try {
-    post.value = await voteOnPost(post.value.id, voteType);
+    const updatedPost = await voteOnPost(post.value.id, voteType);
+    // Update the entire post to ensure voteCount and voteStatus are in sync
+    post.value = updatedPost;
   } catch (err) {
     console.error("Vote failed:", err);
+    alert("Failed to register vote. Please try again.");
   }
 }
 
@@ -157,7 +165,11 @@ onMounted(loadPostData);
 
               <div class="post-footer">
                 <div class="post-voting">
-                  <VoteBox :votes="post.voteCount" :userVote="post.voteStatus" @vote="handleVote" />
+                  <VoteBox
+                    :votes="post.voteCount"
+                    :userVote="post.voteStatus"
+                    @vote="handleVote"
+                  />
                 </div>
               </div>
             </div>
@@ -183,7 +195,11 @@ onMounted(loadPostData);
                 </button>
               </div>
 
-              <CommentList :comments="comments" />
+              <CommentList
+                :comments="comments"
+                @updated="handleCommentUpdated"
+              />
+
             </div>
           </div>
 
