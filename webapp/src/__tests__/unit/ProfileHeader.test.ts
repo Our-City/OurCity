@@ -13,8 +13,8 @@ import { mount } from "@vue/test-utils";
 import ProfileHeader from "@/components/profile/ProfileHeader.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import { createPinia } from "pinia";
-import Toast from 'primevue/toast';
-import ToastService from 'primevue/toastservice';
+import Toast from "primevue/toast";
+import ToastService from "primevue/toastservice";
 
 const router = createRouter({
   history: createWebHistory(),
