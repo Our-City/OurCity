@@ -8,7 +8,7 @@ using OurCity.Api.Services;
 namespace OurCity.Api.Controllers;
 
 [ApiController]
-[Route("[controller]s")]
+[Route("apis/v1/posts")]
 public class PostController : ControllerBase
 {
     private readonly ILogger<PostController> _logger;
@@ -116,7 +116,7 @@ public class PostController : ControllerBase
     }
 
     [HttpPut]
-    [Route("{postId}/vote")]
+    [Route("{postId}/votes")]
     [EndpointSummary("Vote on a post")]
     [EndpointDescription("A user votes on a post, either upvote or downvote")]
     [ProducesResponseType(typeof(PostResponseDto), StatusCodes.Status200OK)]

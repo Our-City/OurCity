@@ -9,7 +9,7 @@ namespace OurCity.Api.Controllers;
 
 [ApiController]
 [Authorize]
-[Route("me")]
+[Route("/apis/v1/me")]
 public class MeController : ControllerBase
 {
     private readonly ILogger<MeController> _logger;

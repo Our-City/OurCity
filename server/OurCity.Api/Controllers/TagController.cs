@@ -1,16 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using OurCity.Api.Common;
-using OurCity.Api.Common.Dtos;
-using OurCity.Api.Common.Dtos.Post;
 using OurCity.Api.Common.Dtos.Tag;
-using OurCity.Api.Extensions;
-using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Services;
 
 namespace OurCity.Api.Controllers;
 
 [ApiController]
-[Route("[controller]s")]
+[Route("apis/v1/tags")]
 public class TagController : ControllerBase
 {
     private readonly ILogger<TagController> _logger;

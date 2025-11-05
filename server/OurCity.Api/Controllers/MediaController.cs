@@ -4,7 +4,7 @@ using OurCity.Api.Common.Dtos.Media;
 using OurCity.Api.Extensions;
 
 [ApiController]
-[Route("media")]
+[Route("apis/v1/media")]
 public class MediaController : ControllerBase
 {
     private readonly IMediaService _mediaService;
@@ -56,7 +56,7 @@ public class MediaController : ControllerBase
         return CreatedAtAction(nameof(UploadMedia), new { id = result.Data?.Id }, result.Data);
     }
 
-    [HttpGet("post/{postId}")]
+    [HttpGet("posts/{postId}")]
     [ProducesResponseType(typeof(List<MediaResponseDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetMediaForPost([FromRoute] Guid postId)
     {

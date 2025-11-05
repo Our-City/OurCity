@@ -2,14 +2,13 @@
 ///  CoPilot assisted by generating boilerplate code for standard CRUD operations
 ///  and routing attributes based on common patterns in ASP.NET API developmeent.
 using Microsoft.AspNetCore.Mvc;
-using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos.User;
 using OurCity.Api.Services;
 
 namespace OurCity.Api.Controllers;
 
 [ApiController]
-[Route("[controller]s")]
+[Route("apis/v1/users")]
 public class UserController : ControllerBase
 {
     private readonly ILogger<UserController> _logger;
