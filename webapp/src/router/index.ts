@@ -15,8 +15,7 @@ const router = createRouter({
     { path: "/profile", name: "profile", component: ProfileView },
     { path: "/posts/:id", name: "post-detail", component: PostDetailView },
     { path: "/create-post", name: "create-post", component: CreatePostView },
-    { path: "/register", name: "register", component: RegisterView },
-    { path: "/test-api", name: "api-test", component: () => import("@/views/APITestView.vue") },
+    { path: "/register", name: "register", component: RegisterView }
   ],
 });
 
