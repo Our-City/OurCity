@@ -65,7 +65,9 @@ public class CommentService : ICommentService
         var post = await _postRepository.GetSlimPostbyId(postId);
         if (post is null)
         {
-            return Result<PaginatedResponseDto<CommentResponseDto>>.Failure(ErrorMessages.PostNotFound);
+            return Result<PaginatedResponseDto<CommentResponseDto>>.Failure(
+                ErrorMessages.PostNotFound
+            );
         }
 
         var comments = await _commentRepository.GetCommentsForPost(postId, cursor, limit + 1);
@@ -93,7 +95,7 @@ public class CommentService : ICommentService
         {
             return Result<CommentResponseDto>.Failure(ErrorMessages.PostNotFound);
         }
-        
+
         var createdComment = await _commentRepository.CreateComment(
             commentRequestDto.CreateRequestToEntity(userId, postId)
         );

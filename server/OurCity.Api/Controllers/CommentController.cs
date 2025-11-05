@@ -1,7 +1,6 @@
 /// Generative AI - CoPilot was used to assist in the creation of this file.
 ///  CoPilot assisted by generating boilerplate code for standard CRUD operations
 ///  and routing attributes based on common patterns in ASP.NET API development
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OurCity.Api.Common;
@@ -77,7 +76,7 @@ public class CommentController : ControllerBase
 
         if (!getResult.IsSuccess)
             return Problem(statusCode: StatusCodes.Status404NotFound, detail: getResult.Error);
-        
+
         return Ok(getResult.Data);
     }
 

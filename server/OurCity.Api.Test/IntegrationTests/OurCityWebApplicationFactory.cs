@@ -103,14 +103,14 @@ public class OurCityWebApplicationFactory : WebApplicationFactory<Program>
                 Description = StubPostDescription,
             };
             db.Posts.Add(stubPost);
-            
+
             //stub comment
             var stubPostWithComment = new Post
             {
                 Id = StubPostWithCommentId,
                 AuthorId = StubUserId,
                 Title = "Title",
-                Description = "Description"
+                Description = "Description",
             };
             var stubComment = new Comment
             {
@@ -119,7 +119,7 @@ public class OurCityWebApplicationFactory : WebApplicationFactory<Program>
                 AuthorId = StubUserId,
                 Content = StubCommentContent,
                 IsDeleted = false,
-                Votes = []
+                Votes = [],
             };
             db.Posts.Add(stubPostWithComment);
             db.Comments.Add(stubComment);

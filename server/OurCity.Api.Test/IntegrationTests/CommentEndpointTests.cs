@@ -31,7 +31,7 @@ public class CommentEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         var loginRequest = new UserCreateRequestDto
         {
             Username = _ourCityApi.StubUsername,
-            Password = _ourCityApi.StubPassword
+            Password = _ourCityApi.StubPassword,
         };
 
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
@@ -66,12 +66,12 @@ public class CommentEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
     {
         using var client = _ourCityApi.CreateClient();
 
-        var createCommentRequest = new CommentRequestDto
-        {
-            Content = "TestContent"
-        };
-        
-        var response = await client.PostAsJsonAsync($"{_baseUrl}/posts/{_ourCityApi.StubPostId}/comments", createCommentRequest);
+        var createCommentRequest = new CommentRequestDto { Content = "TestContent" };
+
+        var response = await client.PostAsJsonAsync(
+            $"{_baseUrl}/posts/{_ourCityApi.StubPostId}/comments",
+            createCommentRequest
+        );
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
@@ -82,12 +82,12 @@ public class CommentEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         using var client = _ourCityApi.CreateClient();
         await LoginOnClient(client);
 
-        var createCommentRequest = new CommentRequestDto
-        {
-            Content = "TestContent"
-        };
-        
-        var response = await client.PostAsJsonAsync($"{_baseUrl}/posts/{Guid.Empty}/comments", createCommentRequest);
+        var createCommentRequest = new CommentRequestDto { Content = "TestContent" };
+
+        var response = await client.PostAsJsonAsync(
+            $"{_baseUrl}/posts/{Guid.Empty}/comments",
+            createCommentRequest
+        );
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -98,12 +98,12 @@ public class CommentEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         using var client = _ourCityApi.CreateClient();
         await LoginOnClient(client);
 
-        var createCommentRequest = new CommentRequestDto
-        {
-            Content = new string('x', 501)
-        };
-        
-        var response = await client.PostAsJsonAsync($"{_baseUrl}/posts/{_ourCityApi.StubPostId}/comments", createCommentRequest);
+        var createCommentRequest = new CommentRequestDto { Content = new string('x', 501) };
+
+        var response = await client.PostAsJsonAsync(
+            $"{_baseUrl}/posts/{_ourCityApi.StubPostId}/comments",
+            createCommentRequest
+        );
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -114,18 +114,25 @@ public class CommentEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         using var client = _ourCityApi.CreateClient();
         await LoginOnClient(client);
 
-        var createCommentRequest = new CommentRequestDto
-        {
-            Content = "TestContent"
-        };
+        var createCommentRequest = new CommentRequestDto { Content = "TestContent" };
 
-        var createCommentResponse = await client.PostAsJsonAsync($"{_baseUrl}/posts/{_ourCityApi.StubPostId}/comments", createCommentRequest);
-        
-        var getCommentResponse = await client.GetAsync($"{_baseUrl}/posts/{_ourCityApi.StubPostId}/comments");
-        var getCommentResponseContent = await getCommentResponse.Content.ReadFromJsonAsync<PaginatedResponseDto<CommentResponseDto>>();
-        
+        var createCommentResponse = await client.PostAsJsonAsync(
+            $"{_baseUrl}/posts/{_ourCityApi.StubPostId}/comments",
+            createCommentRequest
+        );
+
+        var getCommentResponse = await client.GetAsync(
+            $"{_baseUrl}/posts/{_ourCityApi.StubPostId}/comments"
+        );
+        var getCommentResponseContent = await getCommentResponse.Content.ReadFromJsonAsync<
+            PaginatedResponseDto<CommentResponseDto>
+        >();
+
         Assert.Equal(HttpStatusCode.OK, createCommentResponse.StatusCode);
-        Assert.Equal(createCommentRequest.Content, getCommentResponseContent?.Items.First().Content);
+        Assert.Equal(
+            createCommentRequest.Content,
+            getCommentResponseContent?.Items.First().Content
+        );
     }
 
     [Fact]
@@ -133,28 +140,28 @@ public class CommentEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
     {
         using var client = _ourCityApi.CreateClient();
 
-        var updateCommentRequest = new CommentRequestDto
-        {
-            Content = "TestContent"
-        };
-        
-        var response = await client.PutAsJsonAsync($"{_baseUrl}/comments/{_ourCityApi.StubCommentId}", updateCommentRequest);
+        var updateCommentRequest = new CommentRequestDto { Content = "TestContent" };
+
+        var response = await client.PutAsJsonAsync(
+            $"{_baseUrl}/comments/{_ourCityApi.StubCommentId}",
+            updateCommentRequest
+        );
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
-    
+
     [Fact]
     public async Task UpdatingNonexistentComment()
     {
         using var client = _ourCityApi.CreateClient();
         await LoginOnClient(client);
 
-        var updateCommentRequest = new CommentRequestDto
-        {
-            Content = "TestContent"
-        };
+        var updateCommentRequest = new CommentRequestDto { Content = "TestContent" };
 
-        var updateCommentResponse = await client.PutAsJsonAsync($"{_baseUrl}/comments/{Guid.Empty}", updateCommentRequest);
+        var updateCommentResponse = await client.PutAsJsonAsync(
+            $"{_baseUrl}/comments/{Guid.Empty}",
+            updateCommentRequest
+        );
 
         Assert.Equal(HttpStatusCode.NotFound, updateCommentResponse.StatusCode);
     }
@@ -165,12 +172,12 @@ public class CommentEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         using var client = _ourCityApi.CreateClient();
         await LoginOnClient(client);
 
-        var createCommentRequest = new CommentRequestDto
-        {
-            Content = new string('x', 501)
-        };
-        
-        var response = await client.PutAsJsonAsync($"{_baseUrl}/comments/{_ourCityApi.StubCommentId}", createCommentRequest);
+        var createCommentRequest = new CommentRequestDto { Content = new string('x', 501) };
+
+        var response = await client.PutAsJsonAsync(
+            $"{_baseUrl}/comments/{_ourCityApi.StubCommentId}",
+            createCommentRequest
+        );
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -181,12 +188,12 @@ public class CommentEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         using var client = _ourCityApi.CreateClient();
         await LoginOnClient(client);
 
-        var updateCommentRequest = new CommentRequestDto
-        {
-            Content = new string('x', 500)
-        };
-        
-        var response = await client.PutAsJsonAsync($"{_baseUrl}/comments/{_ourCityApi.StubCommentId}", updateCommentRequest);
+        var updateCommentRequest = new CommentRequestDto { Content = new string('x', 500) };
+
+        var response = await client.PutAsJsonAsync(
+            $"{_baseUrl}/comments/{_ourCityApi.StubCommentId}",
+            updateCommentRequest
+        );
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
@@ -201,13 +208,13 @@ public class CommentEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         using var client = _ourCityApi.CreateClient();
         await LoginOnClient(client);
 
-        var voteCommentRequest = new CommentVoteRequestDto
-        {
-            VoteType = VoteType.NoVote
-        };
-        
-        var response = await client.PutAsJsonAsync($"{_baseUrl}/comments/{Guid.Empty}/votes", voteCommentRequest);
-        
+        var voteCommentRequest = new CommentVoteRequestDto { VoteType = VoteType.NoVote };
+
+        var response = await client.PutAsJsonAsync(
+            $"{_baseUrl}/comments/{Guid.Empty}/votes",
+            voteCommentRequest
+        );
+
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
@@ -217,14 +224,14 @@ public class CommentEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         using var client = _ourCityApi.CreateClient();
         await LoginOnClient(client);
 
-        var voteCommentRequest = new CommentVoteRequestDto
-        {
-            VoteType = VoteType.Upvote
-        };
-        
-        var response = await client.PutAsJsonAsync($"{_baseUrl}/comments/{_ourCityApi.StubCommentId}/votes", voteCommentRequest);
+        var voteCommentRequest = new CommentVoteRequestDto { VoteType = VoteType.Upvote };
+
+        var response = await client.PutAsJsonAsync(
+            $"{_baseUrl}/comments/{_ourCityApi.StubCommentId}/votes",
+            voteCommentRequest
+        );
         var responseContent = await response.Content.ReadFromJsonAsync<CommentResponseDto>();
-        
+
         Assert.Equal(VoteType.Upvote, responseContent?.VoteStatus);
     }
 
@@ -234,31 +241,31 @@ public class CommentEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         using var client = _ourCityApi.CreateClient();
         await LoginOnClient(client);
 
-        var voteCommentRequest = new CommentVoteRequestDto
-        {
-            VoteType = VoteType.Downvote
-        };
-        
-        var response = await client.PutAsJsonAsync($"{_baseUrl}/comments/{_ourCityApi.StubCommentId}/votes", voteCommentRequest);
+        var voteCommentRequest = new CommentVoteRequestDto { VoteType = VoteType.Downvote };
+
+        var response = await client.PutAsJsonAsync(
+            $"{_baseUrl}/comments/{_ourCityApi.StubCommentId}/votes",
+            voteCommentRequest
+        );
         var responseContent = await response.Content.ReadFromJsonAsync<CommentResponseDto>();
-        
+
         Assert.Equal(VoteType.Downvote, responseContent?.VoteStatus);
     }
-    
+
     [Fact]
     public async Task NoVotingComment()
     {
         using var client = _ourCityApi.CreateClient();
         await LoginOnClient(client);
 
-        var voteCommentRequest = new CommentVoteRequestDto
-        {
-            VoteType = VoteType.NoVote
-        };
-        
-        var response = await client.PutAsJsonAsync($"{_baseUrl}/comments/{_ourCityApi.StubCommentId}/votes", voteCommentRequest);
+        var voteCommentRequest = new CommentVoteRequestDto { VoteType = VoteType.NoVote };
+
+        var response = await client.PutAsJsonAsync(
+            $"{_baseUrl}/comments/{_ourCityApi.StubCommentId}/votes",
+            voteCommentRequest
+        );
         var responseContent = await response.Content.ReadFromJsonAsync<CommentResponseDto>();
-        
+
         Assert.Equal(VoteType.NoVote, responseContent?.VoteStatus);
     }
 
@@ -282,7 +289,7 @@ public class CommentEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
-    
+
     [Fact]
     public async Task DeletingComment()
     {
