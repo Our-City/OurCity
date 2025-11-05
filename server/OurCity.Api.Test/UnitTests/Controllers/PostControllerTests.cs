@@ -5,7 +5,6 @@
 /// Claude ai was used to help generate the boilerplate for this file.
 /// Prompt: Given a method from the controller, implement the endpoint test cases with thorough coverage.
 /// </credits>
-
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -41,17 +40,14 @@ public class PostControllerTests
 
     private void SetupAuthenticatedUser(Guid userId)
     {
-        var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, userId.ToString())
-        };
+        var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, userId.ToString()) };
 
         _controller.ControllerContext = new ControllerContext
         {
             HttpContext = new DefaultHttpContext
             {
-                User = new ClaimsPrincipal(new ClaimsIdentity(claims, "TestAuth"))
-            }
+                User = new ClaimsPrincipal(new ClaimsIdentity(claims, "TestAuth")),
+            },
         };
     }
 
@@ -61,8 +57,8 @@ public class PostControllerTests
         {
             HttpContext = new DefaultHttpContext
             {
-                User = new ClaimsPrincipal(new ClaimsIdentity()) // No claims
-            }
+                User = new ClaimsPrincipal(new ClaimsIdentity()), // No claims
+            },
         };
     }
 
@@ -75,7 +71,7 @@ public class PostControllerTests
         var createDto = new PostCreateRequestDto
         {
             Title = "Test Post",
-            Description = "Test Description"
+            Description = "Test Description",
         };
 
         var responseDto = new PostResponseDto
@@ -90,7 +86,7 @@ public class PostControllerTests
             Tags = [],
             IsDeleted = false,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
         };
 
         _mockPostService
@@ -104,15 +100,12 @@ public class PostControllerTests
         var createdResult = Assert.IsType<CreatedAtActionResult>(result);
         Assert.Equal(StatusCodes.Status201Created, createdResult.StatusCode);
         Assert.Equal(nameof(_controller.GetPosts), createdResult.ActionName);
-        
+
         var returnedPost = Assert.IsType<PostResponseDto>(createdResult.Value);
         Assert.Equal(_testPostId, returnedPost.Id);
         Assert.Equal("Test Post", returnedPost.Title);
-        
-        _mockPostService.Verify(
-            s => s.CreatePost(_testUserId, createDto),
-            Times.Once
-        );
+
+        _mockPostService.Verify(s => s.CreatePost(_testUserId, createDto), Times.Once);
     }
 
     [Fact]
@@ -123,7 +116,7 @@ public class PostControllerTests
         var createDto = new PostCreateRequestDto
         {
             Title = "Test Post",
-            Description = "Test Description"
+            Description = "Test Description",
         };
 
         // Act
@@ -132,10 +125,10 @@ public class PostControllerTests
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(StatusCodes.Status401Unauthorized, objectResult.StatusCode);
-        
+
         var problemDetails = Assert.IsType<ProblemDetails>(objectResult.Value);
         Assert.Equal(ErrorMessages.UserNotAuthenticated, problemDetails.Detail);
-        
+
         _mockPostService.Verify(
             s => s.CreatePost(It.IsAny<Guid>(), It.IsAny<PostCreateRequestDto>()),
             Times.Never
@@ -164,7 +157,7 @@ public class PostControllerTests
                 DownvoteCount = 0,
                 IsDeleted = false,
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                UpdatedAt = DateTime.UtcNow,
             },
             new()
             {
@@ -178,20 +171,20 @@ public class PostControllerTests
                 DownvoteCount = 2,
                 IsDeleted = false,
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            }
+                UpdatedAt = DateTime.UtcNow,
+            },
         };
 
         var postGetAllRequestDto = new PostGetAllRequestDto
         {
             Cursor = null,
             Limit = _defaultPaginationLimit,
-        }; 
+        };
 
         var paginatedResponse = new PaginatedResponseDto<PostResponseDto>
         {
             Items = posts,
-            NextCursor = null
+            NextCursor = null,
         };
 
         _mockPostService
@@ -206,11 +199,8 @@ public class PostControllerTests
         var returnedData = Assert.IsType<PaginatedResponseDto<PostResponseDto>>(okResult.Value);
         Assert.Equal(2, returnedData.Items.Count());
         Assert.Null(returnedData.NextCursor);
-        
-        _mockPostService.Verify(
-            s => s.GetPosts(_testUserId, postGetAllRequestDto),
-            Times.Once
-        );
+
+        _mockPostService.Verify(s => s.GetPosts(_testUserId, postGetAllRequestDto), Times.Once);
     }
 
     [Fact]
@@ -232,20 +222,20 @@ public class PostControllerTests
                 DownvoteCount = 3,
                 IsDeleted = false,
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            }
+                UpdatedAt = DateTime.UtcNow,
+            },
         };
 
         var postGetAllRequestDto = new PostGetAllRequestDto
         {
             Cursor = null,
             Limit = _defaultPaginationLimit,
-        }; 
+        };
 
         var paginatedResponse = new PaginatedResponseDto<PostResponseDto>
         {
             Items = posts,
-            NextCursor = null
+            NextCursor = null,
         };
 
         _mockPostService
@@ -260,11 +250,8 @@ public class PostControllerTests
         var returnedData = Assert.IsType<PaginatedResponseDto<PostResponseDto>>(okResult.Value);
         Assert.Single(returnedData.Items);
         Assert.Null(returnedData.NextCursor);
-        
-        _mockPostService.Verify(
-            s => s.GetPosts(null, postGetAllRequestDto),
-            Times.Once
-        );
+
+        _mockPostService.Verify(s => s.GetPosts(null, postGetAllRequestDto), Times.Once);
     }
 
     [Fact]
@@ -274,14 +261,14 @@ public class PostControllerTests
         var paginatedResponse = new PaginatedResponseDto<PostResponseDto>
         {
             Items = new List<PostResponseDto>(),
-            NextCursor = null
+            NextCursor = null,
         };
 
         var postGetAllRequestDto = new PostGetAllRequestDto
         {
             Cursor = null,
             Limit = _defaultPaginationLimit,
-        }; 
+        };
 
         _mockPostService
             .Setup(s => s.GetPosts(_testUserId, postGetAllRequestDto))
@@ -295,11 +282,8 @@ public class PostControllerTests
         var returnedData = Assert.IsType<PaginatedResponseDto<PostResponseDto>>(okResult.Value);
         Assert.Empty(returnedData.Items);
         Assert.Null(returnedData.NextCursor);
-        
-        _mockPostService.Verify(
-            s => s.GetPosts(_testUserId, postGetAllRequestDto),
-            Times.Once
-        );
+
+        _mockPostService.Verify(s => s.GetPosts(_testUserId, postGetAllRequestDto), Times.Once);
     }
 
     [Fact]
@@ -322,20 +306,20 @@ public class PostControllerTests
                 DownvoteCount = 1,
                 IsDeleted = false,
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            }
+                UpdatedAt = DateTime.UtcNow,
+            },
         };
 
         var postGetAllRequestDto = new PostGetAllRequestDto
         {
             Cursor = cursor,
             Limit = _defaultPaginationLimit,
-        }; 
+        };
 
         var paginatedResponse = new PaginatedResponseDto<PostResponseDto>
         {
             Items = posts,
-            NextCursor = nextCursor
+            NextCursor = nextCursor,
         };
 
         _mockPostService
@@ -350,11 +334,8 @@ public class PostControllerTests
         var returnedData = Assert.IsType<PaginatedResponseDto<PostResponseDto>>(okResult.Value);
         Assert.Single(returnedData.Items);
         Assert.Equal(nextCursor, returnedData.NextCursor);
-        
-        _mockPostService.Verify(
-            s => s.GetPosts(_testUserId, postGetAllRequestDto),
-            Times.Once
-        );
+
+        _mockPostService.Verify(s => s.GetPosts(_testUserId, postGetAllRequestDto), Times.Once);
     }
 
     [Fact]
@@ -362,7 +343,8 @@ public class PostControllerTests
     {
         // Arrange
         var customLimit = 10;
-        var posts = Enumerable.Range(1, customLimit)
+        var posts = Enumerable
+            .Range(1, customLimit)
             .Select(i => new PostResponseDto
             {
                 Id = Guid.NewGuid(),
@@ -375,7 +357,7 @@ public class PostControllerTests
                 DownvoteCount = 0,
                 IsDeleted = false,
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                UpdatedAt = DateTime.UtcNow,
             })
             .ToList();
 
@@ -383,12 +365,12 @@ public class PostControllerTests
         {
             Cursor = null,
             Limit = _defaultPaginationLimit,
-        }; 
+        };
 
         var paginatedResponse = new PaginatedResponseDto<PostResponseDto>
         {
             Items = posts,
-            NextCursor = Guid.NewGuid()
+            NextCursor = Guid.NewGuid(),
         };
 
         _mockPostService
@@ -403,11 +385,8 @@ public class PostControllerTests
         var returnedData = Assert.IsType<PaginatedResponseDto<PostResponseDto>>(okResult.Value);
         Assert.Equal(customLimit, returnedData.Items.Count());
         Assert.NotNull(returnedData.NextCursor);
-        
-        _mockPostService.Verify(
-            s => s.GetPosts(_testUserId, postGetAllRequestDto),
-            Times.Once
-        );
+
+        _mockPostService.Verify(s => s.GetPosts(_testUserId, postGetAllRequestDto), Times.Once);
     }
 
     [Fact]
@@ -428,20 +407,20 @@ public class PostControllerTests
                 DownvoteCount = 0,
                 IsDeleted = false,
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            }
+                UpdatedAt = DateTime.UtcNow,
+            },
         };
 
         var postGetAllRequestDto = new PostGetAllRequestDto
         {
             Cursor = null,
             Limit = _defaultPaginationLimit,
-        }; 
+        };
 
         var paginatedResponse = new PaginatedResponseDto<PostResponseDto>
         {
             Items = posts,
-            NextCursor = null
+            NextCursor = null,
         };
 
         _mockPostService
@@ -455,11 +434,8 @@ public class PostControllerTests
         var okResult = Assert.IsType<OkObjectResult>(result);
         var returnedData = Assert.IsType<PaginatedResponseDto<PostResponseDto>>(okResult.Value);
         Assert.Single(returnedData.Items);
-        
-        _mockPostService.Verify(
-            s => s.GetPosts(_testUserId, postGetAllRequestDto),
-            Times.Once
-        );
+
+        _mockPostService.Verify(s => s.GetPosts(_testUserId, postGetAllRequestDto), Times.Once);
     }
 
     #endregion
@@ -482,7 +458,7 @@ public class PostControllerTests
             DownvoteCount = 1,
             IsDeleted = false,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
         };
 
         _mockPostService
@@ -497,11 +473,8 @@ public class PostControllerTests
         var returnedPost = Assert.IsType<PostResponseDto>(okResult.Value);
         Assert.Equal(_testPostId, returnedPost.Id);
         Assert.Equal("Test Post", returnedPost.Title);
-        
-        _mockPostService.Verify(
-            s => s.GetPostById(_testUserId, _testPostId),
-            Times.Once
-        );
+
+        _mockPostService.Verify(s => s.GetPostById(_testUserId, _testPostId), Times.Once);
     }
 
     [Fact]
@@ -518,7 +491,7 @@ public class PostControllerTests
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(StatusCodes.Status404NotFound, objectResult.StatusCode);
-        
+
         var problemDetails = Assert.IsType<ProblemDetails>(objectResult.Value);
         Assert.Equal(ErrorMessages.PostNotFound, problemDetails.Detail);
     }
@@ -540,7 +513,7 @@ public class PostControllerTests
             DownvoteCount = 2,
             IsDeleted = false,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
         };
 
         _mockPostService
@@ -567,7 +540,7 @@ public class PostControllerTests
         var updateDto = new PostUpdateRequestDto
         {
             Title = "Updated Title",
-            Description = "Updated Description"
+            Description = "Updated Description",
         };
 
         var responseDto = new PostResponseDto
@@ -582,7 +555,7 @@ public class PostControllerTests
             DownvoteCount = 0,
             IsDeleted = false,
             CreatedAt = DateTime.UtcNow.AddHours(-1),
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
         };
 
         _mockPostService
@@ -597,11 +570,8 @@ public class PostControllerTests
         var returnedPost = Assert.IsType<PostResponseDto>(okResult.Value);
         Assert.Equal("Updated Title", returnedPost.Title);
         Assert.Equal("Updated Description", returnedPost.Description);
-        
-        _mockPostService.Verify(
-            s => s.UpdatePost(_testUserId, _testPostId, updateDto),
-            Times.Once
-        );
+
+        _mockPostService.Verify(s => s.UpdatePost(_testUserId, _testPostId, updateDto), Times.Once);
     }
 
     [Fact]
@@ -612,7 +582,7 @@ public class PostControllerTests
         var updateDto = new PostUpdateRequestDto
         {
             Title = "Updated Title",
-            Description = "Updated Description"
+            Description = "Updated Description",
         };
 
         // Act
@@ -621,10 +591,10 @@ public class PostControllerTests
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(StatusCodes.Status401Unauthorized, objectResult.StatusCode);
-        
+
         var problemDetails = Assert.IsType<ProblemDetails>(objectResult.Value);
         Assert.Equal(ErrorMessages.UserNotAuthenticated, problemDetails.Detail);
-        
+
         _mockPostService.Verify(
             s => s.UpdatePost(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<PostUpdateRequestDto>()),
             Times.Never
@@ -638,7 +608,7 @@ public class PostControllerTests
         var updateDto = new PostUpdateRequestDto
         {
             Title = "Updated Title",
-            Description = "Updated Description"
+            Description = "Updated Description",
         };
 
         _mockPostService
@@ -651,7 +621,7 @@ public class PostControllerTests
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(StatusCodes.Status404NotFound, objectResult.StatusCode);
-        
+
         var problemDetails = Assert.IsType<ProblemDetails>(objectResult.Value);
         Assert.Equal(ErrorMessages.PostNotFound, problemDetails.Detail);
     }
@@ -663,7 +633,7 @@ public class PostControllerTests
         var updateDto = new PostUpdateRequestDto
         {
             Title = "Updated Title",
-            Description = "Updated Description"
+            Description = "Updated Description",
         };
 
         _mockPostService
@@ -676,7 +646,7 @@ public class PostControllerTests
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(StatusCodes.Status403Forbidden, objectResult.StatusCode);
-        
+
         var problemDetails = Assert.IsType<ProblemDetails>(objectResult.Value);
         Assert.Equal(ErrorMessages.PostUnauthorized, problemDetails.Detail);
     }
@@ -689,10 +659,7 @@ public class PostControllerTests
     public async Task VotePost_WithUpvote_ReturnsOk()
     {
         // Arrange
-        var voteDto = new PostVoteRequestDto
-        {
-            VoteType = VoteType.Upvote
-        };
+        var voteDto = new PostVoteRequestDto { VoteType = VoteType.Upvote };
 
         var responseDto = new PostResponseDto
         {
@@ -706,7 +673,7 @@ public class PostControllerTests
             DownvoteCount = 0,
             IsDeleted = false,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
         };
 
         _mockPostService
@@ -721,21 +688,15 @@ public class PostControllerTests
         var returnedPost = Assert.IsType<PostResponseDto>(okResult.Value);
         Assert.Equal(VoteType.Upvote, returnedPost.VoteStatus);
         Assert.Equal(1, returnedPost.UpvoteCount);
-        
-        _mockPostService.Verify(
-            s => s.VotePost(_testUserId, _testPostId, voteDto),
-            Times.Once
-        );
+
+        _mockPostService.Verify(s => s.VotePost(_testUserId, _testPostId, voteDto), Times.Once);
     }
 
     [Fact]
     public async Task VotePost_WithDownvote_ReturnsOk()
     {
         // Arrange
-        var voteDto = new PostVoteRequestDto
-        {
-            VoteType = VoteType.Downvote
-        };
+        var voteDto = new PostVoteRequestDto { VoteType = VoteType.Downvote };
 
         var responseDto = new PostResponseDto
         {
@@ -749,7 +710,7 @@ public class PostControllerTests
             DownvoteCount = 1,
             IsDeleted = false,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
         };
 
         _mockPostService
@@ -770,10 +731,7 @@ public class PostControllerTests
     public async Task VotePost_WithNoVote_ReturnsOk()
     {
         // Arrange
-        var voteDto = new PostVoteRequestDto
-        {
-            VoteType = VoteType.NoVote
-        };
+        var voteDto = new PostVoteRequestDto { VoteType = VoteType.NoVote };
 
         var responseDto = new PostResponseDto
         {
@@ -787,7 +745,7 @@ public class PostControllerTests
             DownvoteCount = 0,
             IsDeleted = false,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
         };
 
         _mockPostService
@@ -808,10 +766,7 @@ public class PostControllerTests
     {
         // Arrange
         SetupAnonymousUser();
-        var voteDto = new PostVoteRequestDto
-        {
-            VoteType = VoteType.Upvote
-        };
+        var voteDto = new PostVoteRequestDto { VoteType = VoteType.Upvote };
 
         // Act
         var result = await _controller.VotePost(_testPostId, voteDto);
@@ -819,10 +774,10 @@ public class PostControllerTests
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(StatusCodes.Status401Unauthorized, objectResult.StatusCode);
-        
+
         var problemDetails = Assert.IsType<ProblemDetails>(objectResult.Value);
         Assert.Equal(ErrorMessages.UserNotAuthenticated, problemDetails.Detail);
-        
+
         _mockPostService.Verify(
             s => s.VotePost(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<PostVoteRequestDto>()),
             Times.Never
@@ -833,10 +788,7 @@ public class PostControllerTests
     public async Task VotePost_WithNonExistentPost_ReturnsNotFound()
     {
         // Arrange
-        var voteDto = new PostVoteRequestDto
-        {
-            VoteType = VoteType.Upvote
-        };
+        var voteDto = new PostVoteRequestDto { VoteType = VoteType.Upvote };
 
         _mockPostService
             .Setup(s => s.VotePost(_testUserId, _testPostId, voteDto))
@@ -848,7 +800,7 @@ public class PostControllerTests
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(StatusCodes.Status404NotFound, objectResult.StatusCode);
-        
+
         var problemDetails = Assert.IsType<ProblemDetails>(objectResult.Value);
         Assert.Equal(ErrorMessages.PostNotFound, problemDetails.Detail);
     }
@@ -873,7 +825,7 @@ public class PostControllerTests
             DownvoteCount = 0,
             IsDeleted = true,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
         };
 
         _mockPostService
@@ -887,11 +839,8 @@ public class PostControllerTests
         var okResult = Assert.IsType<OkObjectResult>(result);
         var returnedPost = Assert.IsType<PostResponseDto>(okResult.Value);
         Assert.True(returnedPost.IsDeleted);
-        
-        _mockPostService.Verify(
-            s => s.DeletePost(_testUserId, _testPostId),
-            Times.Once
-        );
+
+        _mockPostService.Verify(s => s.DeletePost(_testUserId, _testPostId), Times.Once);
     }
 
     [Fact]
@@ -906,14 +855,11 @@ public class PostControllerTests
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(StatusCodes.Status401Unauthorized, objectResult.StatusCode);
-        
+
         var problemDetails = Assert.IsType<ProblemDetails>(objectResult.Value);
         Assert.Equal(ErrorMessages.UserNotAuthenticated, problemDetails.Detail);
-        
-        _mockPostService.Verify(
-            s => s.DeletePost(It.IsAny<Guid>(), It.IsAny<Guid>()),
-            Times.Never
-        );
+
+        _mockPostService.Verify(s => s.DeletePost(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
     }
 
     [Fact]
@@ -930,7 +876,7 @@ public class PostControllerTests
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(StatusCodes.Status404NotFound, objectResult.StatusCode);
-        
+
         var problemDetails = Assert.IsType<ProblemDetails>(objectResult.Value);
         Assert.Equal(ErrorMessages.PostNotFound, problemDetails.Detail);
     }
@@ -949,7 +895,7 @@ public class PostControllerTests
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(StatusCodes.Status403Forbidden, objectResult.StatusCode);
-        
+
         var problemDetails = Assert.IsType<ProblemDetails>(objectResult.Value);
         Assert.Equal(ErrorMessages.PostUnauthorized, problemDetails.Detail);
     }

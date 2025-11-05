@@ -13,6 +13,10 @@ namespace OurCity.Api.Test.IntegrationTests;
 /// </summary>
 /// <credits>
 /// Code modified from ChatGPT response just asking how to call API endpoints for testing
+///
+/// Claude assisted implementing SeedTestDataAsync()
+/// Promt: Following the common practices for ASP.NET, provide me with a sample boilerplate for a
+/// method to seed test data using the passed in data
 /// </credits>
 public class OurCityWebApplicationFactory : WebApplicationFactory<Program>
 {
@@ -27,9 +31,36 @@ public class OurCityWebApplicationFactory : WebApplicationFactory<Program>
         _postgres = new PostgreSqlBuilder().WithImage("postgres:16.10").WithCleanUp(true).Build();
     }
 
-    public async Task StartDbAsync() => await _postgres.StartAsync();
+    public async Task StartDbAsync()
+    {
+        await _postgres.StartAsync();
+    }
 
-    public async Task StopDbAsync() => await _postgres.StopAsync();
+    public async Task StopDbAsync()
+    {
+        await _postgres.StopAsync();
+        await _postgres.DisposeAsync();
+    }
+
+    public async Task SeedTestDataAsync(Func<AppDbContext, UserManager<User>, Task> seedAction)
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+
+        await seedAction(db, userManager);
+        await db.SaveChangesAsync();
+    }
+
+    public async Task ResetDatabaseAsync()
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        await db.Database.ExecuteSqlRawAsync(
+            "TRUNCATE TABLE \"PostVotes\", \"CommentVotes\", \"Comments\", \"Posts\", \"Tags\", \"Media\" RESTART IDENTITY CASCADE;"
+        );
+    }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {

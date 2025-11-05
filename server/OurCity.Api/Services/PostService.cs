@@ -1,6 +1,6 @@
 using OurCity.Api.Common;
-using OurCity.Api.Common.Dtos.Post;
 using OurCity.Api.Common.Dtos.Pagination;
+using OurCity.Api.Common.Dtos.Post;
 using OurCity.Api.Common.Enum;
 using OurCity.Api.Infrastructure;
 using OurCity.Api.Infrastructure.Database;
@@ -69,6 +69,7 @@ public class PostService : IPostService
 
         return Result<PaginatedResponseDto<PostResponseDto>>.Success(response);
     }
+
     public async Task<Result<PostResponseDto>> GetPostById(Guid? userId, Guid postId)
     {
         var post = await _postRepository.GetFatPostById(postId);
