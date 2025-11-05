@@ -128,13 +128,11 @@ const handleSubmit = async (event: Event) => {
     };
 
     const createdPost = await createPost(newPost);
-    console.log("Post created:", createdPost);
 
     // upload media if any images selected
     if (formData.value.images.length > 0) {
       const uploadPromises = formData.value.images.map((file) => uploadMedia(file, createdPost.id));
       await Promise.all(uploadPromises);
-      console.log("Images uploaded successfully");
     }
 
     // redirect to the newly created post's page
