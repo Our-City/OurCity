@@ -60,8 +60,8 @@ export async function deletePost(postId: string): Promise<Post> {
   return toPost(response.data);
 }
 
-  // PUT /posts/{postId}/vote
-  export async function voteOnPost(postId: string, voteType: VoteType): Promise<Post> {
-    const response = await api.put<PostResponseDto>(`/posts/${postId}/votes`, { voteType });
-    return toPost(response.data);
-  }
+// PUT /posts/{postId}/vote
+export async function voteOnPost(postId: string, voteType: VoteType): Promise<Post> {
+  const response = await api.put<PostResponseDto>(`/posts/${postId}/votes`, { voteType });
+  return toPost(response.data);
+}

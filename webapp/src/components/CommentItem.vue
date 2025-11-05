@@ -54,17 +54,12 @@ async function handleVote(voteType: VoteType) {
     </div>
 
     <div class="comment-actions">
-      <VoteBox
-        :votes="comment.voteCount"
-        :userVote="comment.voteStatus"
-        @vote="handleVote"
-      />
+      <VoteBox :votes="comment.voteCount" :userVote="comment.voteStatus" @vote="handleVote" />
     </div>
 
     <div v-if="error" class="comment-error">{{ error }}</div>
   </div>
 </template>
-
 
 <style scoped>
 .comment-item {

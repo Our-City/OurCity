@@ -81,7 +81,7 @@ async function submitComment() {
     };
 
     const created = await createComment(postId, newComment);
-    
+
     // Remove the reload, just update the local state
     comments.value.unshift(created);
     commentText.value = "";
@@ -165,11 +165,7 @@ onMounted(loadPostData);
 
               <div class="post-footer">
                 <div class="post-voting">
-                  <VoteBox
-                    :votes="post.voteCount"
-                    :userVote="post.voteStatus"
-                    @vote="handleVote"
-                  />
+                  <VoteBox :votes="post.voteCount" :userVote="post.voteStatus" @vote="handleVote" />
                 </div>
               </div>
             </div>
@@ -195,11 +191,7 @@ onMounted(loadPostData);
                 </button>
               </div>
 
-              <CommentList
-                :comments="comments"
-                @updated="handleCommentUpdated"
-              />
-
+              <CommentList :comments="comments" @updated="handleCommentUpdated" />
             </div>
           </div>
 

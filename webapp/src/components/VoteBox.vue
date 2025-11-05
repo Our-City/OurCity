@@ -26,9 +26,9 @@ function handleUpvote() {
     router.push("/login");
     return;
   }
-  
+
   let newVoteType: VoteType;
-  
+
   if (props.userVote === VoteType.UPVOTE) {
     // user is removing their upvote
     newVoteType = VoteType.NOVOTE;
@@ -38,7 +38,7 @@ function handleUpvote() {
   }
 
   console.log("existing vote", props.userVote, "new vote", newVoteType);
-  
+
   emit("vote", newVoteType);
 }
 
@@ -47,9 +47,9 @@ function handleDownvote() {
     router.push("/login");
     return;
   }
-  
+
   let newVoteType: VoteType;
-  
+
   if (props.userVote === VoteType.DOWNVOTE) {
     // User is removing their downvote
     newVoteType = VoteType.NOVOTE;
@@ -58,17 +58,17 @@ function handleDownvote() {
     newVoteType = VoteType.DOWNVOTE;
   }
 
-    console.log("existing vote", props.userVote, "new vote", newVoteType);
-  
+  console.log("existing vote", props.userVote, "new vote", newVoteType);
+
   emit("vote", newVoteType);
 }
 </script>
 
 <template>
   <div class="vote-box">
-    <button 
-      class="vote-btn upvote" 
-      :class="{ active: props.userVote === VoteType.UPVOTE }" 
+    <button
+      class="vote-btn upvote"
+      :class="{ active: props.userVote === VoteType.UPVOTE }"
       @click="handleUpvote"
     >
       <i class="pi pi-arrow-up" />
@@ -76,9 +76,9 @@ function handleDownvote() {
 
     <span class="vote-count">{{ votes }}</span>
 
-    <button 
-      class="vote-btn downvote" 
-      :class="{ active: props.userVote === VoteType.DOWNVOTE }" 
+    <button
+      class="vote-btn downvote"
+      :class="{ active: props.userVote === VoteType.DOWNVOTE }"
       @click="handleDownvote"
     >
       <i class="pi pi-arrow-down" />
