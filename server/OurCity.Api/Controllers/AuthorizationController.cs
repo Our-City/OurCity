@@ -7,7 +7,7 @@ namespace OurCity.Api.Controllers;
 /// AuthorizationController has endpoints that lets end users check what policies they have for OurCity
 /// </summary>
 [ApiController]
-[Route("[controller]")]
+[Route("apis/v1/authorization")]
 public class AuthorizationController : ControllerBase
 {
     private readonly ILogger<AuthorizationController> _logger;
@@ -23,7 +23,7 @@ public class AuthorizationController : ControllerBase
     }
 
     [HttpGet]
-    [Route("CanCreatePosts")]
+    [Route("can-create-posts")]
     [EndpointSummary("CanCreatePosts")]
     [EndpointDescription("Check if the current user is authorized to create posts")]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
@@ -35,12 +35,12 @@ public class AuthorizationController : ControllerBase
     }
 
     [HttpGet]
-    [Route("CanMutateThisPost/{postId}")]
+    [Route("can-mutate-post/{postId}")]
     [EndpointSummary("CanMutateThisPost")]
     [EndpointDescription("Check if the current user is authorized to mutate a given post")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-    public async Task<IActionResult> CanMutateThisPost([FromRoute] int postId)
+    public async Task<IActionResult> CanMutateThisPost([FromRoute] Guid postId)
     {
         var isAllowed = await _policyService.CheckResourcePolicy(
             HttpContext.User,

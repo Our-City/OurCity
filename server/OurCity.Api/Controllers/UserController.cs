@@ -8,7 +8,7 @@ using OurCity.Api.Services;
 namespace OurCity.Api.Controllers;
 
 [ApiController]
-[Route("[controller]s")]
+[Route("apis/v1/users")]
 public class UserController : ControllerBase
 {
     private readonly ILogger<UserController> _logger;
@@ -20,59 +20,37 @@ public class UserController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet]
-    [EndpointSummary("Get all users")]
-    [EndpointDescription("Gets a list of all users")]
-    [ProducesResponseType(typeof(List<UserResponseDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetUsers()
-    {
-        var users = await _userService.GetUsers();
-
-        return Ok(users);
-    }
-
-    [HttpGet]
-    [Route("{id}")]
-    [EndpointSummary("Get user by ID")]
-    [EndpointDescription("Gets a user with the specified ID")]
-    [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetUserById([FromRoute] int id)
-    {
-        var user = await _userService.GetUserById(id);
-        if (!user.IsSuccess)
-        {
-            return NotFound(user.Error);
-        }
-        return Ok(user.Data);
-    }
-
     [HttpPost]
     [EndpointSummary("Create a new user")]
     [EndpointDescription("Creates a new user with the provided data")]
-    [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> CreateUser(
         [FromBody] UserCreateRequestDto userCreateRequestDto
     )
     {
-        var user = await _userService.CreateUser(userCreateRequestDto);
+        var createUserResult = await _userService.CreateUser(userCreateRequestDto);
 
-        return CreatedAtAction(nameof(GetUsers), new { id = user.Data?.Id }, user.Data);
+        return createUserResult.IsSuccess
+            ? Ok(createUserResult.Data)
+            : Problem(statusCode: StatusCodes.Status400BadRequest, detail: createUserResult.Error);
     }
 
     [HttpPut]
     [Route("{id}")]
     [EndpointSummary("Update an existing user")]
     [EndpointDescription("Updates the user with the specified ID")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> UpdateUser(
-        [FromRoute] int id,
+        [FromRoute] Guid id,
         [FromBody] UserUpdateRequestDto userUpdateRequestDto
     )
     {
         var user = await _userService.UpdateUser(id, userUpdateRequestDto);
         if (!user.IsSuccess)
         {
-            return NotFound(user.Error);
+            return Problem(statusCode: StatusCodes.Status404NotFound, detail: user.Error);
         }
         return Ok(user.Data);
     }
@@ -81,13 +59,14 @@ public class UserController : ControllerBase
     [Route("{id}")]
     [EndpointSummary("Delete a user")]
     [EndpointDescription("Deletes the user with the specified ID")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> DeleteUser([FromRoute] int id)
+    public async Task<IActionResult> DeleteUser([FromRoute] Guid id)
     {
         var user = await _userService.DeleteUser(id);
         if (!user.IsSuccess)
         {
-            return NotFound(user.Error);
+            return Problem(statusCode: StatusCodes.Status404NotFound, detail: user.Error);
         }
         return Ok(user.Data);
     }

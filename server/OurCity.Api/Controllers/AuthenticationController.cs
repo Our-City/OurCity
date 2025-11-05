@@ -1,102 +1,93 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OurCity.Api.Common.Dtos.User;
-using OurCity.Api.Services;
+using OurCity.Api.Infrastructure.Database;
 
 namespace OurCity.Api.Controllers;
 
-/// <summary>
-/// NOTE: THIS IS JUST A FULL STUB FOR THE ACTUAL AUTHENTICATION
-/// </summary>
 /// <credits>
-/// Code taken largely from ChatGPT prompt asking for cookie authentication where it just takes the user submitted name for the identity
+/// Code based off of ChatGPT request for integrating with ASP NET Core Identity
 /// </credits>
 [ApiController]
-[Route("[controller]")]
+[Route("apis/v1/authentication")]
 public class AuthenticationController : ControllerBase
 {
     private readonly ILogger<AuthenticationController> _logger;
-    private readonly IUserService _userService;
+    private readonly UserManager<User> _userManager;
+    private readonly SignInManager<User> _signInManager;
 
     public AuthenticationController(
         ILogger<AuthenticationController> logger,
-        IUserService userService
+        UserManager<User> userManager,
+        SignInManager<User> signInManager
     )
     {
         _logger = logger;
-        _userService = userService;
+        _userManager = userManager;
+        _signInManager = signInManager;
     }
 
     [HttpPost]
-    [Route("Login/{username}")]
+    [Route("login")]
     [EndpointSummary("Login")]
     [EndpointDescription("Login to the OurCity application")]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> Login([FromRoute] [Required] [MinLength(1)] string username)
+    public async Task<IActionResult> Login([FromBody] UserCreateRequestDto createUserRequest)
     {
-        var claims = new List<Claim> { };
+        var user = await _userManager.FindByNameAsync(createUserRequest.Username);
 
-        var getUserResult = await _userService.GetUserByUsername(username);
-
-        if (getUserResult.IsSuccess)
-        {
-            claims.Add(
-                new Claim(ClaimTypes.NameIdentifier, getUserResult.Data?.Id.ToString() ?? "")
+        if (user == null)
+            return Problem(
+                statusCode: StatusCodes.Status401Unauthorized,
+                detail: "Invalid credentials"
             );
-            claims.Add(new Claim(ClaimTypes.Name, username));
-        }
-        else
-        {
-            var createUserResult = await _userService.CreateUser(
-                new UserCreateRequestDto { Username = username }
-            );
-            var newUser = createUserResult.Data;
 
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, newUser?.Id.ToString() ?? ""));
-            claims.Add(new Claim(ClaimTypes.Name, username));
-        }
-
-        var identity = new ClaimsIdentity(
-            claims,
-            CookieAuthenticationDefaults.AuthenticationScheme
+        var loginResult = await _signInManager.PasswordSignInAsync(
+            user,
+            createUserRequest.Password,
+            true,
+            false
         );
-        var principal = new ClaimsPrincipal(identity);
 
-        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-
-        return NoContent();
+        return loginResult.Succeeded
+            ? NoContent()
+            : Problem(statusCode: StatusCodes.Status401Unauthorized, detail: "Invalid credentials");
     }
 
     [HttpPost]
     [Authorize]
-    [Route("Logout")]
+    [Route("logout")]
     [EndpointSummary("Logout")]
     [EndpointDescription("Logout of the OurCity application")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Logout()
     {
-        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
+        await _signInManager.SignOutAsync();
         return NoContent();
     }
 
     [HttpGet]
-    [Route("Me")]
+    [Authorize]
+    [Route("me")]
     [EndpointSummary("Me")]
     [EndpointDescription("Get the information of the current user")]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult Me()
     {
-        var isUserAuthenticated = User.Identity?.IsAuthenticated ?? false;
-
-        if (!isUserAuthenticated)
-            return Unauthorized();
-
-        return Ok(User.FindFirst(ClaimTypes.Name)?.Value);
+        return Ok(
+            new
+            {
+                Id = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value,
+                Username = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value,
+                Roles = HttpContext
+                    .User.FindAll(ClaimTypes.Role)
+                    .Select(role => role.Value)
+                    .ToList(),
+            }
+        );
     }
 }
