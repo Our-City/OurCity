@@ -1,7 +1,6 @@
 /// <summary>
 /// Tests endpoints in MediaController.cs using mocked service
 /// </summary>
-
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -30,17 +29,14 @@ public class MediaControllerTests
 
     private void SetupAuthenticatedUser(Guid userId)
     {
-        var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, userId.ToString())
-        };
+        var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, userId.ToString()) };
 
         _controller.ControllerContext = new ControllerContext
         {
             HttpContext = new DefaultHttpContext
             {
-                User = new ClaimsPrincipal(new ClaimsIdentity(claims, "TestAuth"))
-            }
+                User = new ClaimsPrincipal(new ClaimsIdentity(claims, "TestAuth")),
+            },
         };
     }
 
@@ -50,8 +46,8 @@ public class MediaControllerTests
         {
             HttpContext = new DefaultHttpContext
             {
-                User = new ClaimsPrincipal(new ClaimsIdentity()) // No claims
-            }
+                User = new ClaimsPrincipal(new ClaimsIdentity()), // No claims
+            },
         };
     }
 
@@ -77,16 +73,13 @@ public class MediaControllerTests
             PostId = _testPostId,
             Url = "https://test-bucket.s3.amazonaws.com/media/test-image.jpg",
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
         };
 
         _mockMediaService
-            .Setup(s => s.UploadMediaAsync(
-                _testUserId,
-                _testPostId,
-                It.IsAny<Stream>(),
-                file.FileName
-            ))
+            .Setup(s =>
+                s.UploadMediaAsync(_testUserId, _testPostId, It.IsAny<Stream>(), file.FileName)
+            )
             .ReturnsAsync(Result<MediaResponseDto>.Success(responseDto));
 
         // Act
@@ -96,18 +89,13 @@ public class MediaControllerTests
         var createdResult = Assert.IsType<CreatedAtActionResult>(result);
         Assert.Equal(StatusCodes.Status201Created, createdResult.StatusCode);
         Assert.Equal(nameof(_controller.UploadMedia), createdResult.ActionName);
-        
+
         var returnedMedia = Assert.IsType<MediaResponseDto>(createdResult.Value);
         Assert.Equal(_testMediaId, returnedMedia.Id);
         Assert.Equal(_testPostId, returnedMedia.PostId);
-        
+
         _mockMediaService.Verify(
-            s => s.UploadMediaAsync(
-                _testUserId,
-                _testPostId,
-                It.IsAny<Stream>(),
-                file.FileName
-            ),
+            s => s.UploadMediaAsync(_testUserId, _testPostId, It.IsAny<Stream>(), file.FileName),
             Times.Once
         );
     }
@@ -125,17 +113,18 @@ public class MediaControllerTests
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(StatusCodes.Status401Unauthorized, objectResult.StatusCode);
-        
+
         var problemDetails = Assert.IsType<ProblemDetails>(objectResult.Value);
         Assert.Equal("User not authenticated", problemDetails.Detail);
-        
+
         _mockMediaService.Verify(
-            s => s.UploadMediaAsync(
-                It.IsAny<Guid>(),
-                It.IsAny<Guid>(),
-                It.IsAny<Stream>(),
-                It.IsAny<string>()
-            ),
+            s =>
+                s.UploadMediaAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<Guid>(),
+                    It.IsAny<Stream>(),
+                    It.IsAny<string>()
+                ),
             Times.Never
         );
     }
@@ -149,17 +138,18 @@ public class MediaControllerTests
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(StatusCodes.Status400BadRequest, objectResult.StatusCode);
-        
+
         var problemDetails = Assert.IsType<ProblemDetails>(objectResult.Value);
         Assert.Equal("No file uploaded", problemDetails.Detail);
-        
+
         _mockMediaService.Verify(
-            s => s.UploadMediaAsync(
-                It.IsAny<Guid>(),
-                It.IsAny<Guid>(),
-                It.IsAny<Stream>(),
-                It.IsAny<string>()
-            ),
+            s =>
+                s.UploadMediaAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<Guid>(),
+                    It.IsAny<Stream>(),
+                    It.IsAny<string>()
+                ),
             Times.Never
         );
     }
@@ -176,17 +166,18 @@ public class MediaControllerTests
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(StatusCodes.Status400BadRequest, objectResult.StatusCode);
-        
+
         var problemDetails = Assert.IsType<ProblemDetails>(objectResult.Value);
         Assert.Equal("No file uploaded", problemDetails.Detail);
-        
+
         _mockMediaService.Verify(
-            s => s.UploadMediaAsync(
-                It.IsAny<Guid>(),
-                It.IsAny<Guid>(),
-                It.IsAny<Stream>(),
-                It.IsAny<string>()
-            ),
+            s =>
+                s.UploadMediaAsync(
+                    It.IsAny<Guid>(),
+                    It.IsAny<Guid>(),
+                    It.IsAny<Stream>(),
+                    It.IsAny<string>()
+                ),
             Times.Never
         );
     }
@@ -198,12 +189,9 @@ public class MediaControllerTests
         var file = CreateMockFormFile("test-image.jpg");
 
         _mockMediaService
-            .Setup(s => s.UploadMediaAsync(
-                _testUserId,
-                _testPostId,
-                It.IsAny<Stream>(),
-                file.FileName
-            ))
+            .Setup(s =>
+                s.UploadMediaAsync(_testUserId, _testPostId, It.IsAny<Stream>(), file.FileName)
+            )
             .ReturnsAsync(Result<MediaResponseDto>.Failure(ErrorMessages.MediaNotFound));
 
         // Act
@@ -212,7 +200,7 @@ public class MediaControllerTests
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(StatusCodes.Status404NotFound, objectResult.StatusCode);
-        
+
         var problemDetails = Assert.IsType<ProblemDetails>(objectResult.Value);
         Assert.Equal(ErrorMessages.MediaNotFound, problemDetails.Detail);
     }
@@ -224,12 +212,9 @@ public class MediaControllerTests
         var file = CreateMockFormFile("test-image.jpg");
 
         _mockMediaService
-            .Setup(s => s.UploadMediaAsync(
-                _testUserId,
-                _testPostId,
-                It.IsAny<Stream>(),
-                file.FileName
-            ))
+            .Setup(s =>
+                s.UploadMediaAsync(_testUserId, _testPostId, It.IsAny<Stream>(), file.FileName)
+            )
             .ReturnsAsync(Result<MediaResponseDto>.Failure(ErrorMessages.MediaUnauthorized));
 
         // Act
@@ -238,7 +223,7 @@ public class MediaControllerTests
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(StatusCodes.Status403Forbidden, objectResult.StatusCode);
-        
+
         var problemDetails = Assert.IsType<ProblemDetails>(objectResult.Value);
         Assert.Equal(ErrorMessages.MediaUnauthorized, problemDetails.Detail);
     }
@@ -259,7 +244,7 @@ public class MediaControllerTests
                 PostId = _testPostId,
                 Url = "https://test-bucket.s3.amazonaws.com/media/image1.jpg",
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                UpdatedAt = DateTime.UtcNow,
             },
             new MediaResponseDto
             {
@@ -267,8 +252,8 @@ public class MediaControllerTests
                 PostId = _testPostId,
                 Url = "https://test-bucket.s3.amazonaws.com/media/image2.jpg",
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            }
+                UpdatedAt = DateTime.UtcNow,
+            },
         };
 
         _mockMediaService
@@ -282,11 +267,8 @@ public class MediaControllerTests
         var okResult = Assert.IsType<OkObjectResult>(result);
         var returnedMedia = Assert.IsType<List<MediaResponseDto>>(okResult.Value);
         Assert.Equal(2, returnedMedia.Count);
-        
-        _mockMediaService.Verify(
-            s => s.GetMediaForPostAsync(_testPostId),
-            Times.Once
-        );
+
+        _mockMediaService.Verify(s => s.GetMediaForPostAsync(_testPostId), Times.Once);
     }
 
     [Fact]
@@ -295,7 +277,9 @@ public class MediaControllerTests
         // Arrange
         _mockMediaService
             .Setup(s => s.GetMediaForPostAsync(_testPostId))
-            .ReturnsAsync(Result<IEnumerable<MediaResponseDto>>.Success(new List<MediaResponseDto>()));
+            .ReturnsAsync(
+                Result<IEnumerable<MediaResponseDto>>.Success(new List<MediaResponseDto>())
+            );
 
         // Act
         var result = await _controller.GetMediaForPost(_testPostId);
@@ -304,11 +288,8 @@ public class MediaControllerTests
         var okResult = Assert.IsType<OkObjectResult>(result);
         var returnedMedia = Assert.IsType<List<MediaResponseDto>>(okResult.Value);
         Assert.Empty(returnedMedia);
-        
-        _mockMediaService.Verify(
-            s => s.GetMediaForPostAsync(_testPostId),
-            Times.Once
-        );
+
+        _mockMediaService.Verify(s => s.GetMediaForPostAsync(_testPostId), Times.Once);
     }
 
     [Fact]
@@ -324,8 +305,8 @@ public class MediaControllerTests
                 PostId = _testPostId,
                 Url = "https://test-bucket.s3.amazonaws.com/media/image1.jpg",
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            }
+                UpdatedAt = DateTime.UtcNow,
+            },
         };
 
         _mockMediaService
@@ -355,7 +336,7 @@ public class MediaControllerTests
             PostId = _testPostId,
             Url = "https://test-bucket.s3.amazonaws.com/media/image.jpg",
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
         };
 
         _mockMediaService
@@ -370,11 +351,8 @@ public class MediaControllerTests
         var returnedMedia = Assert.IsType<MediaResponseDto>(okResult.Value);
         Assert.Equal(_testMediaId, returnedMedia.Id);
         Assert.Equal(_testPostId, returnedMedia.PostId);
-        
-        _mockMediaService.Verify(
-            s => s.GetMediaByIdAsync(_testMediaId),
-            Times.Once
-        );
+
+        _mockMediaService.Verify(s => s.GetMediaByIdAsync(_testMediaId), Times.Once);
     }
 
     [Fact]
@@ -391,7 +369,7 @@ public class MediaControllerTests
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(StatusCodes.Status404NotFound, objectResult.StatusCode);
-        
+
         var problemDetails = Assert.IsType<ProblemDetails>(objectResult.Value);
         Assert.Equal(ErrorMessages.MediaNotFound, problemDetails.Detail);
     }
@@ -407,7 +385,7 @@ public class MediaControllerTests
             PostId = _testPostId,
             Url = "https://test-bucket.s3.amazonaws.com/media/image.jpg",
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
         };
 
         _mockMediaService
@@ -437,7 +415,7 @@ public class MediaControllerTests
             PostId = _testPostId,
             Url = "https://test-bucket.s3.amazonaws.com/media/image.jpg",
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
         };
 
         _mockMediaService
@@ -450,11 +428,8 @@ public class MediaControllerTests
         // Assert
         var noContentResult = Assert.IsType<NoContentResult>(result);
         Assert.Equal(StatusCodes.Status204NoContent, noContentResult.StatusCode);
-        
-        _mockMediaService.Verify(
-            s => s.DeleteMediaAsync(_testUserId, _testMediaId),
-            Times.Once
-        );
+
+        _mockMediaService.Verify(s => s.DeleteMediaAsync(_testUserId, _testMediaId), Times.Once);
     }
 
     [Fact]
@@ -469,10 +444,10 @@ public class MediaControllerTests
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(StatusCodes.Status401Unauthorized, objectResult.StatusCode);
-        
+
         var problemDetails = Assert.IsType<ProblemDetails>(objectResult.Value);
         Assert.Equal("User not authenticated", problemDetails.Detail);
-        
+
         _mockMediaService.Verify(
             s => s.DeleteMediaAsync(It.IsAny<Guid>(), It.IsAny<Guid>()),
             Times.Never
@@ -493,7 +468,7 @@ public class MediaControllerTests
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(StatusCodes.Status404NotFound, objectResult.StatusCode);
-        
+
         var problemDetails = Assert.IsType<ProblemDetails>(objectResult.Value);
         Assert.Equal(ErrorMessages.MediaNotFound, problemDetails.Detail);
     }
@@ -512,7 +487,7 @@ public class MediaControllerTests
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(StatusCodes.Status403Forbidden, objectResult.StatusCode);
-        
+
         var problemDetails = Assert.IsType<ProblemDetails>(objectResult.Value);
         Assert.Equal(ErrorMessages.MediaUnauthorized, problemDetails.Detail);
     }
