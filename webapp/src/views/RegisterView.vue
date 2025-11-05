@@ -9,9 +9,11 @@ import { useAuthStore } from "@/stores/authenticationStore";
 import { createUser } from "@/api/userService";
 import Form from "@/components/utils/FormCmp.vue";
 import InputText from "primevue/inputtext";
+import { useToast } from "primevue/usetoast";
 import { resolveErrorMessage } from "@/utils/error";
 
 const router = useRouter();
+const toast = useToast();
 
 // Form data
 const formData = ref({
@@ -81,6 +83,12 @@ const handleSubmit = async (event: Event) => {
     } catch (e) {
       console.warn("Auto-login failed:", e);
     }
+
+    toast.add({
+      severity: "secondary",
+      summary: "Your acccount was successfully created.",
+      life: 4000,
+    });
 
     // re-route to home after successful registration
     router.push("/");
