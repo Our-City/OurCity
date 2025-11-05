@@ -2,6 +2,15 @@
   CoPilot was asked to provide help with CSS styling and for help with syntax 
   ChatGPT was asked to help with handling the voting logic and emits.-->
 <script setup lang="ts">
+import { computed } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/authenticationStore";
+
+const router = useRouter();
+const auth = useAuthStore();
+
+const isLoggedIn = computed(() => auth.isAuthenticated);
+
 const props = defineProps<{
   votes: number;
   userVote?: number; // -1 | 0 | 1 (optional)
@@ -12,13 +21,23 @@ const emit = defineEmits<{
 }>();
 
 function handleUpvote() {
-  const next = props.userVote === 1 ? 0 : 1;
-  emit("vote", next);
+  if (!isLoggedIn.value) {
+    router.push("/login");
+    return;
+  } else {
+    const next = props.userVote === 1 ? 0 : 1;
+    emit("vote", next);
+  }
 }
 
 function handleDownvote() {
-  const next = props.userVote === -1 ? 0 : -1;
-  emit("vote", next);
+  if (!isLoggedIn.value) {
+    router.push("/login");
+    return;
+  } else {
+    const next = props.userVote === -1 ? 0 : -1;
+    emit("vote", next);
+  }
 }
 </script>
 

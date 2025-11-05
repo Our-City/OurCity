@@ -2,7 +2,7 @@
   ChatGPT was asked to generate code to help integrate the Post service layer API calls.
   e.g. loading posts, mounting, etc.-->
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import Card from "primevue/card";
 import PageHeader from "@/components/PageHeader.vue";
 import PostList from "@/components/PostList.vue";
@@ -10,8 +10,10 @@ import SideBar from "@/components/SideBar.vue";
 import { useRouter } from "vue-router";
 import { getPosts } from "@/api/postService";
 import type { Post } from "@/models/post";
+import { useAuthStore } from "@/stores/authenticationStore";
 
 const router = useRouter();
+const auth = useAuthStore();
 
 const posts = ref<Post[]>([]);
 const nextCursor = ref<string | null>(null);
@@ -39,16 +41,22 @@ async function loadPosts(initial = false) {
 }
 
 function handleCreatePost(): void {
-  router.push("/create-post");
+  if (isLoggedIn.value) {
+    router.push("/create-post");
+  } else {
+    router.push("/login");
+  }
 }
 
 onMounted(() => {
   loadPosts(true);
 });
+
+const isLoggedIn = computed(() => auth.isAuthenticated);
 </script>
 
 <template>
-  <div>
+  <div class="home-page">
     <div class="page-header">
       <PageHeader />
     </div>
@@ -112,6 +120,10 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.home-page {
+  padding: 1rem;
+}
+
 .home-page-layout {
   display: flex;
   height: 100vh;
