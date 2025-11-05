@@ -1,380 +1,764 @@
-// /// Generative AI - CoPilot was used to assist in the creation of this file.
-// ///   CoPilot was asked to help write tests for the PostService by being given
-// ///   a description of what exactly should be tested for this service layer and giving
-// ///   back the needed functions and syntax to implement the tests.
-// ///   The code was then reviewed and edited by the author of this file to ensure correctness.
-// using Microsoft.EntityFrameworkCore;
-// using OurCity.Api.Common.Dtos.Post;
-// using OurCity.Api.Common.Enum;
-// using OurCity.Api.Infrastructure;
-// using OurCity.Api.Infrastructure.Database;
-// using OurCity.Api.Services;
-// using Testcontainers.PostgreSql;
+using System.Net;
+using System.Net.Http.Json;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using OurCity.Api.Common.Dtos.Pagination;
+using OurCity.Api.Common.Dtos.Post;
+using OurCity.Api.Common.Dtos.User;
+using OurCity.Api.Common.Enum;
+using OurCity.Api.Infrastructure.Database;
+using Xunit;
 
-// namespace OurCity.Api.Test.IntegrationTests;
+namespace OurCity.Api.Test.IntegrationTests;
 
-// [Trait("Type", "Integration")]
-// [Trait("Domain", "Post")]
-// public class PostIntegrationTests : IAsyncLifetime
-// {
-//     private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder()
-//         .WithImage("postgres:16.10")
-//         .Build();
-//     private AppDbContext _dbContext = null!;
-//     private User _testUser = null!;
+[Trait("Type", "Integration")]
+[Trait("Domain", "Post")]
+public class PostIntegrationTests : IClassFixture<OurCityWebApplicationFactory>, IAsyncLifetime
+{
+    private OurCityWebApplicationFactory _ourCityApi = null!;
+    private Guid _testPostId;
+    private Guid _testTagId;
+    private readonly string _baseUrl = "/apis/v1";
 
-//     public async Task InitializeAsync()
-//     {
-//         await _postgres.StartAsync();
+    public async Task InitializeAsync()
+    {
+        _ourCityApi = new OurCityWebApplicationFactory();
+        await _ourCityApi.StartDbAsync();
+        await _ourCityApi.ResetDatabaseAsync();
+        await SeedTestData();
+    }
 
-//         var options = new DbContextOptionsBuilder<AppDbContext>()
-//             .UseNpgsql(_postgres.GetConnectionString())
-//             .Options;
+    public async Task DisposeAsync()
+    {
+        await _ourCityApi.StopDbAsync();
+    }
 
-//         _dbContext = new AppDbContext(options);
+    private async Task SeedTestData()
+    {
+        await _ourCityApi.SeedTestDataAsync(
+            async (db, userManager) =>
+            {
+                _testPostId = Guid.NewGuid();
+                _testTagId = Guid.NewGuid();
 
-//         await _dbContext.Database.EnsureCreatedAsync();
+                var tag = new Tag { Id = _testTagId, Name = "Test Tag" };
+                db.Tags.Add(tag);
+                await db.SaveChangesAsync();
 
-//         // Seed a generic user for tests
-//         _testUser = new User
-//         {
-//             Id = 1,
-//             Username = "Dummy",
-//             DisplayName = "Dummy",
-//             IsDeleted = false,
-//             CreatedAt = DateTime.UtcNow,
-//             UpdatedAt = DateTime.UtcNow,
-//         };
-//         _dbContext.Users.Add(_testUser);
-//         await _dbContext.SaveChangesAsync();
-//     }
+                var post = new Post
+                {
+                    Id = _testPostId,
+                    AuthorId = _ourCityApi.StubUserId,
+                    Title = "Test Post",
+                    Description = "Test Description",
+                    Location = "Test Location",
+                    Visisbility = PostVisibility.Published,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    Tags = new List<Tag> { tag },
+                };
+                db.Posts.Add(post);
+            }
+        );
+    }
 
-//     public async Task DisposeAsync()
-//     {
-//         await _dbContext.DisposeAsync();
-//         await _postgres.DisposeAsync();
-//     }
+    #region GetPosts Tests
 
-//     [Fact]
-//     public async Task FreshDbShouldReturnNothing()
-//     {
-//         var postService = new PostService(new PostRepository(_dbContext));
-//         var retrievedPost = await postService.GetPosts();
+    [Fact]
+    public async Task GetPosts_WithNoPosts_ReturnsEmptyList()
+    {
+        using var client = _ourCityApi.CreateClient();
 
-//         Assert.True(retrievedPost.IsSuccess);
-//         Assert.NotNull(retrievedPost.Data);
-//         Assert.Empty(retrievedPost.Data);
-//     }
+        // Arrange - Reset without seeding
+        await _ourCityApi.ResetDatabaseAsync();
 
-//     [Fact]
-//     public async Task GettingExistingPostByIdShouldReturnPost()
-//     {
-//         var postService = new PostService(new PostRepository(_dbContext));
-//         var createDto = new PostCreateRequestDto
-//         {
-//             AuthorId = _testUser.Id,
-//             Title = "Test Post",
-//             Description = "This is a test post",
-//         };
+        // Act
+        var response = await client.GetAsync($"{_baseUrl}/posts");
 
-//         var createdPost = await postService.CreatePost(createDto);
-//         Assert.NotNull(createdPost.Data);
+        // Assert
+        response.EnsureSuccessStatusCode();
+        var result = await response.Content.ReadFromJsonAsync<
+            PaginatedResponseDto<PostResponseDto>
+        >();
+        Assert.NotNull(result);
+        Assert.Empty(result.Items);
+        Assert.Null(result.NextCursor);
+    }
 
-//         var retrievedPost = await postService.GetPostById(createdPost.Data.Id);
-//         Assert.True(retrievedPost.IsSuccess);
-//         Assert.NotNull(retrievedPost.Data);
+    [Fact]
+    public async Task GetPosts_WithExistingPosts_ReturnsPaginatedPosts()
+    {
+        using var client = _ourCityApi.CreateClient();
 
-//         Assert.Multiple(() =>
-//         {
-//             Assert.Equal(createdPost.Data.Id, retrievedPost.Data.Id);
-//             Assert.Equal(createdPost.Data.Title, retrievedPost.Data.Title);
-//             Assert.Equal(_testUser.Id, retrievedPost.Data.AuthorId);
-//             Assert.Equal(createdPost.Data.Description, retrievedPost.Data.Description);
-//             Assert.Equal(createdPost.Data.Location, retrievedPost.Data.Location);
-//             Assert.Equal(createdPost.Data.Votes, retrievedPost.Data.Votes);
-//             Assert.Equal(
-//                 createdPost.Data.Images.Select(i => i.Url),
-//                 retrievedPost.Data.Images.Select(i => i.Url)
-//             );
-//         });
-//     }
+        // Act
+        var response = await client.GetAsync($"{_baseUrl}/posts");
 
-//     [Fact]
-//     public async Task CreatePostShouldAddAndReturnPost()
-//     {
-//         var postService = new PostService(new PostRepository(_dbContext));
-//         var createDto = new PostCreateRequestDto
-//         {
-//             AuthorId = _testUser.Id,
-//             Title = "Test Post",
-//             Description = "This is a test post",
-//         };
+        // Assert
+        response.EnsureSuccessStatusCode();
+        var result = await response.Content.ReadFromJsonAsync<
+            PaginatedResponseDto<PostResponseDto>
+        >();
+        Assert.NotNull(result);
+        Assert.Single(result.Items);
+        Assert.Equal("Test Post", result.Items.First().Title);
+    }
 
-//         var createdPost = await postService.CreatePost(createDto);
-//         Assert.True(createdPost.IsSuccess);
-//         Assert.NotNull(createdPost.Data);
+    [Fact]
+    public async Task GetPosts_WithSearchTerm_ReturnsMatchingPosts()
+    {
+        using var client = _ourCityApi.CreateClient();
 
-//         Assert.Multiple(() =>
-//         {
-//             Assert.Equal("Test Post", createdPost.Data.Title);
-//             Assert.Equal("This is a test post", createdPost.Data.Description);
-//             Assert.Equal(_testUser.Id, createdPost.Data.AuthorId);
-//             Assert.Equal(0, createdPost.Data.Votes);
-//             Assert.Null(createdPost.Data.Location);
-//             Assert.Empty(createdPost.Data.Images);
-//         });
-//     }
+        // Arrange - Add another post
+        await _ourCityApi.SeedTestDataAsync(
+            async (db, userManager) =>
+            {
+                await db.Posts.AddAsync(
+                    new Post
+                    {
+                        Id = Guid.NewGuid(),
+                        AuthorId = _ourCityApi.StubUserId,
+                        Title = "React Tutorial",
+                        Description = "Learn React basics",
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow,
+                    }
+                );
+            }
+        );
 
-//     [Fact]
-//     public async Task UpdatePostShouldModifyAndReturnPost()
-//     {
-//         var postService = new PostService(new PostRepository(_dbContext));
-//         var createDto = new PostCreateRequestDto
-//         {
-//             AuthorId = _testUser.Id,
-//             Title = "Test Post",
-//             Description = "This is a test post",
-//         };
+        // Act
+        var response = await client.GetAsync($"{_baseUrl}/posts?searchTerm=React");
 
-//         var createdPost = await postService.CreatePost(createDto);
-//         Assert.NotNull(createdPost.Data);
+        // Assert
+        response.EnsureSuccessStatusCode();
+        var result = await response.Content.ReadFromJsonAsync<
+            PaginatedResponseDto<PostResponseDto>
+        >();
+        Assert.NotNull(result);
+        Assert.Single(result.Items);
+        Assert.Contains("React", result.Items.First().Title);
+    }
 
-//         var updateDto = new PostUpdateRequestDto
-//         {
-//             Title = "Updated Test Post",
-//             Description = "This is an updatedPost test post",
-//             Location = "New Location",
-//         };
+    [Fact]
+    public async Task GetPosts_WithTagFilter_ReturnsPostsWithMatchingTags()
+    {
+        using var client = _ourCityApi.CreateClient();
 
-//         var updatedPost = await postService.UpdatePost(createdPost.Data.Id, updateDto);
+        // Act
+        var response = await client.GetAsync($"{_baseUrl}/posts?tags={_testTagId}");
 
-//         Assert.True(updatedPost.IsSuccess);
-//         Assert.NotNull(updatedPost.Data);
+        // Assert
+        response.EnsureSuccessStatusCode();
+        var result = await response.Content.ReadFromJsonAsync<
+            PaginatedResponseDto<PostResponseDto>
+        >();
+        Assert.NotNull(result);
+        Assert.Single(result.Items);
+        Assert.Contains(result.Items.First().Tags, t => t.Id == _testTagId);
+    }
 
-//         Assert.Multiple(() =>
-//         {
-//             Assert.Equal("Updated Test Post", updatedPost.Data.Title);
-//             Assert.Equal("This is an updatedPost test post", updatedPost.Data.Description);
-//             Assert.Equal("New Location", updatedPost.Data.Location);
-//             Assert.Equal(_testUser.Id, updatedPost.Data.AuthorId);
-//             Assert.Equal(0, updatedPost.Data.Votes);
-//             Assert.Empty(updatedPost.Data.Images);
-//         });
-//     }
+    [Fact]
+    public async Task GetPosts_WithSortByVotes_ReturnsSortedPosts()
+    {
+        using var client = _ourCityApi.CreateClient();
 
-//     [Fact]
-//     public async Task UpvoteShouldAdd1Vote()
-//     {
-//         var postService = new PostService(new PostRepository(_dbContext));
-//         var createDto = new PostCreateRequestDto
-//         {
-//             AuthorId = _testUser.Id,
-//             Title = "Test Post",
-//             Description = "This is a test post",
-//         };
+        // Arrange
+        await _ourCityApi.SeedTestDataAsync(
+            async (db, userManager) =>
+            {
+                var post1Id = Guid.NewGuid();
+                var post2Id = Guid.NewGuid();
 
-//         var createdPost = await postService.CreatePost(createDto);
-//         Assert.NotNull(createdPost.Data);
-//         Assert.Equal(0, createdPost.Data.Votes);
+                var post1 = new Post
+                {
+                    Id = post1Id,
+                    AuthorId = _ourCityApi.StubUserId,
+                    Title = "Low Votes Post",
+                    Description = "Description",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                };
 
-//         var userId = 1;
-//         var upvotedPost = await postService.VotePost(createdPost.Data.Id, userId, VoteType.Upvote);
+                var post2 = new Post
+                {
+                    Id = post2Id,
+                    AuthorId = _ourCityApi.StubUserId,
+                    Title = "High Votes Post",
+                    Description = "Description",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                };
 
-//         Assert.True(upvotedPost.IsSuccess);
-//         Assert.NotNull(upvotedPost.Data);
+                db.Posts.AddRange(post1, post2);
+                await db.SaveChangesAsync();
 
-//         Assert.Equal(1, upvotedPost.Data.Votes);
-//     }
+                db.PostVotes.Add(
+                    new PostVote
+                    {
+                        Id = Guid.NewGuid(),
+                        PostId = post2Id,
+                        VoterId = _ourCityApi.StubUserId,
+                        VoteType = VoteType.Upvote,
+                        VotedAt = DateTime.UtcNow,
+                    }
+                );
+            }
+        );
 
-//     [Fact]
-//     public async Task DownvoteShouldRemove1Vote()
-//     {
-//         var postService = new PostService(new PostRepository(_dbContext));
-//         var createDto = new PostCreateRequestDto
-//         {
-//             AuthorId = _testUser.Id,
-//             Title = "Test Post",
-//             Description = "This is a test post",
-//         };
+        // Act
+        var response = await client.GetAsync($"{_baseUrl}/posts?sortBy=votes&sortOrder=Desc");
 
-//         var createdPost = await postService.CreatePost(createDto);
-//         Assert.NotNull(createdPost.Data);
-//         Assert.Equal(0, createdPost.Data.Votes);
+        // Assert
+        response.EnsureSuccessStatusCode();
+        var result = await response.Content.ReadFromJsonAsync<
+            PaginatedResponseDto<PostResponseDto>
+        >();
+        Assert.NotNull(result);
+        Assert.True(result.Items.Count() >= 2);
+        Assert.Equal("High Votes Post", result.Items.First().Title);
+    }
 
-//         var userId = 2;
-//         var downvotedPost = await postService.VotePost(
-//             createdPost.Data.Id,
-//             userId,
-//             VoteType.Downvote
-//         );
+    [Fact]
+    public async Task GetPosts_WithPagination_ReturnsCorrectPage()
+    {
+        using var client = _ourCityApi.CreateClient();
 
-//         Assert.True(downvotedPost.IsSuccess);
-//         Assert.NotNull(downvotedPost.Data);
+        // Arrange - Create 30 posts
+        await _ourCityApi.SeedTestDataAsync(
+            async (db, userManager) =>
+            {
+                for (int i = 0; i < 30; i++)
+                {
+                    await db.Posts.AddAsync(
+                        new Post
+                        {
+                            Id = Guid.NewGuid(),
+                            AuthorId = _ourCityApi.StubUserId,
+                            Title = $"Post {i}",
+                            Description = $"Description {i}",
+                            CreatedAt = DateTime.UtcNow.AddMinutes(-i),
+                            UpdatedAt = DateTime.UtcNow,
+                        }
+                    );
+                }
+            }
+        );
 
-//         Assert.Equal(-1, downvotedPost.Data.Votes);
-//     }
+        // Act - Get first page
+        var response1 = await client.GetAsync($"{_baseUrl}/posts?limit=10");
+        response1.EnsureSuccessStatusCode();
+        var result1 = await response1.Content.ReadFromJsonAsync<
+            PaginatedResponseDto<PostResponseDto>
+        >();
 
-//     [Fact]
-//     public async Task UpvoteShouldNegateDownvote()
-//     {
-//         var postService = new PostService(new PostRepository(_dbContext));
-//         var createDto = new PostCreateRequestDto
-//         {
-//             AuthorId = _testUser.Id,
-//             Title = "Test Post",
-//             Description = "This is a test post",
-//         };
+        Assert.NotNull(result1);
+        Assert.Equal(10, result1.Items.Count());
+        Assert.NotNull(result1.NextCursor);
 
-//         var createdPost = await postService.CreatePost(createDto);
-//         Assert.NotNull(createdPost.Data);
-//         Assert.Equal(0, createdPost.Data.Votes);
+        // Act - Get second page using cursor
+        var response2 = await client.GetAsync(
+            $"{_baseUrl}/posts?limit=10&cursor={result1.NextCursor}"
+        );
+        response2.EnsureSuccessStatusCode();
+        var result2 = await response2.Content.ReadFromJsonAsync<
+            PaginatedResponseDto<PostResponseDto>
+        >();
 
-//         var userId = 2;
-//         var downvotedPost = await postService.VotePost(
-//             createdPost.Data.Id,
-//             userId,
-//             VoteType.Downvote
-//         );
+        Assert.NotNull(result2);
+        Assert.Equal(10, result2.Items.Count());
 
-//         Assert.True(downvotedPost.IsSuccess);
-//         Assert.NotNull(downvotedPost.Data);
+        // Verify no duplicate posts
+        var firstPageIds = result1.Items.Select(p => p.Id).ToList();
+        var secondPageIds = result2.Items.Select(p => p.Id).ToList();
+        Assert.Empty(firstPageIds.Intersect(secondPageIds));
+    }
 
-//         Assert.Equal(-1, downvotedPost.Data.Votes);
+    #endregion
 
-//         var userIdTwo = 3;
-//         var upvotedPost = await postService.VotePost(
-//             createdPost.Data.Id,
-//             userIdTwo,
-//             VoteType.Upvote
-//         );
+    #region GetPostById Tests
 
-//         Assert.True(upvotedPost.IsSuccess);
-//         Assert.NotNull(upvotedPost.Data);
+    [Fact]
+    public async Task GetPostById_WithExistingPost_ReturnsPost()
+    {
+        using var client = _ourCityApi.CreateClient();
 
-//         Assert.Equal(0, upvotedPost.Data.Votes);
-//     }
+        // Act
+        var response = await client.GetAsync($"{_baseUrl}/posts/{_testPostId}");
 
-//     [Fact]
-//     public async Task DownvoteShouldNegateUpvote()
-//     {
-//         var postService = new PostService(new PostRepository(_dbContext));
-//         var createDto = new PostCreateRequestDto
-//         {
-//             AuthorId = _testUser.Id,
-//             Title = "Test Post",
-//             Description = "This is a test post",
-//         };
+        // Assert
+        response.EnsureSuccessStatusCode();
+        var post = await response.Content.ReadFromJsonAsync<PostResponseDto>();
+        Assert.NotNull(post);
+        Assert.Equal(_testPostId, post.Id);
+        Assert.Equal("Test Post", post.Title);
+    }
 
-//         var createdPost = await postService.CreatePost(createDto);
-//         Assert.NotNull(createdPost.Data);
-//         Assert.Equal(0, createdPost.Data.Votes);
+    [Fact]
+    public async Task GetPostById_WithNonExistentPost_ReturnsNotFound()
+    {
+        using var client = _ourCityApi.CreateClient();
 
-//         var userId = 2;
-//         var upvotedPost = await postService.VotePost(createdPost.Data.Id, userId, VoteType.Upvote);
+        // Arrange
+        var nonExistentId = Guid.NewGuid();
 
-//         Assert.True(upvotedPost.IsSuccess);
-//         Assert.NotNull(upvotedPost.Data);
+        // Act
+        var response = await client.GetAsync($"{_baseUrl}/posts/{nonExistentId}");
 
-//         Assert.Equal(1, upvotedPost.Data.Votes);
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
 
-//         var userIdTwo = 3;
-//         var downvotedPost = await postService.VotePost(
-//             createdPost.Data.Id,
-//             userIdTwo,
-//             VoteType.Downvote
-//         );
+    #endregion
 
-//         Assert.True(downvotedPost.IsSuccess);
-//         Assert.NotNull(downvotedPost.Data);
+    #region CreatePost Tests
 
-//         Assert.Equal(0, downvotedPost.Data.Votes);
-//     }
+    [Fact]
+    public async Task CreatePost_WithoutLogin_ReturnUnauthorized()
+    {
+        using var client = _ourCityApi.CreateClient();
 
-//     [Fact]
-//     public async Task DoubleUpvoteShouldNegatePreviousUpvote()
-//     {
-//         var postService = new PostService(new PostRepository(_dbContext));
-//         var createDto = new PostCreateRequestDto
-//         {
-//             AuthorId = _testUser.Id,
-//             Title = "Test Post",
-//             Description = "This is a test post",
-//         };
-//         var createdPost = await postService.CreatePost(createDto);
-//         Assert.NotNull(createdPost.Data);
-//         Assert.Equal(0, createdPost.Data.Votes);
+        // Arrange
+        var createDto = new PostCreateRequestDto
+        {
+            Title = "Test Title",
+            Description = "Description Description",
+        };
 
-//         var userId = 2;
-//         var upvotedPost = await postService.VotePost(createdPost.Data.Id, userId, VoteType.Upvote);
-//         Assert.True(upvotedPost.IsSuccess);
-//         Assert.NotNull(upvotedPost.Data);
-//         Assert.Equal(1, upvotedPost.Data.Votes);
+        // Act
+        var response = await client.PostAsJsonAsync($"{_baseUrl}/posts", createDto);
 
-//         var upvotedPostAgain = await postService.VotePost(
-//             createdPost.Data.Id,
-//             userId,
-//             VoteType.Upvote
-//         );
-//         Assert.True(upvotedPostAgain.IsSuccess);
-//         Assert.NotNull(upvotedPostAgain.Data);
-//         Assert.Equal(0, upvotedPostAgain.Data.Votes);
-//     }
+        // Assert
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
 
-//     [Fact]
-//     public async Task DoubleDownvoteShouldNegatePreviousDownvote()
-//     {
-//         var postService = new PostService(new PostRepository(_dbContext));
-//         var createDto = new PostCreateRequestDto
-//         {
-//             AuthorId = _testUser.Id,
-//             Title = "Test Post",
-//             Description = "This is a test post",
-//         };
-//         var createdPost = await postService.CreatePost(createDto);
-//         Assert.NotNull(createdPost.Data);
-//         Assert.Equal(0, createdPost.Data.Votes);
+    [Fact]
+    public async Task CreatePost_WithValidData_SavesPostToDatabase()
+    {
+        using var client = _ourCityApi.CreateClient();
 
-//         var userId = 2;
-//         var downvotedPost = await postService.VotePost(
-//             createdPost.Data.Id,
-//             userId,
-//             VoteType.Downvote
-//         );
-//         Assert.True(downvotedPost.IsSuccess);
-//         Assert.NotNull(downvotedPost.Data);
-//         Assert.Equal(-1, downvotedPost.Data.Votes);
+        // Arrange
+        var createDto = new PostCreateRequestDto
+        {
+            Title = "New Post",
+            Description = "New Description for test",
+            Location = "Test Location",
+            TagIds = new List<Guid> { _testTagId },
+        };
 
-//         var downvotedPostAgain = await postService.VotePost(
-//             createdPost.Data.Id,
-//             userId,
-//             VoteType.Downvote
-//         );
-//         Assert.True(downvotedPostAgain.IsSuccess);
-//         Assert.NotNull(downvotedPostAgain.Data);
-//         Assert.Equal(0, downvotedPostAgain.Data.Votes);
-//     }
+        var loginRequest = new UserCreateRequestDto
+        {
+            Username = _ourCityApi.StubUsername,
+            Password = _ourCityApi.StubPassword,
+        };
 
-//     [Fact]
-//     public async Task DeletePostShouldRemoveAndReturnPost()
-//     {
-//         var postService = new PostService(new PostRepository(_dbContext));
-//         var createDto = new PostCreateRequestDto
-//         {
-//             AuthorId = _testUser.Id,
-//             Title = "Test Post",
-//             Description = "This is a test post",
-//         };
+        // Act
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
+        var response = await client.PostAsJsonAsync($"{_baseUrl}/posts", createDto);
 
-//         var createdPost = await postService.CreatePost(createDto);
-//         Assert.NotNull(createdPost.Data);
+        // Assert
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var createdPost = await response.Content.ReadFromJsonAsync<PostResponseDto>();
+        Assert.NotNull(createdPost);
+        Assert.Equal(createDto.Title, createdPost.Title);
+        Assert.Single(createdPost.Tags);
 
-//         var deletedPost = await postService.DeletePost(createdPost.Data.Id);
+        // Verify in database
+        using var scope = _ourCityApi.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var savedPost = await db
+            .Posts.Include(p => p.Tags)
+            .FirstOrDefaultAsync(p => p.Title == createDto.Title);
+        Assert.NotNull(savedPost);
+        Assert.Equal(createDto.Description, savedPost.Description);
+        Assert.Single(savedPost.Tags);
+    }
 
-//         Assert.True(deletedPost.IsSuccess);
-//         Assert.NotNull(deletedPost.Data);
+    [Fact]
+    public async Task CreatePost_WithInvalidData_ReturnsBadRequest()
+    {
+        using var client = _ourCityApi.CreateClient();
 
-//         var retrievedPost = await postService.GetPostById(deletedPost.Data.Id);
-//         Assert.False(retrievedPost.IsSuccess);
-//         Assert.Same(retrievedPost.Error, "Post does not exist");
-//     }
-// }
+        // Arrange
+        var createDto = new PostCreateRequestDto
+        {
+            Title = "", // Invalid - empty title
+            Description = "Description",
+        };
+
+        var loginRequest = new UserCreateRequestDto
+        {
+            Username = _ourCityApi.StubUsername,
+            Password = _ourCityApi.StubPassword,
+        };
+
+        // Act
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
+        var response = await client.PostAsJsonAsync($"{_baseUrl}/posts", createDto);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    #endregion
+
+    #region UpdatePost Tests
+
+    [Fact]
+    public async Task UpdatePost_WithoutLogin_ReturnUnauthorized()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        // Arrange
+        var updateDto = new PostUpdateRequestDto
+        {
+            Title = "Updated Title",
+            Description = "Updated Description",
+        };
+
+        // Act
+        var response = await client.PutAsJsonAsync($"{_baseUrl}/posts/{_testPostId}", updateDto);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdatePost_AsNonAuthor_ReturnForbidden()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        var nonAuthorUsername = "testUser";
+        var nonAuthorPassword = "TestPassword1!";
+
+        // Arrange
+        var updateDto = new PostUpdateRequestDto
+        {
+            Title = "Updated Title",
+            Description = "Updated Description",
+        };
+
+        await _ourCityApi.SeedTestDataAsync(
+            async (db, userManager) =>
+            {
+                var user = new User
+                {
+                    Id = Guid.NewGuid(),
+                    UserName = nonAuthorUsername,
+                    CreatedAt = DateTime.UtcNow,
+                };
+                await userManager.CreateAsync(user, nonAuthorPassword);
+            }
+        );
+
+        var loginRequest = new UserCreateRequestDto
+        {
+            Username = nonAuthorUsername,
+            Password = nonAuthorPassword,
+        };
+
+        // Act
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
+        var response = await client.PutAsJsonAsync($"{_baseUrl}/posts/{_testPostId}", updateDto);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdatePost_WithValidData_UpdatesPostInDatabase()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        // Arrange
+        var updateDto = new PostUpdateRequestDto
+        {
+            Title = "Updated Title",
+            Description = "Updated Description",
+        };
+
+        var loginRequest = new UserCreateRequestDto
+        {
+            Username = _ourCityApi.StubUsername,
+            Password = _ourCityApi.StubPassword,
+        };
+
+        // Act
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
+        var response = await client.PutAsJsonAsync($"{_baseUrl}/posts/{_testPostId}", updateDto);
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        var updatedPost = await response.Content.ReadFromJsonAsync<PostResponseDto>();
+        Assert.NotNull(updatedPost);
+        Assert.Equal(updateDto.Title, updatedPost.Title);
+
+        // Verify in database
+        using var scope = _ourCityApi.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var savedPost = await db.Posts.FindAsync(_testPostId);
+        Assert.NotNull(savedPost);
+        Assert.Equal(updateDto.Title, savedPost.Title);
+        Assert.Equal(updateDto.Description, savedPost.Description);
+    }
+
+    [Fact]
+    public async Task UpdatePost_WithNonExistentPost_ReturnsNotFound()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        // Arrange
+        var nonExistentId = Guid.NewGuid();
+        var updateDto = new PostUpdateRequestDto { Title = "Updated" };
+
+        var loginRequest = new UserCreateRequestDto
+        {
+            Username = _ourCityApi.StubUsername,
+            Password = _ourCityApi.StubPassword,
+        };
+
+        // Act
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
+        var response = await client.PutAsJsonAsync($"{_baseUrl}/posts/{nonExistentId}", updateDto);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    #endregion
+
+    #region VotePost Tests
+
+    [Fact]
+    public async Task VotePost_WithoutLogin_ReturnUnauthorized()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        // Arrange
+        var voteDto = new PostVoteRequestDto { VoteType = VoteType.Upvote };
+
+        // Act
+        var response = await client.PutAsJsonAsync(
+            $"{_baseUrl}/posts/{_testPostId}/votes",
+            voteDto
+        );
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task VotePost_WithUpvote_SavesVoteToDatabase()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        // Arrange
+        var voteDto = new PostVoteRequestDto { VoteType = VoteType.Upvote };
+        var loginRequest = new UserCreateRequestDto
+        {
+            Username = _ourCityApi.StubUsername,
+            Password = _ourCityApi.StubPassword,
+        };
+
+        // Act
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
+        var response = await client.PutAsJsonAsync(
+            $"{_baseUrl}/posts/{_testPostId}/votes",
+            voteDto
+        );
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        var votedPost = await response.Content.ReadFromJsonAsync<PostResponseDto>();
+        Assert.NotNull(votedPost);
+        Assert.Equal(1, votedPost.UpvoteCount);
+        Assert.Equal(VoteType.Upvote, votedPost.VoteStatus);
+
+        // Verify in database
+        using var scope = _ourCityApi.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var vote = await db.PostVotes.FirstOrDefaultAsync(v => v.PostId == _testPostId);
+        Assert.NotNull(vote);
+        Assert.Equal(VoteType.Upvote, vote.VoteType);
+    }
+
+    [Fact]
+    public async Task VotePost_WithNoVote_RemovesVoteFromDatabase()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        var loginRequest = new UserCreateRequestDto
+        {
+            Username = _ourCityApi.StubUsername,
+            Password = _ourCityApi.StubPassword,
+        };
+
+        // Act
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
+        await client.PutAsJsonAsync(
+            $"{_baseUrl}/posts/{_testPostId}/votes",
+            new PostVoteRequestDto { VoteType = VoteType.Upvote }
+        );
+
+        var response = await client.PutAsJsonAsync(
+            $"{_baseUrl}/posts/{_testPostId}/votes",
+            new PostVoteRequestDto { VoteType = VoteType.NoVote }
+        );
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        var votedPost = await response.Content.ReadFromJsonAsync<PostResponseDto>();
+        Assert.NotNull(votedPost);
+        Assert.Equal(0, votedPost.UpvoteCount);
+
+        // Verify vote removed from database
+        using var scope = _ourCityApi.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var vote = await db.PostVotes.FirstOrDefaultAsync(v => v.PostId == _testPostId);
+        Assert.Null(vote);
+    }
+
+    [Fact]
+    public async Task VotePost_ChangingVote_UpdatesVoteInDatabase()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        var loginRequest = new UserCreateRequestDto
+        {
+            Username = _ourCityApi.StubUsername,
+            Password = _ourCityApi.StubPassword,
+        };
+
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
+
+        // Arrange - First vote upvote
+        await client.PutAsJsonAsync(
+            $"{_baseUrl}/posts/{_testPostId}/votes",
+            new PostVoteRequestDto { VoteType = VoteType.Upvote }
+        );
+
+        // Act - Change to downvote
+        var response = await client.PutAsJsonAsync(
+            $"{_baseUrl}/posts/{_testPostId}/votes",
+            new PostVoteRequestDto { VoteType = VoteType.Downvote }
+        );
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        var votedPost = await response.Content.ReadFromJsonAsync<PostResponseDto>();
+        Assert.NotNull(votedPost);
+        Assert.Equal(0, votedPost.UpvoteCount);
+        Assert.Equal(1, votedPost.DownvoteCount);
+
+        // Verify in database
+        using var scope = _ourCityApi.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var vote = await db.PostVotes.FirstOrDefaultAsync(v => v.PostId == _testPostId);
+        Assert.NotNull(vote);
+        Assert.Equal(VoteType.Downvote, vote.VoteType);
+    }
+
+    #endregion
+
+    #region DeletePost Tests
+
+    [Fact]
+    public async Task DeletePost_WithoutLogin_ReturnUnauthorized()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        // Act
+        var response = await client.DeleteAsync($"{_baseUrl}/posts/{_testPostId}");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task DeletePost_AsNonAuthor_ReturnForbidden()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        // Arrange
+        var nonAuthorUsername = "testUser";
+        var nonAuthorPassword = "TestPassword1!";
+
+        await _ourCityApi.SeedTestDataAsync(
+            async (db, userManager) =>
+            {
+                var user = new User
+                {
+                    Id = Guid.NewGuid(),
+                    UserName = nonAuthorUsername,
+                    CreatedAt = DateTime.UtcNow,
+                };
+                await userManager.CreateAsync(user, nonAuthorPassword);
+            }
+        );
+
+        var loginRequest = new UserCreateRequestDto
+        {
+            Username = nonAuthorUsername,
+            Password = nonAuthorPassword,
+        };
+
+        // Act
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
+        var response = await client.DeleteAsync($"{_baseUrl}/posts/{_testPostId}");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task DeletePost_WithValidPost_MarksPostAsDeletedInDatabase()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        // Arrange
+        var loginRequest = new UserCreateRequestDto
+        {
+            Username = _ourCityApi.StubUsername,
+            Password = _ourCityApi.StubPassword,
+        };
+
+        // Act
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
+        var response = await client.DeleteAsync($"{_baseUrl}/posts/{_testPostId}");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        var deletedPost = await response.Content.ReadFromJsonAsync<PostResponseDto>();
+        Assert.NotNull(deletedPost);
+        Assert.True(deletedPost.IsDeleted);
+
+        // Verify in database
+        using var scope = _ourCityApi.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var savedPost = await db.Posts.FindAsync(_testPostId);
+        Assert.NotNull(savedPost);
+        Assert.True(savedPost.IsDeleted);
+    }
+
+    [Fact]
+    public async Task DeletePost_WithNonExistentPost_ReturnsNotFound()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        // Arrange
+        var nonExistentId = Guid.NewGuid();
+        var loginRequest = new UserCreateRequestDto
+        {
+            Username = _ourCityApi.StubUsername,
+            Password = _ourCityApi.StubPassword,
+        };
+
+        // Act
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
+        var response = await client.DeleteAsync($"{_baseUrl}/posts/{nonExistentId}");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    #endregion
+}
