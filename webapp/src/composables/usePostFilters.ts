@@ -72,8 +72,7 @@ async function fetchPosts() {
 function setSort(sort: SortType) {
   // if clicking same sort type again: toggle order
   if (currentSort.value === sort) {
-    filters.value.sortOrder =
-      filters.value.sortOrder === "Desc" ? "Asc" : "Desc";
+    filters.value.sortOrder = filters.value.sortOrder === "Desc" ? "Asc" : "Desc";
   } else {
     // new sort type:  default to Desc
     currentSort.value = sort;
@@ -90,7 +89,7 @@ function setSort(sort: SortType) {
   fetchPosts();
 }
 
-// filtering by tag 
+// filtering by tag
 function setFilter(filter: FilterType) {
   currentFilter.value = filter;
 

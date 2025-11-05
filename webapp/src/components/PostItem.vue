@@ -51,7 +51,9 @@ const postImage = computed(() => media.value[0]?.url || null);
     <div class="post-card-left">
       <div class="post-author-date">
         @{{ authorUsername }}
-        <span v-if="post.createdAt" class="post-date">{{ post.createdAt.toLocaleDateString() }}</span>
+        <span v-if="post.createdAt" class="post-date">
+          {{ new Date(post.createdAt).toLocaleDateString() }}
+        </span>
       </div>
 
       <h1 class="post-title">

@@ -80,9 +80,7 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
             </template>
           </div>
 
-          <div class="map-overview">
-            Map Overview Coming Soon
-          </div>
+          <div class="map-overview">Map Overview Coming Soon</div>
         </div>
       </div>
     </div>

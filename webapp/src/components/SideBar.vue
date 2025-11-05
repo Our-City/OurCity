@@ -24,14 +24,26 @@ onMounted(fetchTags);
 
 <template>
   <div :class="['side-bar', `toolbar--${props.view}`]">
-    <button class="home-button" @click="goToHome">
-      <i class="pi pi-home"></i> Home
-    </button>
+    <button class="home-button" @click="goToHome"><i class="pi pi-home"></i> Home</button>
 
-    <button @click="() => { reset(); setSort('popular'); }">
+    <button
+      @click="
+        () => {
+          reset();
+          setSort('popular');
+        }
+      "
+    >
       <i class="pi pi-chart-line"></i> Popular
     </button>
-    <button @click="() => { reset(); setSort('recent'); }">
+    <button
+      @click="
+        () => {
+          reset();
+          setSort('recent');
+        }
+      "
+    >
       <i class="pi pi-clock"></i> Recent
     </button>
 

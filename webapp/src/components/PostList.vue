@@ -20,7 +20,7 @@ function toggleSortOrder() {
 const sortOrderIcon = computed(() =>
   postFilters.filters.value.sortOrder === "Desc"
     ? "pi pi-sort-amount-down"
-    : "pi pi-sort-amount-up"
+    : "pi pi-sort-amount-up",
 );
 
 // dynamic label for sort button

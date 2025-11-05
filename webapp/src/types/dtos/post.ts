@@ -40,8 +40,8 @@ export interface PostGetAllRequestDto {
   limit?: number;
   searchTerm?: string;
   tags?: string[]; // array of tag IDs
-  sortBy?: string
-  sortOrder?: 'Asc' | 'Desc';
+  sortBy?: string;
+  sortOrder?: "Asc" | "Desc";
 }
 
 export interface PostCreateRequestDto {

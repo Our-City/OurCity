@@ -26,9 +26,7 @@ export async function getPostById(postId: string): Promise<Post> {
 }
 
 // GET /posts?limit=&cursor=
-export async function getPosts(
-  params: PostGetAllRequestDto
-): Promise<PaginatedResult<Post>> {
+export async function getPosts(params: PostGetAllRequestDto): Promise<PaginatedResult<Post>> {
   const searchParams = new URLSearchParams();
 
   if (params.limit) searchParams.append("limit", params.limit.toString());
@@ -40,7 +38,7 @@ export async function getPosts(
   if (params.sortOrder) searchParams.append("sortOrder", params.sortOrder);
 
   const response = await api.get<{ items: PostResponseDto[]; nextCursor?: string }>(
-    `/posts?${searchParams.toString()}`
+    `/posts?${searchParams.toString()}`,
   );
 
   return {
@@ -48,7 +46,6 @@ export async function getPosts(
     nextCursor: response.data.nextCursor,
   };
 }
-
 
 // POST /posts
 export async function createPost(post: Post): Promise<Post> {

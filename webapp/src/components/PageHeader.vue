@@ -54,11 +54,7 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
         <div class="search-container w-full">
           <span class="p-input-icon-left">
             <i class="pi pi-search" />
-            <InputText
-              v-model="searchTerm"
-              placeholder="Search posts..."
-              class="search-input"
-            />
+            <InputText v-model="searchTerm" placeholder="Search posts..." class="search-input" />
           </span>
         </div>
       </template>
@@ -80,10 +76,20 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
 
           <template #dropdown="{ close }">
             <ul>
-              <li @click="handleViewProfile(); close();">
+              <li
+                @click="
+                  handleViewProfile();
+                  close();
+                "
+              >
                 <i class="pi pi-user"></i> View Profile
               </li>
-              <li @click="handleLogout(); close();">
+              <li
+                @click="
+                  handleLogout();
+                  close();
+                "
+              >
                 <i class="pi pi-sign-out"></i> Log Out
               </li>
             </ul>
