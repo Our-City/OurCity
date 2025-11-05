@@ -84,6 +84,8 @@ async function submitComment() {
 
     const created = await createComment(postId, newComment);
 
+    window.location.reload();
+
     // Optimistically prepend
     comments.value.unshift(created);
     commentText.value = "";
