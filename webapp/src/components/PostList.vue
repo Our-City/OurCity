@@ -34,9 +34,7 @@ const filteredAndSortedPosts = computed(() => {
   // filter by tag (or category substitute)
   if (currentFilter.value !== "all") {
     result = result.filter((post) =>
-      post.tags.some(
-        (tag) => tag.name.toLowerCase() === currentFilter.value.toLowerCase()
-      )
+      post.tags.some((tag) => tag.name.toLowerCase() === currentFilter.value.toLowerCase()),
     );
   }
 
@@ -50,9 +48,7 @@ const filteredAndSortedPosts = computed(() => {
       break;
     case "recent":
     default:
-      result.sort(
-        (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
-      );
+      result.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
       break;
   }
 
@@ -69,9 +65,30 @@ const filteredAndSortedPosts = computed(() => {
       </template>
       <template #dropdown="{ close }">
         <ul>
-          <li @click="setSort('popular'); close()">Popular</li>
-          <li @click="setSort('recent'); close()">Recent</li>
-          <li @click="setSort('nearby'); close()">Nearby</li>
+          <li
+            @click="
+              setSort('popular');
+              close();
+            "
+          >
+            Popular
+          </li>
+          <li
+            @click="
+              setSort('recent');
+              close();
+            "
+          >
+            Recent
+          </li>
+          <li
+            @click="
+              setSort('nearby');
+              close();
+            "
+          >
+            Nearby
+          </li>
         </ul>
       </template>
     </Dropdown>

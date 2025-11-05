@@ -32,11 +32,7 @@ function closeImageModal() {
 <template>
   <div class="post-image-container">
     <div class="image-hover-container">
-      <img
-        :src="images[imgIndex].src"
-        class="post-image"
-        @click="openImageModal()"
-      />
+      <img :src="images[imgIndex].src" class="post-image" @click="openImageModal()" />
       <div class="image-zoom-icon">
         <i class="pi pi-arrow-up-right-and-arrow-down-left-from-center"></i>
       </div>
@@ -65,11 +61,7 @@ function closeImageModal() {
       ></div>
     </div>
   </div>
-  <ImageModal
-    :show="showImageModal"
-    :imageUrl="images[imgIndex].src"
-    @close="closeImageModal"
-  />
+  <ImageModal :show="showImageModal" :imageUrl="images[imgIndex].src" @close="closeImageModal" />
 </template>
 
 <style scoped>

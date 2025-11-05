@@ -10,11 +10,11 @@ import type { VoteType } from "../enums";
 // request DTOs
 export interface CommentRequestDto {
   content: string;
-};
+}
 
 export interface CommentVoteRequestDto {
   voteType: VoteType;
-};
+}
 
 // response DTOs
 export interface CommentResponseDto {
@@ -29,7 +29,7 @@ export interface CommentResponseDto {
   isDeleted: boolean;
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
-};
+}
 
 // TODO: postListResponseDto (unclear on pagination)
 export interface CommentListResponseDto {

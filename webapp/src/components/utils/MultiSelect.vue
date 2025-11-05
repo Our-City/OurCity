@@ -156,7 +156,7 @@ onUnmounted(() => {
             :key="typeof item === 'string' ? item : item.id"
             class="multiselect__tag"
           >
-            {{ typeof item === 'string' ? item : item.name }}
+            {{ typeof item === "string" ? item : item.name }}
             <button
               type="button"
               class="multiselect__tag-remove"
@@ -170,12 +170,11 @@ onUnmounted(() => {
             +{{ selectedValues.length - 3 }} more
           </span>
         </div>
-        
+
         <!-- Placeholder -->
         <span v-else class="multiselect__placeholder">
           {{ placeholder }}
         </span>
-  
       </div>
 
       <!-- Actions -->
@@ -220,8 +219,8 @@ onUnmounted(() => {
         >
           <div class="multiselect__option-content">
             <span class="multiselect__option-text">
-              {{ typeof option === 'string' ? option : option.name }}
-            </span> 
+              {{ typeof option === "string" ? option : option.name }}
+            </span>
             <i v-if="isSelected(option)" class="multiselect__option-check"> ✓ </i>
           </div>
         </div>

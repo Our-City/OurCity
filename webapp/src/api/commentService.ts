@@ -6,9 +6,13 @@
   AI assisted in the creation of this file. 
     Specifically, ChatGPT 5.0 was prompted to assist with handling the paginated results.
 */
-import api from "./axios"
-import type { Comment } from "@/models/comment"
-import type { CommentRequestDto, CommentResponseDto, CommentVoteRequestDto } from "../types/dtos/comment"
+import api from "./axios";
+import type { Comment } from "@/models/comment";
+import type {
+  CommentRequestDto,
+  CommentResponseDto,
+  CommentVoteRequestDto,
+} from "../types/dtos/comment";
 import { toComment, toComments } from "@/mappers/commentMapper";
 import { toCommentRequestDto } from "@/mappers/commentMapper";
 import type { PaginatedResult } from "@/types/common/paginatedResult";
@@ -17,13 +21,13 @@ import type { PaginatedResult } from "@/types/common/paginatedResult";
 export async function getCommentsByPostId(
   postId: string,
   limit = 25,
-  cursor?: string | null
+  cursor?: string | null,
 ): Promise<PaginatedResult<Comment>> {
   const params = new URLSearchParams({ limit: limit.toString() });
   if (cursor) params.append("cursor", cursor);
 
   const response = await api.get<{ items: CommentResponseDto[]; nextCursor?: string }>(
-    `/posts/${postId}/comments?${params.toString()}`
+    `/posts/${postId}/comments?${params.toString()}`,
   );
 
   return {
@@ -55,7 +59,10 @@ export async function deleteComment(commentId: string): Promise<Comment> {
 }
 
 // PUT /comments/{commentId}/vote
-export async function voteOnComment(commentId: string, voteType: CommentVoteRequestDto): Promise<Comment> {
+export async function voteOnComment(
+  commentId: string,
+  voteType: CommentVoteRequestDto,
+): Promise<Comment> {
   const response = await api.put<CommentResponseDto>(`/comments/${commentId}/votes`, voteType);
   return toComment(response.data);
 }

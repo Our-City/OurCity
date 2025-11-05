@@ -9,7 +9,6 @@
 */
 import axios from "axios";
 
-
 // create preconfigured axios instance
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL, // should be localhost:8000/apis/v1
@@ -19,14 +18,10 @@ const api = axios.create({
 // response interceptor to unwrap backend API responses automatically.
 api.interceptors.response.use(
   (response) => {
-    const data = response.data; 
+    const data = response.data;
 
     // check if backend returned the Result response wrapper
-    if (
-      data &&
-      typeof data === "object" &&
-      ("isSuccess" in data || "IsSuccess" in data)
-    ) {
+    if (data && typeof data === "object" && ("isSuccess" in data || "IsSuccess" in data)) {
       const isSuccess = data.isSuccess ?? data.IsSuccess;
       const payload = data.data ?? data.Data;
       const error = data.error ?? data.Error;
@@ -50,7 +45,7 @@ api.interceptors.response.use(
       const data = error.response.data;
 
       // try to extract meaningful message from backend response
-      if (typeof data === 'string') {
+      if (typeof data === "string") {
         message = data;
       } else if (data?.detail) {
         message = data.detail;
@@ -74,7 +69,7 @@ api.interceptors.response.use(
 
     // maybe add a toast notification here too
     return Promise.reject(new Error(message));
-  }
+  },
 );
 
 export default api;

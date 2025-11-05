@@ -10,13 +10,14 @@ import { VoteType } from "../enums";
 export interface UserCreateRequestDto {
   username: string;
   password: string;
-};
-
-export interface UserUpdateRequestDto {
-  username? : string;
 }
 
-export interface UserVoteRequestDto { // TODO: kind of confused by this DTO, need to clarify.
+export interface UserUpdateRequestDto {
+  username?: string;
+}
+
+export interface UserVoteRequestDto {
+  // TODO: kind of confused by this DTO, need to clarify.
   commentIds: string[];
 }
 
@@ -27,12 +28,12 @@ export interface UserResponseDto {
   posts: string[];
   savedPosts: string[];
   reportedPosts: string[];
-  comments: string[]; 
+  comments: string[];
   isAdmin: boolean;
   isBanned: boolean;
   createdAt: string;
   updatedAt: string;
-};
+}
 
 export interface UserVoteResponseDto {
   itemId: string;

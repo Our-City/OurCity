@@ -13,12 +13,10 @@ import type { Post } from "@/models/post";
 
 const router = useRouter();
 
-
 const posts = ref<Post[]>([]);
 const nextCursor = ref<string | null>(null);
 const isLoading = ref(false);
 const errorMessage = ref<string | null>(null);
-
 
 async function loadPosts(initial = false) {
   if (isLoading.value) return;
@@ -95,11 +93,7 @@ onMounted(() => {
 
               <!-- Load more -->
               <div v-if="nextCursor" class="load-more-container">
-                <button
-                  class="load-more-button"
-                  @click="loadPosts()"
-                  :disabled="isLoading"
-                >
+                <button class="load-more-button" @click="loadPosts()" :disabled="isLoading">
                   {{ isLoading ? "Loading..." : "Load More" }}
                 </button>
               </div>

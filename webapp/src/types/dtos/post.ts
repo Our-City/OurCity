@@ -20,10 +20,10 @@ export interface PostResponseDto {
   downvoteCount: number;
   reportCount: number;
   commentCount: number;
-  visibility: PostVisibility,
+  visibility: PostVisibility;
   tags: TagDto[];
   isDeleted: boolean;
-  voteStatus: VoteType,
+  voteStatus: VoteType;
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
 }

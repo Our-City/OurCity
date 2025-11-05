@@ -36,7 +36,6 @@ function handleDeleted(id: string) {
   </div>
 </template>
 
-
 <style scoped>
 .comments-list {
   margin-top: 1.5rem;

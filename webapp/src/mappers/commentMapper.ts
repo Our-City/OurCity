@@ -31,7 +31,7 @@ export function toComments(dtos: CommentResponseDto[]): Comment[] {
 }
 
 // Models -> DTOs:
-// maps a Comment model to a CommentRequestDto 
+// maps a Comment model to a CommentRequestDto
 export function toCommentRequestDto(comment: Comment): CommentRequestDto {
   return {
     content: comment.content,

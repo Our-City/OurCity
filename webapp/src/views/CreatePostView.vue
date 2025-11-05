@@ -130,9 +130,7 @@ const handleSubmit = async (event: Event) => {
 
     // upload media if any images selected
     if (formData.value.images.length > 0) {
-      const uploadPromises = formData.value.images.map((file) =>
-        uploadMedia(file, createdPost.id)
-      );
+      const uploadPromises = formData.value.images.map((file) => uploadMedia(file, createdPost.id));
       await Promise.all(uploadPromises);
       console.log("Images uploaded successfully");
     }
@@ -141,8 +139,7 @@ const handleSubmit = async (event: Event) => {
     router.push(`/posts/${createdPost.id}`);
   } catch (error: any) {
     console.error("Error creating post:", error);
-    errors.value.submit =
-      error?.message || "Failed to create post. Please try again.";
+    errors.value.submit = error?.message || "Failed to create post. Please try again.";
   } finally {
     isSubmitting.value = false;
   }

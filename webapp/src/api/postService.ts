@@ -6,13 +6,16 @@
   AI assisted in the creation of this file. 
     Specifically, ChatGPT 5.0 was prompted to assist with handling the paginated results.
 */
-import api from "./axios"
-import type { Post } from "@/models/post"
-import type { PostResponseDto, PostCreateRequestDto, PostUpdateRequestDto } from "@/types/dtos/post"
-import { toPost, toPosts } from "@/mappers/postMapper"
-import { toPostCreateRequestDto, toPostUpdateRequestDto } from "@/mappers/postMapper"
+import api from "./axios";
+import type { Post } from "@/models/post";
+import type {
+  PostResponseDto,
+  PostCreateRequestDto,
+  PostUpdateRequestDto,
+} from "@/types/dtos/post";
+import { toPost, toPosts } from "@/mappers/postMapper";
+import { toPostCreateRequestDto, toPostUpdateRequestDto } from "@/mappers/postMapper";
 import type { PaginatedResult } from "@/types/common/paginatedResult";
-
 
 // GET /posts/{postId}
 export async function getPostById(postId: string): Promise<Post> {
@@ -21,16 +24,13 @@ export async function getPostById(postId: string): Promise<Post> {
 }
 
 // GET /posts?limit=&cursor=
-export async function getPosts(
-  limit = 25,
-  cursor?: string | null
-): Promise<PaginatedResult<Post>> {
+export async function getPosts(limit = 25, cursor?: string | null): Promise<PaginatedResult<Post>> {
   const params = new URLSearchParams({ limit: limit.toString() });
   if (cursor) params.append("cursor", cursor);
 
   // backend returns { items, nextCursor }
   const response = await api.get<{ items: PostResponseDto[]; nextCursor?: string }>(
-    `/posts?${params.toString()}`
+    `/posts?${params.toString()}`,
   );
 
   return {

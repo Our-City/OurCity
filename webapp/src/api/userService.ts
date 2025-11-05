@@ -5,14 +5,18 @@
 */
 import api from "./axios";
 import type { User } from "@/models/user";
-import type { UserResponseDto, UserCreateRequestDto, UserUpdateRequestDto } from "@/types/dtos/user";
+import type {
+  UserResponseDto,
+  UserCreateRequestDto,
+  UserUpdateRequestDto,
+} from "@/types/dtos/user";
 import { toUser, toUserUpdateRequestDto } from "@/mappers/userMapper";
 
 // POST /users
 export async function createUser(username: string, password: string): Promise<User> {
   const dto: UserCreateRequestDto = {
     username,
-    password
+    password,
   };
   const response = await api.post<UserResponseDto>("/users", dto);
   return toUser(response.data);
@@ -26,10 +30,10 @@ export async function updateUser(userId: string, user: Partial<User>): Promise<U
 }
 
 // DELETE /users/{userId}
-export async function deleteUser(userId: string): Promise<void> { // return UserResponseDto instead?
+export async function deleteUser(userId: string): Promise<void> {
+  // return UserResponseDto instead?
   await api.delete(`/users/${userId}`);
 }
-
 
 // /me endpoints
 
@@ -47,7 +51,7 @@ export async function updateCurrentUser(user: Partial<User>): Promise<User> {
 }
 
 // DELETE /me
-export async function deleteCurrentUser(): Promise<void> { // return UserResponseDto instead?
+export async function deleteCurrentUser(): Promise<void> {
+  // return UserResponseDto instead?
   await api.delete("/me");
 }
-

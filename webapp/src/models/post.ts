@@ -19,7 +19,7 @@ export interface Post {
   voteCount: number; // total votes (upvotes - downvotes)
   commentCount: number;
   visibility: PostVisibility; // PUBLISHED | HIDDEN
-  tags: Tag[]; 
+  tags: Tag[];
   isDeleted: boolean;
   voteStatus: VoteType; // UPVOTE = 1| DOWNVOTE = -1| NONE = 0
   createdAt: Date;

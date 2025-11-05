@@ -8,7 +8,6 @@ import type { MediaResponseDto } from "@/types/dtos/media";
 import type { Media } from "@/models/media";
 import { toMedia } from "@/mappers/mediaMapper";
 
-
 // POST /media/{postId}
 export async function uploadMedia(file: File, postId: string): Promise<Media> {
   const formData = new FormData();
@@ -19,7 +18,7 @@ export async function uploadMedia(file: File, postId: string): Promise<Media> {
       "Content-Type": "multipart/form-data",
     },
   });
-  
+
   return toMedia(response.data);
 }
 

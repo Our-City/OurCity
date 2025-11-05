@@ -37,13 +37,13 @@ export function toPosts(dtos: PostResponseDto[]): Post[] {
 
 // Models -> DTOs:
 
-// maps a Post model to a PostCreateRequestDto 
+// maps a Post model to a PostCreateRequestDto
 export function toPostCreateRequestDto(post: Post): PostCreateRequestDto {
   return {
     title: post.title,
     description: post.description,
     location: post.location,
-    tags: post.tags.map(tag => tag.id),
+    tags: post.tags.map((tag) => tag.id),
   };
 }
 // maps a Post model to a PostUpdateRequestDto
@@ -52,6 +52,6 @@ export function toPostUpdateRequestDto(post: Post): PostUpdateRequestDto {
     title: post.title,
     description: post.description,
     location: post.location,
-    tags: post.tags.map(tag => tag.id),
+    tags: post.tags.map((tag) => tag.id),
   };
 }

@@ -19,7 +19,6 @@ const emit = defineEmits<{
 const auth = useAuthStore();
 const error = ref<string | null>(null);
 
-
 async function handleVote(voteType: VoteType) {
   if (!auth.user) {
     alert("You must be logged in to vote on comments.");
@@ -50,11 +49,7 @@ async function handleVote(voteType: VoteType) {
     </div>
 
     <div class="comment-actions">
-      <VoteBox
-        :votes="comment.voteCount"
-        :userVote="comment.voteStatus"
-        @vote="handleVote"
-      />
+      <VoteBox :votes="comment.voteCount" :userVote="comment.voteStatus" @vote="handleVote" />
     </div>
 
     <div v-if="error" class="comment-error">{{ error }}</div>

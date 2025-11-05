@@ -104,7 +104,6 @@ async function handleVote(voteType: VoteType) {
   }
 }
 
-
 onMounted(loadPostData);
 </script>
 
@@ -126,11 +125,7 @@ onMounted(loadPostData);
         <div class="post-content">
           <div class="post-card">
             <div class="post-tags">
-              <span
-                v-for="tag in post.tags"
-                :key="tag.id"
-                class="tag-pill"
-              >
+              <span v-for="tag in post.tags" :key="tag.id" class="tag-pill">
                 {{ tag.name }}
               </span>
             </div>
@@ -147,9 +142,11 @@ onMounted(loadPostData);
 
             <div v-if="images.length" class="post-images">
               <ImageGalleria
-                :images="images.map((m) => ({
-                  src: m.url
-                }))"
+                :images="
+                  images.map((m) => ({
+                    src: m.url,
+                  }))
+                "
               />
             </div>
 
@@ -159,20 +156,13 @@ onMounted(loadPostData);
 
             <div class="post-footer">
               <div class="post-voting">
-                <VoteBox
-                  :votes="post.voteCount"
-                  :userVote="post.voteStatus"
-                  @vote="handleVote"
-                />
-
+                <VoteBox :votes="post.voteCount" :userVote="post.voteStatus" @vote="handleVote" />
               </div>
             </div>
           </div>
 
           <div class="comment-card">
-            <h1 class="comment-header">
-              Comments ({{ comments.length }})
-            </h1>
+            <h1 class="comment-header">Comments ({{ comments.length }})</h1>
 
             <div class="comment-input-container">
               <TextArea

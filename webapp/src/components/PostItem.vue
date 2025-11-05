@@ -25,7 +25,6 @@ onMounted(async () => {
   }
 });
 
-
 // author name (uses authorName if available)
 const authorUsername = computed(() => {
   if (props.post.authorName && props.post.authorName.trim()) {
@@ -69,7 +68,6 @@ const postImage = computed(() => media.value[0]?.url || null);
     </div>
   </div>
 </template>
-
 
 <style scoped>
 .post-card {

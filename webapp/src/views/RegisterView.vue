@@ -69,7 +69,7 @@ const handleSubmit = async (event: Event) => {
     // request user creation
     const username = formData.value.username.trim();
     const password = formData.value.password;
-    
+
     const newUser = await createUser(username, password);
     console.log("User registered successfully:", newUser);
 
@@ -85,13 +85,11 @@ const handleSubmit = async (event: Event) => {
     router.push("/");
   } catch (error: any) {
     console.error("Registration error:", error);
-    errors.value.submit =
-      error?.response?.data?.error || error.message || "Registration failed.";
+    errors.value.submit = error?.response?.data?.error || error.message || "Registration failed.";
   } finally {
     isSubmitting.value = false;
   }
 };
-
 
 const handleReset = () => {
   formData.value = {

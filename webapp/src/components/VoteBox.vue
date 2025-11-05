@@ -24,26 +24,17 @@ function handleDownvote() {
 
 <template>
   <div class="vote-box">
-    <button
-      class="upvote-button"
-      :class="{ active: userVote === 1 }"
-      @click="handleUpvote"
-    >
+    <button class="upvote-button" :class="{ active: userVote === 1 }" @click="handleUpvote">
       <i class="pi pi-arrow-up" />
     </button>
 
     <span class="vote-count">{{ votes }}</span>
 
-    <button
-      class="downvote-button"
-      :class="{ active: userVote === -1 }"
-      @click="handleDownvote"
-    >
+    <button class="downvote-button" :class="{ active: userVote === -1 }" @click="handleDownvote">
       <i class="pi pi-arrow-down" />
     </button>
   </div>
 </template>
-
 
 <style scoped>
 .vote-section {

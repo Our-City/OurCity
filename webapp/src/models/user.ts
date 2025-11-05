@@ -6,8 +6,8 @@
 export interface User {
   id: string;
   username: string;
-  email?: string; 
-  posts?: string[]; // store post ids 
+  email?: string;
+  posts?: string[]; // store post ids
   savedPosts?: string[];
   comments?: string[]; // store comment ids
   isAdmin: boolean;

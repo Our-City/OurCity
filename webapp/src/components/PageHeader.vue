@@ -56,46 +56,23 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
       <div class="search-container w-full">
         <span class="p-input-icon-left">
           <i class="pi pi-search" />
-          <InputText
-            v-model="searchQuery"
-            placeholder="Search..."
-            class="search-input"
-          />
+          <InputText v-model="searchQuery" placeholder="Search..." class="search-input" />
         </span>
       </div>
     </template>
 
     <template #end>
       <!-- Not logged in -->
-      <button
-        v-if="!isLoggedIn"
-        class="login-button"
-        @click="handleLogin"
-      >
-        Login
-      </button>
+      <button v-if="!isLoggedIn" class="login-button" @click="handleLogin">Login</button>
 
-      <button
-        v-if="!isLoggedIn"
-        class="signup-button"
-        @click="handleSignUp"
-      >
-        Sign Up
-      </button>
+      <button v-if="!isLoggedIn" class="signup-button" @click="handleSignUp">Sign Up</button>
 
-      <button
-        v-if="isLoggedIn"
-        class="create-post-button"
-        @click="handleCreatePost"
-      >
+      <button v-if="isLoggedIn" class="create-post-button" @click="handleCreatePost">
         <i class="pi pi-plus"></i>
         Create Post
       </button>
 
-      <Dropdown
-        v-if="isLoggedIn"
-        button-class="account-button"
-      >
+      <Dropdown v-if="isLoggedIn" button-class="account-button">
         <template #button>
           <i class="pi pi-user" />
           <i class="pi pi-angle-down" />
@@ -127,7 +104,6 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
     </template>
   </Toolbar>
 </template>
-
 
 <style scoped>
 .app-title {

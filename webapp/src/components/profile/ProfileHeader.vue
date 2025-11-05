@@ -15,7 +15,6 @@ const props = withDefaults(defineProps<Props>(), {
   username: "Username",
 });
 
-
 const isEditingUsername = ref(false);
 const editedUsername = ref(props.username);
 const isSaving = ref(false);

@@ -3,8 +3,8 @@
 
   This file contains the service functions to interact with the Authentication related API endpoints.
 */
-import api from "./axios"
-import type { UserCreateRequestDto, UserResponseDto} from "@/types/dtos/user"
+import api from "./axios";
+import type { UserCreateRequestDto, UserResponseDto } from "@/types/dtos/user";
 import type { User } from "@/models/user";
 import { toUser } from "@/mappers/userMapper";
 
@@ -12,7 +12,7 @@ import { toUser } from "@/mappers/userMapper";
 export async function login(username: string, password: string): Promise<User> {
   const dto: UserCreateRequestDto = {
     username,
-    password
+    password,
   };
   const response = await api.post<UserResponseDto>("/authentication/login", dto);
   return toUser(response.data);

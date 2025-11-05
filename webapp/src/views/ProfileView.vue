@@ -31,7 +31,7 @@ async function fetchProfileData() {
     user.value = currentUser;
 
     if (currentUser.posts && currentUser.posts.length > 0) {
-      // fetch posts for those postIds concurrently 
+      // fetch posts for those postIds concurrently
       const postPromises = currentUser.posts.map((id) => getPostById(id));
       const fetchedPosts = await Promise.all(postPromises);
       posts.value = fetchedPosts;
@@ -48,7 +48,6 @@ async function fetchProfileData() {
 
 onMounted(fetchProfileData);
 </script>
-
 
 <template>
   <div>
@@ -80,7 +79,6 @@ onMounted(fetchProfileData);
     </div>
   </div>
 </template>
-
 
 <style scoped>
 .profile-page-layout {

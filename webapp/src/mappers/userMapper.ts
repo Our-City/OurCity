@@ -4,7 +4,11 @@
   This file contains the mapping functions to convert between User DTOs and User models.
 */
 import type { User } from "@/models/user";
-import type { UserResponseDto, UserCreateRequestDto, UserUpdateRequestDto } from "@/types/dtos/user";
+import type {
+  UserResponseDto,
+  UserCreateRequestDto,
+  UserUpdateRequestDto,
+} from "@/types/dtos/user";
 
 // DTOs -> Models:
 // maps a UserResponseDto to a User model
@@ -26,12 +30,11 @@ export function toUsers(dtos: UserResponseDto[]): User[] {
   return dtos.map(toUser);
 }
 
-
 // Models -> DTOs:
 export function toUserCreateRequestDto(username: string, password: string): UserCreateRequestDto {
   return {
     username,
-    password
+    password,
   };
 }
 

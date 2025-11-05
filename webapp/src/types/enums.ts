@@ -5,12 +5,12 @@
 */
 
 export enum PostVisibility {
-    PUBLISHED = 'Published',
-    HIDDEN = 'Hidden'
+  PUBLISHED = "Published",
+  HIDDEN = "Hidden",
 }
 
 export enum VoteType {
-    UPVOTE = 1,
-    DOWNVOTE = -1,
-    NONE = 0
+  UPVOTE = 1,
+  DOWNVOTE = -1,
+  NONE = 0,
 }

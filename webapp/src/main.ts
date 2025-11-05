@@ -19,6 +19,6 @@ app.use(PrimeVue);
 
 // restore auth session on app start
 const auth = useAuthStore(pinia);
-await auth.restoreSession(); 
+await auth.restoreSession();
 
 app.mount("#app");
