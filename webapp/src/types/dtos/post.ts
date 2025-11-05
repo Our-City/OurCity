@@ -35,6 +35,15 @@ export interface PostListResponseDto {
 }
 
 // request DTOs for Post
+export interface PostGetAllRequestDto {
+  cursor?: string;
+  limit?: number;
+  searchTerm?: string;
+  tags?: string[]; // array of tag IDs
+  sortBy?: string
+  sortOrder?: 'Asc' | 'Desc';
+}
+
 export interface PostCreateRequestDto {
   title: string;
   description: string;

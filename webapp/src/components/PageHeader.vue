@@ -2,7 +2,7 @@
   ChatGPT was asked to generate code to help integrate the Pinia authenticationStore
   for global authentication in the PageHeader.-->
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { computed } from "vue";
 import { useRouter } from "vue-router";
 import InputText from "primevue/inputtext";
 import Dropdown from "./utils/DropdownMenu.vue";
@@ -11,9 +11,7 @@ import { usePostFilters } from "@/composables/usePostFilters";
 import { useAuthStore } from "@/stores/authenticationStore";
 
 const router = useRouter();
-const searchQuery = ref("");
-
-const { reset } = usePostFilters();
+const { reset, searchTerm } = usePostFilters(); // <-- shared searchTerm
 const auth = useAuthStore();
 
 function goToHome(): void {
@@ -42,7 +40,6 @@ function handleCreatePost(): void {
   router.push("/create-post");
 }
 
-// reactive computed value from store
 const isLoggedIn = computed(() => auth.isAuthenticated);
 </script>
 
@@ -57,15 +54,17 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
         <div class="search-container w-full">
           <span class="p-input-icon-left">
             <i class="pi pi-search" />
-            <InputText v-model="searchQuery" placeholder="Search..." class="search-input" />
+            <InputText
+              v-model="searchTerm"
+              placeholder="Search posts..."
+              class="search-input"
+            />
           </span>
         </div>
       </template>
 
       <template #end>
-        <!-- Not logged in -->
         <button v-if="!isLoggedIn" class="login-button" @click="handleLogin">Login</button>
-
         <button v-if="!isLoggedIn" class="signup-button" @click="handleSignUp">Sign Up</button>
 
         <button v-if="isLoggedIn" class="create-post-button" @click="handleCreatePost">
@@ -81,23 +80,11 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
 
           <template #dropdown="{ close }">
             <ul>
-              <li
-                @click="
-                  handleViewProfile();
-                  close();
-                "
-              >
-                <i class="pi pi-user"></i>
-                View Profile
+              <li @click="handleViewProfile(); close();">
+                <i class="pi pi-user"></i> View Profile
               </li>
-              <li
-                @click="
-                  handleLogout();
-                  close();
-                "
-              >
-                <i class="pi pi-sign-out"></i>
-                Log Out
+              <li @click="handleLogout(); close();">
+                <i class="pi pi-sign-out"></i> Log Out
               </li>
             </ul>
           </template>

@@ -12,6 +12,7 @@ import type {
   PostResponseDto,
   PostCreateRequestDto,
   PostUpdateRequestDto,
+  PostGetAllRequestDto,
 } from "@/types/dtos/post";
 import type { VoteType } from "@/types/enums";
 import { toPost, toPosts } from "@/mappers/postMapper";
@@ -25,13 +26,21 @@ export async function getPostById(postId: string): Promise<Post> {
 }
 
 // GET /posts?limit=&cursor=
-export async function getPosts(limit = 25, cursor?: string | null): Promise<PaginatedResult<Post>> {
-  const params = new URLSearchParams({ limit: limit.toString() });
-  if (cursor) params.append("cursor", cursor);
+export async function getPosts(
+  params: PostGetAllRequestDto
+): Promise<PaginatedResult<Post>> {
+  const searchParams = new URLSearchParams();
 
-  // backend returns { items, nextCursor }
+  if (params.limit) searchParams.append("limit", params.limit.toString());
+  if (params.cursor) searchParams.append("cursor", params.cursor);
+  if (params.searchTerm) searchParams.append("searchTerm", params.searchTerm);
+  if (params.tags && params.tags.length > 0)
+    params.tags.forEach((tag) => searchParams.append("tags", tag));
+  if (params.sortBy) searchParams.append("sortBy", params.sortBy);
+  if (params.sortOrder) searchParams.append("sortOrder", params.sortOrder);
+
   const response = await api.get<{ items: PostResponseDto[]; nextCursor?: string }>(
-    `/posts?${params.toString()}`,
+    `/posts?${searchParams.toString()}`
   );
 
   return {
@@ -39,6 +48,7 @@ export async function getPosts(limit = 25, cursor?: string | null): Promise<Pagi
     nextCursor: response.data.nextCursor,
   };
 }
+
 
 // POST /posts
 export async function createPost(post: Post): Promise<Post> {

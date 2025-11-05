@@ -3,43 +3,18 @@
   ChatGPT was asked to generate code to help integrate the Post service layer API calls.
   e.g. loading posts, mounting, etc.-->
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { onMounted, computed } from "vue";
 import Card from "primevue/card";
 import PageHeader from "@/components/PageHeader.vue";
 import PostList from "@/components/PostList.vue";
 import SideBar from "@/components/SideBar.vue";
 import { useRouter } from "vue-router";
-import { getPosts } from "@/api/postService";
-import type { Post } from "@/models/post";
 import { useAuthStore } from "@/stores/authenticationStore";
+import { usePostFilters } from "@/composables/usePostFilters";
 
 const router = useRouter();
 const auth = useAuthStore();
-
-const posts = ref<Post[]>([]);
-const nextCursor = ref<string | null>(null);
-const isLoading = ref(false);
-const errorMessage = ref<string | null>(null);
-
-async function loadPosts(initial = false) {
-  if (isLoading.value) return;
-
-  isLoading.value = true;
-  errorMessage.value = null;
-
-  try {
-    const { items, nextCursor: cursor } = await getPosts(25, initial ? null : nextCursor.value);
-
-    // replace or append
-    posts.value = initial ? items : [...posts.value, ...items];
-    nextCursor.value = cursor ?? null;
-  } catch (err) {
-    console.error("Failed to load posts:", err);
-    errorMessage.value = "Failed to load posts. Please try again later.";
-  } finally {
-    isLoading.value = false;
-  }
-}
+const { posts, loading, error, nextCursor, fetchPosts } = usePostFilters();
 
 function handleCreatePost(): void {
   if (isLoggedIn.value) {
@@ -50,7 +25,7 @@ function handleCreatePost(): void {
 }
 
 onMounted(() => {
-  loadPosts(true);
+  fetchPosts(); // initial load
 });
 
 const isLoggedIn = computed(() => auth.isAuthenticated);
@@ -68,7 +43,6 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
       </div>
 
       <div class="home-page-body">
-        <!-- Create Post Card -->
         <Card class="create-post-card">
           <template #title>
             <h1 class="create-post-title">A community for Winnipeg residents</h1>
@@ -83,36 +57,31 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
           </template>
         </Card>
 
-        <!-- Main Content -->
         <div class="home-page-content-layout">
           <div class="post-list">
-            <!-- Loading and error handling -->
-            <div v-if="isLoading && posts.length === 0" class="loading-state">
+            <div v-if="loading && posts.length === 0" class="loading-state">
               <i class="pi pi-spin pi-spinner"></i>
               <p>Loading posts...</p>
             </div>
 
-            <div v-else-if="errorMessage" class="error-state">
+            <div v-else-if="error" class="error-state">
               <i class="pi pi-times-circle"></i>
-              <p>{{ errorMessage }}</p>
+              <p>{{ error }}</p>
             </div>
 
             <template v-else>
-              <PostList :posts="posts" />
+              <PostList />
 
-              <!-- Load more -->
               <div v-if="nextCursor" class="load-more-container">
-                <button class="load-more-button" @click="loadPosts()" :disabled="isLoading">
-                  {{ isLoading ? "Loading..." : "Load More" }}
+                <button class="load-more-button" @click="fetchPosts" :disabled="loading">
+                  {{ loading ? "Loading..." : "Load More" }}
                 </button>
               </div>
             </template>
           </div>
 
-          <!-- Map placeholder -->
           <div class="map-overview">
             Map Overview Coming Soon
-            <div class="spinner"></div>
           </div>
         </div>
       </div>
