@@ -103,12 +103,19 @@ function handleCommentUpdated(updated: Comment) {
 async function handleVote(voteType: VoteType) {
   if (!post.value) return;
   try {
-    const updatedPost = await voteOnPost(post.value.id, voteType);
-    // Update the entire post to ensure voteCount and voteStatus are in sync
-    post.value = updatedPost;
+    const updated = await voteOnPost(post.value.id, voteType);
+
+    // only update fields that actually changed from the vote request
+    post.value = {
+      ...post.value,
+      voteCount: updated.voteCount,
+      upvoteCount: updated.upvoteCount,
+      downvoteCount: updated.downvoteCount,
+      voteStatus: updated.voteStatus,
+      updatedAt: updated.updatedAt,
+    };
   } catch (err) {
     console.error("Vote failed:", err);
-    alert("Failed to register vote. Please try again.");
   }
 }
 

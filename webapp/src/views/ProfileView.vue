@@ -2,7 +2,7 @@
   ChatGPT was asked to generate code to help integrate the Pinia authentication store.
   e.g., for fetching current user information via /me, etc. -->
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import PageHeader from "@/components/PageHeader.vue";
 import PostList from "@/components/PostList.vue";
 import ProfileHeader from "@/components/profile/ProfileHeader.vue";
@@ -11,15 +11,14 @@ import SideBar from "@/components/SideBar.vue";
 
 import { getCurrentUser } from "@/api/userService";
 import { getPostById } from "@/api/postService";
-
-import type { User } from "@/models/user";
-import type { Post } from "@/models/post";
-
-import { useAuthStore } from "@/stores/authenticationStore";
 import { resolveErrorMessage } from "@/utils/error";
 
+import type { Post } from "@/models/post";
+import { useAuthStore } from "@/stores/authenticationStore";
+
 const auth = useAuthStore();
-const user = ref<User | null>(null);
+const user = computed(() => auth.user);
+
 const posts = ref<Post[]>([]);
 const loading = ref(false);
 const error = ref<string | null>(null);
@@ -27,15 +26,13 @@ const error = ref<string | null>(null);
 async function fetchProfileData() {
   loading.value = true;
   try {
-    // fetch current user and their posts
     const currentUser = await getCurrentUser();
-    user.value = currentUser;
+    if (auth.user) Object.assign(auth.user, currentUser);
+    else auth.user = currentUser;
 
-    if (currentUser.posts && currentUser.posts.length > 0) {
-      // fetch posts for those postIds concurrently
-      const postPromises = currentUser.posts.map((id) => getPostById(id));
-      const fetchedPosts = await Promise.all(postPromises);
-      posts.value = fetchedPosts;
+    if (currentUser.posts?.length) {
+      const fetchedPosts = await Promise.all(currentUser.posts.map((id) => getPostById(id)));
+      posts.value = fetchedPosts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     } else {
       posts.value = [];
     }
@@ -64,7 +61,7 @@ onMounted(fetchProfileData);
         <div v-else-if="error" class="error-state">{{ error }}</div>
 
         <template v-else-if="user">
-          <ProfileHeader :username="auth.user?.username" />
+          <ProfileHeader :username="user?.username" />
           <ProfileToolbar />
 
           <div class="profile-page-content-layout">
