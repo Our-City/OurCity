@@ -27,7 +27,7 @@ export interface UserResponseDto {
   posts: string[];
   savedPosts: string[];
   reportedPosts: string[];
-  comments: string[];
+  comments: string[]; 
   isAdmin: boolean;
   isBanned: boolean;
   createdAt: string;

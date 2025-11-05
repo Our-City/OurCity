@@ -11,7 +11,7 @@ import type { Comment } from "@/models/comment"
 import type { CommentRequestDto, CommentResponseDto, CommentVoteRequestDto } from "../types/dtos/comment"
 import { toComment, toComments } from "@/mappers/commentMapper";
 import { toCommentRequestDto } from "@/mappers/commentMapper";
-import type { PaginatedResult } from "@/types/common/PaginatedResult";
+import type { PaginatedResult } from "@/types/common/paginatedResult";
 
 // GET /posts/{postId}/comments?limit=&cursor=
 export async function getCommentsByPostId(
@@ -22,18 +22,18 @@ export async function getCommentsByPostId(
   const params = new URLSearchParams({ limit: limit.toString() });
   if (cursor) params.append("cursor", cursor);
 
-  const response = await api.get<{ comments: CommentResponseDto[]; nextCursor?: string }>(
+  const response = await api.get<{ items: CommentResponseDto[]; nextCursor?: string }>(
     `/posts/${postId}/comments?${params.toString()}`
   );
 
   return {
-    items: toComments(response.data.comments),
+    items: toComments(response.data.items),
     nextCursor: response.data.nextCursor,
   };
 }
 
 // POST /posts/{postId}/comments
-export async function createComment(comment: Comment, postId: string): Promise<Comment> {
+export async function createComment(postId: string, comment: Comment): Promise<Comment> {
   const dto: CommentRequestDto = toCommentRequestDto(comment);
   const response = await api.post<CommentResponseDto>(`/posts/${postId}/comments`, dto);
 
@@ -56,6 +56,6 @@ export async function deleteComment(commentId: string): Promise<Comment> {
 
 // PUT /comments/{commentId}/vote
 export async function voteOnComment(commentId: string, voteType: CommentVoteRequestDto): Promise<Comment> {
-  const response = await api.put<CommentResponseDto>(`/comments/${commentId}/vote`, voteType);
+  const response = await api.put<CommentResponseDto>(`/comments/${commentId}/votes`, voteType);
   return toComment(response.data);
 }

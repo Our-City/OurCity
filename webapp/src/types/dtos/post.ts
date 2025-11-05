@@ -14,6 +14,7 @@ export interface PostResponseDto {
   authorId: string;
   title: string;
   description: string;
+  authorName?: string;
   location?: string;
   upvoteCount: number;
   downvoteCount: number;

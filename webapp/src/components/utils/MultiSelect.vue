@@ -2,8 +2,8 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 
 interface Props {
-  modelValue: string[];
-  options: string[];
+  modelValue: any[];
+  options: any[];
   placeholder?: string;
   disabled?: boolean;
   maxSelected?: number;
@@ -152,11 +152,11 @@ onUnmounted(() => {
         <!-- Selected items display -->
         <div v-if="selectedValues.length > 0" class="multiselect__selected">
           <span
-            v-for="(item) in selectedValues.slice(0, 3)"
-            :key="item"
+            v-for="item in selectedValues.slice(0, 3)"
+            :key="typeof item === 'string' ? item : item.id"
             class="multiselect__tag"
           >
-            {{ item }}
+            {{ typeof item === 'string' ? item : item.name }}
             <button
               type="button"
               class="multiselect__tag-remove"
@@ -165,15 +165,17 @@ onUnmounted(() => {
               ×
             </button>
           </span>
+
           <span v-if="selectedValues.length > 3" class="multiselect__more">
             +{{ selectedValues.length - 3 }} more
           </span>
         </div>
-
+        
         <!-- Placeholder -->
         <span v-else class="multiselect__placeholder">
           {{ placeholder }}
         </span>
+  
       </div>
 
       <!-- Actions -->
@@ -208,7 +210,7 @@ onUnmounted(() => {
       <div class="multiselect__options">
         <div
           v-for="option in filteredOptions"
-          :key="option"
+          :key="typeof option === 'string' ? option : option.id"
           class="multiselect__option"
           :class="{
             'multiselect__option--selected': isSelected(option),
@@ -217,7 +219,9 @@ onUnmounted(() => {
           @click="selectOption(option)"
         >
           <div class="multiselect__option-content">
-            <span class="multiselect__option-text">{{ option }}</span>
+            <span class="multiselect__option-text">
+              {{ typeof option === 'string' ? option : option.name }}
+            </span> 
             <i v-if="isSelected(option)" class="multiselect__option-check"> ✓ </i>
           </div>
         </div>

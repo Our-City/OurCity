@@ -19,9 +19,10 @@ export interface CommentVoteRequestDto {
 // response DTOs
 export interface CommentResponseDto {
   id: string;
-  postID: string;
-  authorID: string;
+  postId: string;
+  authorId: string;
   content: string;
+  authorName?: string;
   upvoteCount: number;
   downvoteCount: number;
   voteStatus: VoteType;

@@ -12,11 +12,11 @@ export interface Post {
   authorId: string;
   title: string;
   description: string;
+  authorName?: string;
   location?: string;
   upvoteCount: number;
   downvoteCount: number;
   voteCount: number; // total votes (upvotes - downvotes)
-  reportCount: number;
   commentCount: number;
   visibility: PostVisibility; // PUBLISHED | HIDDEN
   tags: Tag[]; 

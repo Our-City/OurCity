@@ -1,33 +1,49 @@
 <!-- Generative AI - CoPilot was used to assist in the creation of this file.
-  CoPilot was asked to provide help with CSS styling and for help with syntax -->
+  CoPilot was asked to provide help with CSS styling and for help with syntax 
+  ChatGPT was asked to help with handling the voting logic and emits.-->
 <script setup lang="ts">
-import VoteButton from "primevue/button";
-
-const props = defineProps<{ votes: number }>();
-
-const emit = defineEmits<{
-  (e: "upvote"): void;
-  (e: "downvote"): void;
+const props = defineProps<{
+  votes: number;
+  userVote?: number; // -1 | 0 | 1 (optional)
 }>();
 
-function upvote() {
-  emit("upvote");
+const emit = defineEmits<{
+  (e: "vote", voteType: number): void;
+}>();
+
+function handleUpvote() {
+  const next = props.userVote === 1 ? 0 : 1;
+  emit("vote", next);
 }
 
-function downvote() {
-  emit("downvote");
+function handleDownvote() {
+  const next = props.userVote === -1 ? 0 : -1;
+  emit("vote", next);
 }
 </script>
 
 <template>
-  <div class="vote-section">
-    <div class="vote-box">
-      <VoteButton icon="pi pi-arrow-up" class="vote-btn upvote" @click.prevent="upvote" />
-      <div class="vote-count">{{ props.votes }}</div>
-      <VoteButton icon="pi pi-arrow-down" class="vote-btn downvote" @click.prevent="downvote" />
-    </div>
+  <div class="vote-box">
+    <button
+      class="upvote-button"
+      :class="{ active: userVote === 1 }"
+      @click="handleUpvote"
+    >
+      <i class="pi pi-arrow-up" />
+    </button>
+
+    <span class="vote-count">{{ votes }}</span>
+
+    <button
+      class="downvote-button"
+      :class="{ active: userVote === -1 }"
+      @click="handleDownvote"
+    >
+      <i class="pi pi-arrow-down" />
+    </button>
   </div>
 </template>
+
 
 <style scoped>
 .vote-section {

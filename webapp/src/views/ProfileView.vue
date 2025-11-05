@@ -1,34 +1,86 @@
+<!-- Generative AI was used to assist in the creation of this file.
+  ChatGPT was asked to generate code to help integrate the Pinia authentication store.
+  e.g., for fetching current user information via /me, etc. -->
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import PageHeader from "@/components/PageHeader.vue";
 import PostList from "@/components/PostList.vue";
-import { mockPosts } from "@/data/mockData.ts";
 import ProfileHeader from "@/components/profile/ProfileHeader.vue";
 import ProfileToolbar from "@/components/profile/ProfileToolbar.vue";
 import SideBar from "@/components/SideBar.vue";
 
-const posts = ref(mockPosts);
+import { getCurrentUser } from "@/api/userService";
+import { getPostById } from "@/api/postService";
+
+import type { User } from "@/models/user";
+import type { Post } from "@/models/post";
+
+import { useAuthStore } from "@/stores/authenticationStore";
+
+const auth = useAuthStore();
+const user = ref<User | null>(null);
+const posts = ref<Post[]>([]);
+const loading = ref(false);
+const error = ref<string | null>(null);
+
+async function fetchProfileData() {
+  loading.value = true;
+  try {
+    // fetch current user and their posts
+    const currentUser = await getCurrentUser();
+    user.value = currentUser;
+
+    if (currentUser.posts && currentUser.posts.length > 0) {
+      // fetch posts for those postIds concurrently 
+      const postPromises = currentUser.posts.map((id) => getPostById(id));
+      const fetchedPosts = await Promise.all(postPromises);
+      posts.value = fetchedPosts;
+    } else {
+      posts.value = [];
+    }
+  } catch (err: any) {
+    console.error("Failed to load profile:", err);
+    error.value = "Could not load your profile information.";
+  } finally {
+    loading.value = false;
+  }
+}
+
+onMounted(fetchProfileData);
 </script>
+
 
 <template>
   <div>
     <div class="page-header">
       <PageHeader />
     </div>
+
     <div class="profile-page-layout">
       <SideBar view="profile" />
+
       <div class="profile-page-body">
-        <ProfileHeader username="JohnDoe" />
-        <ProfileToolbar />
-        <div class="profile-page-content-layout">
-          <div class="post-list">
-            <PostList :posts="posts" />
+        <div v-if="loading" class="loading-state">Loading profile...</div>
+        <div v-else-if="error" class="error-state">{{ error }}</div>
+
+        <template v-else-if="user">
+          <ProfileHeader :username="auth.user?.username" />
+          <ProfileToolbar />
+
+          <div class="profile-page-content-layout">
+            <div class="post-list">
+              <PostList v-if="posts.length" :posts="posts" />
+              <div v-else class="no-posts-message">
+                <p>You haven’t created any posts yet.</p>
+              </div>
+            </div>
           </div>
-        </div>
+        </template>
       </div>
     </div>
   </div>
 </template>
+
 
 <style scoped>
 .profile-page-layout {

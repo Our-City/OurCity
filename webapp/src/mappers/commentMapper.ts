@@ -12,9 +12,10 @@ import type { CommentRequestDto } from "@/types/dtos/comment";
 export function toComment(dto: CommentResponseDto): Comment {
   return {
     id: dto.id,
-    postID: dto.postID,
-    authorID: dto.authorID,
+    postId: dto.postId,
+    authorId: dto.authorId,
     content: dto.content,
+    authorName: dto.authorName,
     upvoteCount: dto.upvoteCount,
     downvoteCount: dto.downvoteCount,
     voteCount: dto.upvoteCount - dto.downvoteCount,

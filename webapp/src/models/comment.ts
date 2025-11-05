@@ -8,9 +8,10 @@ import { VoteType } from "../types/enums";
 // Post model representing the Post entity in the application
 export interface Comment {
   id: string;
-  postID: string;
-  authorID: string;
+  postId: string;
+  authorId: string;
   content: string;
+  authorName?: string;
   upvoteCount: number;
   downvoteCount: number;
   voteCount: number; // total votes (upvotes - downvotes)

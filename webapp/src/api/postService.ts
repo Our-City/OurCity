@@ -11,7 +11,7 @@ import type { Post } from "@/models/post"
 import type { PostResponseDto, PostCreateRequestDto, PostUpdateRequestDto } from "@/types/dtos/post"
 import { toPost, toPosts } from "@/mappers/postMapper"
 import { toPostCreateRequestDto, toPostUpdateRequestDto } from "@/mappers/postMapper"
-import type { PaginatedResult } from "@/types/common/PaginatedResult";
+import type { PaginatedResult } from "@/types/common/paginatedResult";
 
 
 // GET /posts/{postId}
@@ -59,8 +59,8 @@ export async function deletePost(postId: string): Promise<Post> {
   return toPost(response.data);
 }
 
-// POST /posts/{postId}/vote
+// PUT /posts/{postId}/vote
 export async function voteOnPost(postId: string, voteType: number): Promise<Post> {
-  const response = await api.post<PostResponseDto>(`/posts/${postId}/vote`, { voteType });
+  const response = await api.put<PostResponseDto>(`/posts/${postId}/votes`, { voteType });
   return toPost(response.data);
 }

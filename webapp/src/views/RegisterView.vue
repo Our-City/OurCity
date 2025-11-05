@@ -1,6 +1,11 @@
+<!-- Generative AI was used to assist in the creation of this file.
+  ChatGPT was asked to generate code to help integrate the User service layer API calls.
+  Also assisted with integrating the Pinia authentication store.-->
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/authenticationStore";
+import { createUser } from "@/api/userService";
 import Form from "@/components/utils/FormCmp.vue";
 import InputText from "primevue/inputtext";
 
@@ -45,11 +50,9 @@ const showConfirmPasswordError = computed(() => {
   return confirmPasswordTouched.value && errors.value.confirmPassword;
 });
 
-// Form handlers
+// form handlers
 const handleSubmit = async (event: Event) => {
   event.preventDefault();
-
-  // Mark all fields as touched on submit
   usernameTouched.value = true;
   passwordTouched.value = true;
   confirmPasswordTouched.value = true;
@@ -63,24 +66,32 @@ const handleSubmit = async (event: Event) => {
   errors.value = {};
 
   try {
-    // Simulate API call for registration
-    const registerData = {
-      username: formData.value.username.trim(),
-      password: formData.value.password,
-    };
+    // request user creation
+    const username = formData.value.username.trim();
+    const password = formData.value.password;
+    
+    const newUser = await createUser(username, password);
+    console.log("User registered successfully:", newUser);
 
-    // Here you would make the actual API call
-    console.log("Registering with:", registerData);
+    // auto login after registration
+    try {
+      const auth = useAuthStore();
+      await auth.loginUser(username, password);
+    } catch (e) {
+      console.warn("Auto-login failed:", e);
+    }
 
-    // Simulate success - redirect to home
+    // re-route to home after successful registration
     router.push("/");
-  } catch (error) {
+  } catch (error: any) {
     console.error("Registration error:", error);
-    errors.value.submit = "Registration failed. Please try again.";
+    errors.value.submit =
+      error?.response?.data?.error || error.message || "Registration failed.";
   } finally {
     isSubmitting.value = false;
   }
 };
+
 
 const handleReset = () => {
   formData.value = {

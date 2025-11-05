@@ -31,7 +31,7 @@ export async function getMediaById(mediaId: string): Promise<Media> {
 
 // GET /media/post/{postId}
 export async function getMediaByPostId(postId: string): Promise<Media[]> {
-  const response = await api.get<MediaResponseDto[]>(`/media/post/${postId}`);
+  const response = await api.get<MediaResponseDto[]>(`/media/posts/${postId}`);
   return response.data.map(toMedia);
 }
 

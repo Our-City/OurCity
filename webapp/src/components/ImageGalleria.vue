@@ -5,8 +5,6 @@ import ImageModal from "@/components/ImageModal.vue";
 const props = defineProps<{
   images: Array<{
     src: string;
-    alt: string;
-    title: string;
   }>;
 }>();
 
@@ -36,7 +34,6 @@ function closeImageModal() {
     <div class="image-hover-container">
       <img
         :src="images[imgIndex].src"
-        :alt="images[imgIndex].alt"
         class="post-image"
         @click="openImageModal()"
       />
@@ -71,7 +68,6 @@ function closeImageModal() {
   <ImageModal
     :show="showImageModal"
     :imageUrl="images[imgIndex].src"
-    :title="images[imgIndex].title"
     @close="closeImageModal"
   />
 </template>

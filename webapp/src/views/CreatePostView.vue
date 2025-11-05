@@ -1,22 +1,37 @@
+<!-- Generative AI was used to assist in the creation of this file.
+  ChatGPT was asked to generate code to help integrate the service layer API calls.
+  e.g., loading Tags using API, etc.-->
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
+
 import PageHeader from "@/components/PageHeader.vue";
 import SideBar from "@/components/SideBar.vue";
 import Form from "@/components/utils/FormCmp.vue";
 import MultiSelect from "@/components/utils/MultiSelect.vue";
+
 import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
-import type { PostCreateRequestDto } from "@/types/posts";
+
+import { useAuthStore } from "@/stores/authenticationStore";
+
+import { createPost } from "@/api/postService";
+import { uploadMedia } from "@/api/mediaService";
+import { getTags } from "@/api/tagService";
+
+import type { Post } from "@/models/post";
+import type { Tag } from "@/models/tag";
+import { PostVisibility } from "@/types/enums";
 
 const router = useRouter();
+const auth = useAuthStore();
 
 // Form data
 const formData = ref({
   title: "",
   location: "",
   description: "",
-  tags: [] as string[],
+  tags: [] as Tag[],
   images: [] as File[],
 });
 
@@ -28,27 +43,25 @@ const titleTouched = ref(false);
 const locationTouched = ref(false);
 const descriptionTouched = ref(false);
 
-// Available tags for multiselect
-const availableTags = ref([
-  "Construction",
-  "Transportation",
-  "Entertainment",
-  "Shopping",
-  "Food & Dining",
-  "Parks & Recreation",
-  "Safety",
-  "Community Events",
-  "Infrastructure",
-  "Business",
-  "Education",
-  "Healthcare",
-  "Environment",
-  "Sports",
-  "Culture",
-  "Tourism",
-  "Housing",
-  "Technology",
-]);
+// Available tags for multiselect (mocked for now, ideally fetched from API once available)
+const availableTags = ref<Tag[]>([]);
+const isLoadingTags = ref(false);
+const tagError = ref<string | null>(null);
+
+async function loadTags() {
+  try {
+    isLoadingTags.value = true;
+    tagError.value = null;
+    availableTags.value = await getTags();
+  } catch (err) {
+    console.error("Failed to load tags:", err);
+    tagError.value = "Failed to load tags from server.";
+  } finally {
+    isLoadingTags.value = false;
+  }
+}
+
+onMounted(loadTags);
 
 // Computed properties
 const isFormValid = computed(() => {
@@ -76,7 +89,6 @@ const showDescriptionError = computed(() => {
 const handleSubmit = async (event: Event) => {
   event.preventDefault();
 
-  // Mark all fields as touched on submit
   titleTouched.value = true;
   locationTouched.value = true;
   descriptionTouched.value = true;
@@ -90,27 +102,47 @@ const handleSubmit = async (event: Event) => {
   errors.value = {};
 
   try {
-    // Simulate API call
-    const postData: PostCreateRequestDto = {
-      authorId: 1, // This would come from auth context
+    if (!auth.user) {
+      throw new Error("You must be logged in to create a post.");
+    }
+
+    // create post object
+    const newPost: Post = {
+      id: "", // backend will assign this
+      authorId: auth.user.id,
       title: formData.value.title.trim(),
       location: formData.value.location.trim(),
       description: formData.value.description.trim(),
+      tags: formData.value.tags,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      upvoteCount: 0,
+      downvoteCount: 0,
+      voteCount: 0,
+      visibility: PostVisibility.PUBLISHED,
+      commentCount: 0,
+      voteStatus: 0,
+      isDeleted: false,
     };
 
-    // Here you would make the actual API call
-    console.log("Creating post:", postData);
-    console.log("Tags:", formData.value.tags);
-    console.log("Images:", formData.value.images);
+    const createdPost = await createPost(newPost);
+    console.log("Post created:", createdPost);
 
-    // Simulate delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // upload media if any images selected
+    if (formData.value.images.length > 0) {
+      const uploadPromises = formData.value.images.map((file) =>
+        uploadMedia(file, createdPost.id)
+      );
+      await Promise.all(uploadPromises);
+      console.log("Images uploaded successfully");
+    }
 
-    // Redirect to home or post view
-    router.push("/");
-  } catch (error) {
+    // redirect to the newly created post's page
+    router.push(`/posts/${createdPost.id}`);
+  } catch (error: any) {
     console.error("Error creating post:", error);
-    errors.value.submit = "Failed to create post. Please try again.";
+    errors.value.submit =
+      error?.message || "Failed to create post. Please try again.";
   } finally {
     isSubmitting.value = false;
   }
@@ -261,19 +293,25 @@ const removeImage = (index: number) => {
             <!-- Tags Field -->
             <div class="form-field">
               <label class="form-label" for="tags">Tags</label>
+
+              <div v-if="isLoadingTags" class="form-help">Loading tags...</div>
+              <div v-else-if="tagError" class="form-error">{{ tagError }}</div>
+
               <MultiSelect
+                v-else
                 id="tags"
                 v-model="formData.tags"
                 :options="availableTags"
+                optionLabel="name"
                 placeholder="Select relevant tags"
                 :max-selected="5"
                 :searchable="true"
               />
+
               <div class="form-help">
                 Choose tags that best describe your post (max 5, optional)
               </div>
             </div>
-
             <!-- Image Upload Field -->
             <div class="form-field">
               <label class="form-label" for="images">Images</label>

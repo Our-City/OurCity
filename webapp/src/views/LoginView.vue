@@ -1,20 +1,28 @@
+<!-- Generative AI was used to assist in the creation of this file.
+  ChatGPT was asked to generate code to help integrate the service layer API calls,
+  validation, and integrating the Pinia authentication store.-->
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import Form from "@/components/utils/FormCmp.vue";
 import InputText from "primevue/inputtext";
+import { useAuthStore } from "@/stores/authenticationStore";
+
 const router = useRouter();
-// Form data
+const auth = useAuthStore();
+
 const formData = ref({
   username: "",
   password: "",
 });
+
 // Form state
 const isSubmitting = ref(false);
 const errors = ref<Record<string, string>>({});
 const showPassword = ref(false);
 const usernameTouched = ref(false);
 const passwordTouched = ref(false);
+
 // Computed properties
 const isFormValid = computed(() => {
   return formData.value.username.trim() && formData.value.password.trim();
@@ -29,32 +37,12 @@ const showPasswordError = computed(() => {
 // Form handlers
 const handleSubmit = async (event: Event) => {
   event.preventDefault();
-
-  // Mark all fields as touched on submit
-  usernameTouched.value = true;
-  passwordTouched.value = true;
-
-  if (!isFormValid.value) {
-    validateForm();
-    return;
-  }
-  isSubmitting.value = true;
-  errors.value = {};
   try {
-    // Simulate API call for login
-    const loginData = {
-      username: formData.value.username.trim(),
-      password: formData.value.password,
-    };
-    // Here you would make the actual API call
-    console.log("Logging in with:", loginData);
-    // Simulate success - redirect to home
+    await auth.loginUser(formData.value.username, formData.value.password);
+    console.log("Auth store after login:", auth.user);
     router.push("/");
-  } catch (error) {
-    console.error("Login error:", error);
-    errors.value.submit = "Invalid credentials. Please try again.";
-  } finally {
-    isSubmitting.value = false;
+  } catch {
+    errors.value.submit = "Invalid username or password";
   }
 };
 const handleReset = () => {
@@ -81,9 +69,6 @@ const validateForm = () => {
 };
 const navigateToRegister = () => {
   router.push("/register");
-};
-const navigateToForgotPassword = () => {
-  //   router.push('/forgot-password');
 };
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value;
@@ -157,15 +142,6 @@ const handleCancel = () => {
           </div>
           <div v-if="showPasswordError" class="form-error">{{ errors.password }}</div>
         </div>
-
-        <!-- Additional Options -->
-        <template #between>
-          <div class="login-options">
-            <button type="button" class="link-button" @click="navigateToForgotPassword">
-              Forgot your password?
-            </button>
-          </div>
-        </template>
 
         <!-- Form Actions -->
         <template #actions="{ loading }">

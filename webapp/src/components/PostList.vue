@@ -1,16 +1,20 @@
+<!-- Generative AI was used to assist in the creation of this file.
+  ChatGPT was asked to generate code to help integrate the Post service layer API calls.-->
 <script setup lang="ts">
 import { computed } from "vue";
 import PostItem from "./PostItem.vue";
-import type { PostResponseDto } from "@/types/posts";
+import type { Post } from "@/models/post";
 import { usePostFilters } from "@/composables/usePostFilters";
 import Dropdown from "./utils/DropdownMenu.vue";
 
 const props = defineProps<{
-  posts: PostResponseDto[];
+  posts: Post[];
 }>();
 
+// composable that manages sorting/filtering state
 const { setSort, currentSort, currentFilter } = usePostFilters();
 
+// display label for current sort
 const sortLabel = computed(() => {
   switch (currentSort.value) {
     case "popular":
@@ -23,25 +27,31 @@ const sortLabel = computed(() => {
   }
 });
 
+// apply filtering and sorting logic
 const filteredAndSortedPosts = computed(() => {
   let result = [...props.posts];
 
+  // filter by tag (or category substitute)
   if (currentFilter.value !== "all") {
-    result = result.filter((post) => post.category?.toLowerCase() === currentFilter.value);
+    result = result.filter((post) =>
+      post.tags.some(
+        (tag) => tag.name.toLowerCase() === currentFilter.value.toLowerCase()
+      )
+    );
   }
 
+  // sort based on currentSort
   switch (currentSort.value) {
     case "popular":
-      result.sort((a, b) => (b.upvotes || 0) - (a.upvotes || 0));
+      result.sort((a, b) => b.upvoteCount - a.upvoteCount);
       break;
     case "nearby":
-      // TODO: Implement location-based sorting
-      // For now, just return as-is
+      // TODO: Add geolocation-based sorting once we have user coordinates
       break;
     case "recent":
     default:
       result.sort(
-        (a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime(),
+        (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
       );
       break;
   }
@@ -59,40 +69,21 @@ const filteredAndSortedPosts = computed(() => {
       </template>
       <template #dropdown="{ close }">
         <ul>
-          <li
-            @click="
-              setSort('popular');
-              close();
-            "
-          >
-            Popular
-          </li>
-          <li
-            @click="
-              setSort('recent');
-              close();
-            "
-          >
-            Recent
-          </li>
-          <li
-            @click="
-              setSort('nearby');
-              close();
-            "
-          >
-            Nearby
-          </li>
+          <li @click="setSort('popular'); close()">Popular</li>
+          <li @click="setSort('recent'); close()">Recent</li>
+          <li @click="setSort('nearby'); close()">Nearby</li>
         </ul>
       </template>
     </Dropdown>
   </div>
+
   <div class="post-list">
     <div v-if="filteredAndSortedPosts.length === 0" class="empty-message">
       <i class="pi pi-inbox"></i>
       <p>No posts found</p>
       <p class="empty-subtitle">Try adjusting your filters or check back later</p>
     </div>
+
     <router-link
       v-else
       v-for="post in filteredAndSortedPosts"
