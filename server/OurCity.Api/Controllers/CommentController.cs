@@ -11,6 +11,7 @@ using OurCity.Api.Services;
 namespace OurCity.Api.Controllers;
 
 [ApiController]
+[Route("apis/v1")]
 public class CommentController : ControllerBase
 {
     private readonly ILogger<CommentController> _logger;
@@ -23,7 +24,7 @@ public class CommentController : ControllerBase
     }
 
     [HttpPost]
-    [Route("Posts/{postId}/Comments")]
+    [Route("posts/{postId}/comments")]
     [EndpointSummary("Create a new comment under a post")]
     [EndpointDescription("Creates a new comment to be associated with a specific post")]
     [ProducesResponseType(typeof(CommentResponseDto), StatusCodes.Status201Created)]
@@ -49,7 +50,7 @@ public class CommentController : ControllerBase
     }
 
     [HttpGet]
-    [Route("Posts/{postId}/Comments")]
+    [Route("posts/{postId}/comments")]
     [EndpointSummary("Get all comments associated with a post")]
     [EndpointDescription("Gets a list of all comments for a specific post")]
     [ProducesResponseType(
@@ -68,7 +69,7 @@ public class CommentController : ControllerBase
     }
 
     [HttpPut]
-    [Route("Comments/{commentId}")]
+    [Route("comments/{commentId}")]
     [EndpointSummary("Update an existing comment")]
     [EndpointDescription("Updates an existing comment associated with a specific post")]
     [ProducesResponseType(typeof(CommentResponseDto), StatusCodes.Status200OK)]
@@ -106,7 +107,7 @@ public class CommentController : ControllerBase
     }
 
     [HttpPut]
-    [Route("Comments/{commentId}/vote")]
+    [Route("comments/{commentId}/votes")]
     [EndpointSummary("Vote on a comment")]
     [EndpointDescription("A user votes on a comment, either upvote or downvote")]
     [ProducesResponseType(typeof(CommentResponseDto), StatusCodes.Status200OK)]
@@ -137,7 +138,7 @@ public class CommentController : ControllerBase
         return Ok(res.Data);
     }
 
-    [HttpDelete("Comments/{commentId}")]
+    [HttpDelete("comments/{commentId}")]
     [EndpointSummary("Delete a comment")]
     [EndpointDescription("Deletes a comment associated with a specific post")]
     [ProducesResponseType(typeof(CommentResponseDto), StatusCodes.Status200OK)]

@@ -11,7 +11,7 @@ namespace OurCity.Api.Controllers;
 /// Code based off of ChatGPT request for integrating with ASP NET Core Identity
 /// </credits>
 [ApiController]
-[Route("[controller]")]
+[Route("apis/v1/authentication")]
 public class AuthenticationController : ControllerBase
 {
     private readonly ILogger<AuthenticationController> _logger;
@@ -30,7 +30,7 @@ public class AuthenticationController : ControllerBase
     }
 
     [HttpPost]
-    [Route("Login")]
+    [Route("login")]
     [EndpointSummary("Login")]
     [EndpointDescription("Login to the OurCity application")]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -59,7 +59,7 @@ public class AuthenticationController : ControllerBase
 
     [HttpPost]
     [Authorize]
-    [Route("Logout")]
+    [Route("logout")]
     [EndpointSummary("Logout")]
     [EndpointDescription("Logout of the OurCity application")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -71,7 +71,7 @@ public class AuthenticationController : ControllerBase
 
     [HttpGet]
     [Authorize]
-    [Route("Me")]
+    [Route("me")]
     [EndpointSummary("Me")]
     [EndpointDescription("Get the information of the current user")]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
