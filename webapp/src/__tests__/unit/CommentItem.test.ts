@@ -65,7 +65,7 @@ describe("CommentItem.vue", () => {
 
   it("calls voteOnComment and emits updated when user is authenticated", async () => {
     const updatedComment = { ...mockComment, voteCount: 6 };
-    (voteOnComment as any).mockResolvedValue(updatedComment);
+    (voteOnComment as typeof voteOnComment).mockResolvedValue(updatedComment);
 
     const wrapper = mount(CommentItem, {
       props: { comment: mockComment },
@@ -99,7 +99,7 @@ describe("CommentItem.vue", () => {
   });
 
   it("handles errors from voteOnComment gracefully", async () => {
-    (voteOnComment as any).mockRejectedValue(new Error("Network error"));
+    (voteOnComment as typeof voteOnComment).mockRejectedValue(new Error("Network error"));
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
     const wrapper = mount(CommentItem, {
