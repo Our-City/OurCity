@@ -7,6 +7,7 @@ import type { Post } from "@/models/post";
 import type { PostResponseDto } from "@/types/dtos/post";
 import type { PostCreateRequestDto, PostUpdateRequestDto } from "@/types/dtos/post";
 import { toTags } from "./tagMapper";
+import { parseVoteType } from "@/utils/voteUtils";
 
 // DTOs -> Models:
 // maps a PostResponseDto to a Post model
@@ -25,7 +26,7 @@ export function toPost(dto: PostResponseDto): Post {
     visibility: dto.visibility,
     tags: toTags(dto.tags),
     isDeleted: dto.isDeleted,
-    voteStatus: dto.voteStatus,
+    voteStatus: parseVoteType(dto.voteStatus),
     createdAt: new Date(dto.createdAt),
     updatedAt: new Date(dto.updatedAt),
   };

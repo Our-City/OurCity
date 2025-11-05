@@ -5,6 +5,7 @@
 import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/authenticationStore";
+import { VoteType } from "@/types/enums";
 
 const router = useRouter();
 const auth = useAuthStore();
@@ -13,97 +14,133 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
 
 const props = defineProps<{
   votes: number;
-  userVote?: number; // -1 | 0 | 1 (optional)
+  userVote?: VoteType; // -1 | 0 | 1 (optional)
 }>();
 
 const emit = defineEmits<{
-  (e: "vote", voteType: number): void;
+  (e: "vote", voteType: VoteType): void;
 }>();
 
 function handleUpvote() {
   if (!isLoggedIn.value) {
     router.push("/login");
     return;
-  } else {
-    const next = props.userVote === 1 ? 0 : 1;
-    emit("vote", next);
   }
+
+  let newVoteType: VoteType;
+
+  if (props.userVote === VoteType.UPVOTE) {
+    // user is removing their upvote
+    newVoteType = VoteType.NOVOTE;
+  } else {
+    // user is upvoting (either from no vote or from downvote)
+    newVoteType = VoteType.UPVOTE;
+  }
+
+  console.log("existing vote", props.userVote, "new vote", newVoteType);
+
+  emit("vote", newVoteType);
 }
 
 function handleDownvote() {
   if (!isLoggedIn.value) {
     router.push("/login");
     return;
-  } else {
-    const next = props.userVote === -1 ? 0 : -1;
-    emit("vote", next);
   }
+
+  let newVoteType: VoteType;
+
+  if (props.userVote === VoteType.DOWNVOTE) {
+    // User is removing their downvote
+    newVoteType = VoteType.NOVOTE;
+  } else {
+    // User is downvoting (either from no vote or from upvote)
+    newVoteType = VoteType.DOWNVOTE;
+  }
+
+  console.log("existing vote", props.userVote, "new vote", newVoteType);
+
+  emit("vote", newVoteType);
 }
 </script>
 
 <template>
   <div class="vote-box">
-    <button class="upvote-button" :class="{ active: userVote === 1 }" @click="handleUpvote">
+    <button
+      class="vote-btn upvote"
+      :class="{ active: props.userVote === VoteType.UPVOTE }"
+      @click="handleUpvote"
+    >
       <i class="pi pi-arrow-up" />
     </button>
 
     <span class="vote-count">{{ votes }}</span>
 
-    <button class="downvote-button" :class="{ active: userVote === -1 }" @click="handleDownvote">
+    <button
+      class="vote-btn downvote"
+      :class="{ active: props.userVote === VoteType.DOWNVOTE }"
+      @click="handleDownvote"
+    >
       <i class="pi pi-arrow-down" />
     </button>
   </div>
 </template>
 
 <style scoped>
-.vote-section {
-  display: flex;
-  justify-content: left;
-}
 .vote-box {
   display: flex;
   align-items: center;
-  border: none;
+  gap: 0.25rem;
   border-radius: 3rem;
 }
+
 .vote-btn {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0;
+  border: none;
   border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  color: var(--primary-text-color);
   transition:
     background-color 150ms ease,
     color 150ms ease,
     transform 120ms ease;
 }
-.vote-btn.p-button {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  color: var(--primary-text-color) !important;
-}
-.vote-btn.p-button .pi {
-  font-size: 0.9rem;
-}
-.vote-btn.p-button:hover {
-  color: var(--primary-text-color) !important;
+
+.vote-btn:hover {
   transform: translateY(-1px);
 }
 
-.vote-btn.upvote.p-button:hover {
-  color: var(--positive-color) !important;
+.vote-btn.upvote:hover {
+  color: var(--positive-color);
 }
 
-.vote-btn.downvote.p-button:hover {
-  color: var(--negative-color) !important;
+.vote-btn.upvote.active {
+  color: var(--positive-color);
 }
+
+.vote-btn.downvote:hover {
+  color: var(--negative-color);
+}
+
+.vote-btn.downvote.active {
+  color: var(--negative-color);
+}
+
+.vote-btn .pi {
+  font-size: 0.9rem;
+}
+
 .vote-count {
   font-weight: bold;
   font-size: 1rem;
-  margin: 0.5rem 0.25rem;
+  min-width: 2rem;
+  text-align: center;
   color: var(--text-color);
 }
 </style>
