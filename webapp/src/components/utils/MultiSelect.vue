@@ -1,9 +1,7 @@
 <!-- Generative AI - CoPilot was used to assist in the creation of this file.
   CoPilot was asked to provide help with CSS styling and for help with syntax.
-  
   Additionally, Copilot assisted with refactoring the component to remove references
   to any and replace them with MultiSelectObjectOption.-->
-
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
 
