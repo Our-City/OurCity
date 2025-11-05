@@ -1,8 +1,12 @@
+<!-- Generative AI - CoPilot was used to assist in the creation of this file.
+  CoPilot was asked to provide help with CSS styling and for help with syntax.
+  It also assisted with error handling.-->
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { updateCurrentUser } from "@/api/userService";
 import { useAuthStore } from "@/stores/authenticationStore";
+import { resolveErrorMessage } from "@/utils/error";
 
 interface Props {
   username?: string;
@@ -60,9 +64,9 @@ async function saveUsername() {
     auth.user = updatedUser;
 
     isEditingUsername.value = false;
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Failed to update username:", err);
-    errorMessage.value = "Failed to update username. Please try again.";
+    errorMessage.value = resolveErrorMessage(err, "Failed to update username. Please try again.");
   } finally {
     isSaving.value = false;
   }

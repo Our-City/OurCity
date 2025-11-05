@@ -2,14 +2,6 @@
 import Toolbar from "../utils/ToolbarCmp.vue";
 
 function handlePosts() {}
-
-function handleSaved() {}
-
-function handleDrafts() {}
-
-function handleUnderConsideration() {}
-
-function handleAccepted() {}
 </script>
 
 <template>

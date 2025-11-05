@@ -1,6 +1,7 @@
 <!-- Generative AI was used to assist in the creation of this file.
   ChatGPT was asked to generate code to help integrate the User service layer API calls.
-  Also assisted with integrating the Pinia authentication store.-->
+  Also assisted with integrating the Pinia authentication store.
+  Copilot assisted with error handling.-->
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
@@ -8,6 +9,7 @@ import { useAuthStore } from "@/stores/authenticationStore";
 import { createUser } from "@/api/userService";
 import Form from "@/components/utils/FormCmp.vue";
 import InputText from "primevue/inputtext";
+import { resolveErrorMessage } from "@/utils/error";
 
 const router = useRouter();
 
@@ -83,9 +85,9 @@ const handleSubmit = async (event: Event) => {
 
     // re-route to home after successful registration
     router.push("/");
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Registration error:", error);
-    errors.value.submit = error?.response?.data?.error || error.message || "Registration failed.";
+    errors.value.submit = resolveErrorMessage(error, "Registration failed.");
   } finally {
     isSubmitting.value = false;
   }

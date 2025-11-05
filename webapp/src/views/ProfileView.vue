@@ -16,6 +16,7 @@ import type { User } from "@/models/user";
 import type { Post } from "@/models/post";
 
 import { useAuthStore } from "@/stores/authenticationStore";
+import { resolveErrorMessage } from "@/utils/error";
 
 const auth = useAuthStore();
 const user = ref<User | null>(null);
@@ -38,9 +39,9 @@ async function fetchProfileData() {
     } else {
       posts.value = [];
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Failed to load profile:", err);
-    error.value = "Could not load your profile information.";
+    error.value = resolveErrorMessage(err, "Could not load your profile information.");
   } finally {
     loading.value = false;
   }

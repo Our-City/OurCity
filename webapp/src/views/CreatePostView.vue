@@ -1,6 +1,7 @@
 <!-- Generative AI was used to assist in the creation of this file.
   ChatGPT was asked to generate code to help integrate the service layer API calls.
-  e.g., loading Tags using API, etc.-->
+  e.g., loading Tags using API, etc.
+  Copilot assisted with error handling.-->
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
@@ -18,6 +19,7 @@ import { useAuthStore } from "@/stores/authenticationStore";
 import { createPost } from "@/api/postService";
 import { uploadMedia } from "@/api/mediaService";
 import { getTags } from "@/api/tagService";
+import { resolveErrorMessage } from "@/utils/error";
 
 import type { Post } from "@/models/post";
 import type { Tag } from "@/models/tag";
@@ -137,9 +139,9 @@ const handleSubmit = async (event: Event) => {
 
     // redirect to the newly created post's page
     router.push(`/posts/${createdPost.id}`);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating post:", error);
-    errors.value.submit = error?.message || "Failed to create post. Please try again.";
+    errors.value.submit = resolveErrorMessage(error, "Failed to create post. Please try again.");
   } finally {
     isSubmitting.value = false;
   }
