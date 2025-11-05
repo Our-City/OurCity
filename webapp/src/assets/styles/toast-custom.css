@@ -21,13 +21,3 @@
 .p-toast .p-toast-message-secondary {
   background: var(--toast-color);
 }
-
-.p-toast-summary {
-  font-weight: bold;
-  font-size: 1.5rem;
-}
-
-.p-toast-detail {
-  font-weight: normal;
-  font-size: 1rem;
-}
