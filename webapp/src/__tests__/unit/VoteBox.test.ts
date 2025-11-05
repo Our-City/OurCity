@@ -38,7 +38,7 @@ describe("VoteBox", () => {
       props: { votes: 0, userVote: 0 },
     });
 
-    const upvoteBtn = wrapper.find(".upvote-button");
+    const upvoteBtn = wrapper.find(".upvote");
     expect(upvoteBtn.exists()).toBe(true);
 
     await upvoteBtn.trigger("click");
@@ -53,7 +53,7 @@ describe("VoteBox", () => {
       props: { votes: 0, userVote: 0 },
     });
 
-    const downvoteBtn = wrapper.find(".downvote-button");
+    const downvoteBtn = wrapper.find(".downvote");
     expect(downvoteBtn.exists()).toBe(true);
 
     await downvoteBtn.trigger("click");
