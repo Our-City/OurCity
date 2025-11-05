@@ -1,7 +1,8 @@
 <!-- Generative AI - CoPilot was used to assist in the creation of this file.
-  CoPilot was asked to provide help with CSS styling and for help with syntax.
-  It also assisted with error handling.-->
+  CoPilot was asked to provide help with CSS styling and for help with syntax
+  Also assisted with filtering.-->
 <script setup lang="ts">
+import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { usePostFilters } from "@/composables/usePostFilters";
 
@@ -9,66 +10,68 @@ interface Props {
   view?: "home" | "profile";
 }
 
+const props = withDefaults(defineProps<Props>(), { view: "home" });
 const router = useRouter();
-const { setSort, setFilter, reset } = usePostFilters();
+const { tags, currentFilter, setSort, setFilter, reset, fetchTags } = usePostFilters();
 
-const props = withDefaults(defineProps<Props>(), {
-  view: "home",
-});
-
-function goToHome(): void {
+function goToHome() {
   reset();
   router.push("/");
 }
 
-function handleSort(sortType: "popular" | "nearby" | "recent") {
-  setSort(sortType);
-}
-
-function handleFilter(filterType: "recreational" | "infrastructure" | "all") {
-  setFilter(filterType);
-}
+onMounted(fetchTags);
 </script>
 
 <template>
   <div :class="['side-bar', `toolbar--${props.view}`]" data-testid="sidebar">
     <button class="home-button" @click="goToHome"><i class="pi pi-home"></i> Home</button>
+
     <button
-      class="popular-button"
       @click="
-        reset();
-        handleSort('popular');
+        () => {
+          reset();
+          setSort('popular');
+        }
       "
     >
       <i class="pi pi-chart-line"></i> Popular
     </button>
     <button
-      class="nearby-button"
       @click="
-        reset();
-        handleSort('nearby');
+        () => {
+          reset();
+          setSort('recent');
+        }
       "
     >
-      <i class="pi pi-map-marker"></i> Nearby
+      <i class="pi pi-clock"></i> Recent
     </button>
+
+    <div class="sidebar-divider"></div>
+
+    <!-- Optional: add (WIP) if you want -->
+    <h4 class="filter-title">Filter by tag (WIP)</h4>
+
     <button
-      class="recreational-button"
-      @click="
-        reset();
-        handleFilter('recreational');
-      "
+      class="tag-button all-tags"
+      :class="{ active: currentFilter === 'all' }"
+      @click="setFilter('all')"
     >
-      <i class="pi pi-sun"></i> Recreational
+      <i class="pi pi-list"></i> All
     </button>
-    <button
-      class="infrastructure-button"
-      @click="
-        reset();
-        handleFilter('infrastructure');
-      "
-    >
-      <i class="pi pi-building"></i> Infrastructure
-    </button>
+
+    <!-- scrollable tag list -->
+    <div class="tag-list disabled">
+      <button
+        v-for="tag in tags"
+        :key="tag.id"
+        :class="['tag-button', { active: currentFilter === tag.id }]"
+        @click="setFilter(tag.id)"
+      >
+        <i class="pi pi-tag"></i>
+        <span class="tag-name">{{ tag.name }}</span>
+      </button>
+    </div>
 
     <div class="sidebar-divider"></div>
 
@@ -87,52 +90,104 @@ function handleFilter(filterType: "recreational" | "infrastructure" | "all") {
 .side-bar {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  width: 20rem;
+  align-items: stretch;
+  width: 18rem;
   padding: 1rem;
-  height: 100%;
+  height: 100vh;
   background: var(--primary-background-color);
+  border-right: 1px solid var(--border-color);
+  box-sizing: border-box;
 }
 
+/* buttons */
 .side-bar button {
-  width: 100%;
-  text-align: left;
-  display: flex;
-  gap: 0.7rem;
-}
-
-.sidebar-divider {
-  width: 100%;
-  height: 1px;
-  background-color: var(--neutral-color);
-  margin: 1rem 0;
-}
-
-.github-link {
-  width: 100%;
-  text-align: left;
   display: flex;
   align-items: center;
-  gap: 0.7rem;
-  background: var(--primary-background-color);
-  color: var(--primary-text-color);
+  gap: 0.6rem;
+  width: 100%;
+  text-align: left;
+  background: none;
   border: none;
-  border-radius: 0.75rem;
-  padding: 0.5rem 1rem;
-  font-size: 1.25rem;
-  transition:
-    background 0.2s,
-    color 0.2s;
-  text-decoration: none;
+  color: var(--primary-text-color);
+  font-size: 1rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.4rem;
+  transition: background 0.15s ease;
+}
+
+.side-bar button:hover {
+  background: rgba(25, 118, 210, 0.08);
   cursor: pointer;
 }
 
-.github-link:hover {
-  background: var(--primary-background-color-hover);
+.sidebar-divider {
+  margin: 1rem 0;
+  height: 1px;
+  background-color: var(--border-color);
 }
 
-.github-link i {
-  font-size: 1rem;
+.filter-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary-text-color);
+  margin: 0.5rem 0;
+}
+
+/* scrollable tag area */
+.tag-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  overflow-y: auto;
+  flex-grow: 1;
+  padding-right: 0.3rem;
+}
+
+/* ✅ disable interactions + scroll */
+.tag-list.disabled {
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0.6; /* optional visual cue, remove if undesired */
+}
+
+.tag-list::-webkit-scrollbar {
+  width: 0.35rem;
+}
+.tag-list::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 0.5rem;
+}
+
+/* Tag buttons */
+.tag-button {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: transparent;
+  border: none;
+  color: var(--primary-text-color);
+  font-size: 0.9rem;
+  text-align: left;
+  padding: 0.3rem 0.5rem;
+  border-radius: 0.4rem;
+  transition: background 0.15s ease-in-out;
+  width: 100%;
+}
+
+.tag-button:hover {
+  background: rgba(25, 118, 210, 0.08);
+}
+
+.tag-button.active {
+  background: var(--accent-color, #1976d2);
+  color: #fff;
+  font-weight: 500;
+}
+
+.tag-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

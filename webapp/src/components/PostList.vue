@@ -1,101 +1,63 @@
 <!-- Generative AI was used to assist in the creation of this file.
-  ChatGPT was asked to generate code to help integrate the Post service layer API calls.-->
+  ChatGPT was asked to generate code to help integrate the Post service layer API calls.
+  It also assisted with sorting/filtering logic-->
 <script setup lang="ts">
-import { computed } from "vue";
 import PostItem from "./PostItem.vue";
-import type { Post } from "@/models/post";
+import { computed } from "vue";
 import { usePostFilters } from "@/composables/usePostFilters";
-import Dropdown from "./utils/DropdownMenu.vue";
 
-const props = defineProps<{
-  posts: Post[];
-}>();
+// composable instance
+const postFilters = usePostFilters();
 
-// composable that manages sorting/filtering state
-const { setSort, currentSort, currentFilter } = usePostFilters();
+// toggle sort order
+function toggleSortOrder() {
+  postFilters.filters.value.sortOrder =
+    postFilters.filters.value.sortOrder === "Desc" ? "Asc" : "Desc";
+  postFilters.fetchPosts();
+}
 
-// display label for current sort
-const sortLabel = computed(() => {
-  switch (currentSort.value) {
+// dynamic icon depending on order
+const sortOrderIcon = computed(() =>
+  postFilters.filters.value.sortOrder === "Desc"
+    ? "pi pi-sort-amount-down"
+    : "pi pi-sort-amount-up",
+);
+
+// dynamic label for sort button
+const sortButtonLabel = computed(() => {
+  switch (postFilters.currentSort.value) {
     case "popular":
       return "Popular";
-    case "nearby":
-      return "Nearby";
     case "recent":
-    default:
       return "Recent";
-  }
-});
-
-// apply filtering and sorting logic
-const filteredAndSortedPosts = computed(() => {
-  let result = [...props.posts];
-
-  // filter by tag (or category substitute)
-  if (currentFilter.value !== "all") {
-    result = result.filter((post) =>
-      post.tags.some((tag) => tag.name.toLowerCase() === currentFilter.value.toLowerCase()),
-    );
-  }
-
-  // sort based on currentSort
-  switch (currentSort.value) {
-    case "popular":
-      result.sort((a, b) => b.upvoteCount - a.upvoteCount);
-      break;
-    case "nearby":
-      // TODO: Add geolocation-based sorting once we have user coordinates
-      break;
-    case "recent":
     default:
-      result.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-      break;
+      return "Sort by: Recent";
   }
-
-  return result;
 });
 </script>
 
 <template>
-  <div class="sort-dropdown-container">
-    <Dropdown button-class="sort-posts-button">
-      <template #button>
-        <i class="pi pi-sort-amount-down" />
-        {{ sortLabel }}
-      </template>
-      <template #dropdown="{ close }">
-        <ul>
-          <li
-            @click="
-              setSort('popular');
-              close();
-            "
-          >
-            Popular
-          </li>
-          <li
-            @click="
-              setSort('recent');
-              close();
-            "
-          >
-            Recent
-          </li>
-          <li
-            @click="
-              setSort('nearby');
-              close();
-            "
-          >
-            Nearby
-          </li>
-        </ul>
-      </template>
-    </Dropdown>
+  <!-- Sort toggle button -->
+  <div class="sort-order-container">
+    <button class="sort-order-button" @click="toggleSortOrder">
+      <i :class="sortOrderIcon" class="sort-icon" />
+      {{ sortButtonLabel }}
+    </button>
   </div>
 
+  <!-- Post list -->
   <div class="post-list" data-testid="post-list">
-    <div v-if="filteredAndSortedPosts.length === 0" class="empty-message">
+    <div v-if="postFilters.loading.value" class="loading-state">
+      <i class="pi pi-spin pi-spinner"></i>
+      <p>Loading posts...</p>
+    </div>
+
+    <div v-else-if="postFilters.error.value" class="error-state">
+      <i class="pi pi-times-circle"></i>
+      <p>{{ postFilters.error.value }}</p>
+    </div>
+
+    <div v-else-if="postFilters.posts.value.length === 0" class="empty-message">
       <i class="pi pi-inbox"></i>
       <p>No posts found</p>
       <p class="empty-subtitle">Try adjusting your filters or check back later</p>
@@ -103,7 +65,7 @@ const filteredAndSortedPosts = computed(() => {
 
     <router-link
       v-else
-      v-for="post in filteredAndSortedPosts"
+      v-for="post in postFilters.posts.value"
       :key="post.id"
       :to="`/posts/${post.id}`"
       class="post-link"

@@ -36,7 +36,7 @@ describe("PageHeader", () => {
   it("renders the search input", () => {
     const wrapper = mount(PageHeader, mountOptions);
     expect(wrapper.find(".search-input").exists()).toBe(true);
-    expect(wrapper.find(".search-input").attributes("placeholder")).toBe("Search...");
+    expect(wrapper.find(".search-input").attributes("placeholder")).toBe("Search posts...");
   });
 
   it("renders login and signup buttons when not logged in", () => {
