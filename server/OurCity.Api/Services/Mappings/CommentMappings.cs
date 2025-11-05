@@ -25,6 +25,7 @@ public static class CommentMappings
             PostId = comment.PostId,
             AuthorId = comment.AuthorId,
             Content = comment.Content,
+            AuthorName = comment.Author?.UserName,
             UpvoteCount = comment.Votes.Count(vote => vote.VoteType == VoteType.Upvote),
             DownvoteCount = comment.Votes.Count(vote => vote.VoteType == VoteType.Downvote),
             VoteStatus = userId.HasValue
