@@ -192,7 +192,16 @@ const handleFileUpload = (event: Event) => {
       return true;
     });
 
-    formData.value.images = [...formData.value.images, ...validFiles];
+    // Limit total images to 5
+    const totalImages = formData.value.images.length + validFiles.length;
+    if (totalImages > 5) {
+      alert("You can only attach up to 5 images.");
+      // Only add up to 5 images
+      const allowedFiles = validFiles.slice(0, 5 - formData.value.images.length);
+      formData.value.images = [...formData.value.images, ...allowedFiles];
+    } else {
+      formData.value.images = [...formData.value.images, ...validFiles];
+    }
 
     // Clear the input
     target.value = "";
