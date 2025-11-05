@@ -1,6 +1,7 @@
 /// Generative AI - CoPilot was used to assist in the creation of this file.
 ///  CoPilot assisted by generating boilerplate code for standard CRUD operations
 ///  and routing attributes based on common patterns in ASP.NET API development
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos.Comments;
@@ -24,6 +25,7 @@ public class CommentController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     [Route("posts/{postId}/comments")]
     [EndpointSummary("Create a new comment under a post")]
     [EndpointDescription("Creates a new comment to be associated with a specific post")]
@@ -46,7 +48,12 @@ public class CommentController : ControllerBase
 
         var res = await _commentService.CreateComment(userId.Value, postId, commentRequestDto);
 
-        return StatusCode(StatusCodes.Status201Created, res.Data);
+        if (!res.IsSuccess)
+        {
+            return Problem(statusCode: StatusCodes.Status404NotFound, detail: res.Error);
+        }
+
+        return Ok(res.Data);
     }
 
     [HttpGet]
@@ -64,11 +71,17 @@ public class CommentController : ControllerBase
     )
     {
         var userId = User.GetUserId();
-        var result = await _commentService.GetCommentsForPost(userId, postId, cursor, limit);
-        return Ok(result.Data);
+
+        var getResult = await _commentService.GetCommentsForPost(userId, postId, cursor, limit);
+
+        if (!getResult.IsSuccess)
+            return Problem(statusCode: StatusCodes.Status404NotFound, detail: getResult.Error);
+
+        return Ok(getResult.Data);
     }
 
     [HttpPut]
+    [Authorize]
     [Route("comments/{commentId}")]
     [EndpointSummary("Update an existing comment")]
     [EndpointDescription("Updates an existing comment associated with a specific post")]
@@ -107,6 +120,7 @@ public class CommentController : ControllerBase
     }
 
     [HttpPut]
+    [Authorize]
     [Route("comments/{commentId}/votes")]
     [EndpointSummary("Vote on a comment")]
     [EndpointDescription("A user votes on a comment, either upvote or downvote")]
@@ -139,6 +153,7 @@ public class CommentController : ControllerBase
     }
 
     [HttpDelete("comments/{commentId}")]
+    [Authorize]
     [EndpointSummary("Delete a comment")]
     [EndpointDescription("Deletes a comment associated with a specific post")]
     [ProducesResponseType(typeof(CommentResponseDto), StatusCodes.Status200OK)]

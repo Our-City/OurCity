@@ -37,7 +37,7 @@ public class AuthenticationIntegrationTests
 
         var response = await client.GetAsync($"{_baseUrl}/authentication/me");
 
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public class AuthenticationIntegrationTests
     }
 
     [Fact]
-    public async Task LoggingInToNonexistentAccountWorks()
+    public async Task LoggingInToNonexistentAccountDoesNotWork()
     {
         using var client = _ourCityApi.CreateClient();
 
@@ -81,7 +81,7 @@ public class AuthenticationIntegrationTests
         var meResponse = await client.GetAsync($"{_baseUrl}/authentication/me");
 
         Assert.Equal(HttpStatusCode.Unauthorized, loginResponse.StatusCode);
-        Assert.Equal(HttpStatusCode.NotFound, meResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, meResponse.StatusCode);
     }
 
     [Fact]
@@ -109,6 +109,6 @@ public class AuthenticationIntegrationTests
         Assert.Equal(HttpStatusCode.NoContent, loginResponse.StatusCode);
         Assert.Equal(HttpStatusCode.OK, meAfterLoginResponse.StatusCode);
         Assert.Equal(HttpStatusCode.NoContent, logoutResponse.StatusCode);
-        Assert.Equal(HttpStatusCode.NotFound, meAfterLogoutResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, meAfterLogoutResponse.StatusCode);
     }
 }
