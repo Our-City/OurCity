@@ -9,6 +9,7 @@ namespace OurCity.Api.Test.EndpointTests;
 public class MeEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebApplicationFactory>
 {
     private OurCityWebApplicationFactory _ourCityApi = null!;
+    private readonly string _baseUrl = "/apis/v1";
 
     public async Task InitializeAsync()
     {
@@ -26,7 +27,7 @@ public class MeEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebApplicati
     {
         using var client = _ourCityApi.CreateClient();
 
-        var response = await client.GetAsync("/me");
+        var response = await client.GetAsync($"{_baseUrl}/me");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -42,9 +43,9 @@ public class MeEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebApplicati
             Password = _ourCityApi.StubPassword,
         };
 
-        await client.PostAsJsonAsync("/Authentication/Login", loginRequest);
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
 
-        var response = await client.GetAsync("/me");
+        var response = await client.GetAsync($"{_baseUrl}/me");
         var responseContent = await response.Content.ReadFromJsonAsync<UserResponseDto>();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -67,14 +68,14 @@ public class MeEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebApplicati
             Username = "SubterraneanHomesickAlienSubterraneanHomesickAlien1",
         };
 
-        await client.PostAsJsonAsync("/Authentication/Login", loginRequest);
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
 
         var updateResponse = await client.PutAsJsonAsync(
-            "/me",
+            $"{_baseUrl}/me",
             updateRequestWithOneOverCharacterLimit
         );
 
-        var meResponse = await client.GetAsync("/me");
+        var meResponse = await client.GetAsync($"{_baseUrl}/me");
         var meResponseContent = await meResponse.Content.ReadFromJsonAsync<UserResponseDto>();
 
         Assert.Equal(HttpStatusCode.BadRequest, updateResponse.StatusCode);
@@ -98,10 +99,10 @@ public class MeEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebApplicati
 
         var updateRequest = new UserUpdateRequestDto { Username = "NewUserName" };
 
-        await client.PostAsJsonAsync("/Authentication/Login", loginRequest);
-        await client.PutAsJsonAsync("/me", updateRequest);
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
+        await client.PutAsJsonAsync($"{_baseUrl}/me", updateRequest);
 
-        var response = await client.GetAsync("/me");
+        var response = await client.GetAsync($"{_baseUrl}/me");
         var responseContent = await response.Content.ReadFromJsonAsync<UserResponseDto>();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -119,10 +120,10 @@ public class MeEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebApplicati
             Password = _ourCityApi.StubPassword,
         };
 
-        await client.PostAsJsonAsync("/Authentication/Login", loginRequest);
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
 
-        var deleteResponse = await client.DeleteAsync("/me");
-        var meResponse = await client.GetAsync("/me");
+        var deleteResponse = await client.DeleteAsync($"{_baseUrl}/me");
+        var meResponse = await client.GetAsync($"{_baseUrl}/me");
 
         Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, meResponse.StatusCode);

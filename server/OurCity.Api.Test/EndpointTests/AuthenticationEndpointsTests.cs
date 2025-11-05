@@ -5,7 +5,7 @@ using OurCity.Api.Common.Dtos.User;
 namespace OurCity.Api.Test.EndpointTests;
 
 /// <summary>
-/// Test the /Authentication endpoints
+/// Test the /authentication endpoints
 /// </summary>
 /// <credits>
 /// Code modified from ChatGPT response just asking how to call API endpoints for testing
@@ -17,6 +17,7 @@ public class AuthenticationEndpointsTests
         IClassFixture<OurCityWebApplicationFactory>
 {
     private OurCityWebApplicationFactory _ourCityApi = null!;
+    private readonly string _baseUrl = "/apis/v1";
 
     public async Task InitializeAsync()
     {
@@ -34,7 +35,7 @@ public class AuthenticationEndpointsTests
     {
         using var client = _ourCityApi.CreateClient();
 
-        var response = await client.GetAsync("/Authentication/Me");
+        var response = await client.GetAsync($"{_baseUrl}/authentication/me");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -50,10 +51,13 @@ public class AuthenticationEndpointsTests
             Password = _ourCityApi.StubPassword,
         };
 
-        await client.PostAsJsonAsync("/Authentication/Register", userRequest);
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/register", userRequest);
 
-        var loginResponse = await client.PostAsJsonAsync("/Authentication/Login", userRequest);
-        var meResponse = await client.GetAsync("/Authentication/Me");
+        var loginResponse = await client.PostAsJsonAsync(
+            $"{_baseUrl}/authentication/login",
+            userRequest
+        );
+        var meResponse = await client.GetAsync($"{_baseUrl}/authentication/me");
 
         Assert.Equal(HttpStatusCode.NoContent, loginResponse.StatusCode);
         Assert.Equal(HttpStatusCode.OK, meResponse.StatusCode);
@@ -71,10 +75,10 @@ public class AuthenticationEndpointsTests
         };
 
         var loginResponse = await client.PostAsJsonAsync(
-            "/Authentication/Login",
+            $"{_baseUrl}/authentication/login",
             nonExistentUserRequest
         );
-        var meResponse = await client.GetAsync("/Authentication/Me");
+        var meResponse = await client.GetAsync($"{_baseUrl}/authentication/me");
 
         Assert.Equal(HttpStatusCode.Unauthorized, loginResponse.StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, meResponse.StatusCode);
@@ -91,13 +95,16 @@ public class AuthenticationEndpointsTests
             Password = _ourCityApi.StubPassword,
         };
 
-        await client.PostAsJsonAsync("/Authentication/Register", userRequest);
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/register", userRequest);
 
-        var loginResponse = await client.PostAsJsonAsync("/Authentication/Login", userRequest);
-        var meAfterLoginResponse = await client.GetAsync("/Authentication/Me");
+        var loginResponse = await client.PostAsJsonAsync(
+            $"{_baseUrl}/authentication/login",
+            userRequest
+        );
+        var meAfterLoginResponse = await client.GetAsync($"{_baseUrl}/authentication/me");
 
-        var logoutResponse = await client.PostAsync("/Authentication/Logout", null);
-        var meAfterLogoutResponse = await client.GetAsync("/Authentication/Me");
+        var logoutResponse = await client.PostAsync($"{_baseUrl}/authentication/logout", null);
+        var meAfterLogoutResponse = await client.GetAsync($"{_baseUrl}/authentication/me");
 
         Assert.Equal(HttpStatusCode.NoContent, loginResponse.StatusCode);
         Assert.Equal(HttpStatusCode.OK, meAfterLoginResponse.StatusCode);
