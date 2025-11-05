@@ -24,6 +24,14 @@ public class OurCityWebApplicationFactory : WebApplicationFactory<Program>
     public readonly string StubUsername = "StubUser";
     public readonly string StubPassword = "TestPassword1!";
 
+    public readonly Guid StubPostId = Guid.NewGuid();
+    public readonly string StubPostTitle = "Test Title";
+    public readonly string StubPostDescription = "Test Description";
+
+    public readonly Guid StubPostWithCommentId = Guid.NewGuid();
+    public readonly Guid StubCommentId = Guid.NewGuid();
+    public readonly string StubCommentContent = "Test Content";
+
     private readonly PostgreSqlContainer _postgres;
 
     public OurCityWebApplicationFactory()
@@ -85,6 +93,38 @@ public class OurCityWebApplicationFactory : WebApplicationFactory<Program>
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
             var newUser = new User { Id = StubUserId, UserName = StubUsername };
             userManager.CreateAsync(newUser, StubPassword).Wait();
+
+            //stub post
+            var stubPost = new Post
+            {
+                Id = StubPostId,
+                AuthorId = StubUserId,
+                Title = StubPostTitle,
+                Description = StubPostDescription,
+            };
+            db.Posts.Add(stubPost);
+
+            //stub comment
+            var stubPostWithComment = new Post
+            {
+                Id = StubPostWithCommentId,
+                AuthorId = StubUserId,
+                Title = "Title",
+                Description = "Description",
+            };
+            var stubComment = new Comment
+            {
+                Id = StubCommentId,
+                PostId = StubPostWithCommentId,
+                AuthorId = StubUserId,
+                Content = StubCommentContent,
+                IsDeleted = false,
+                Votes = [],
+            };
+            db.Posts.Add(stubPostWithComment);
+            db.Comments.Add(stubComment);
+
+            db.SaveChangesAsync().Wait();
         });
     }
 }

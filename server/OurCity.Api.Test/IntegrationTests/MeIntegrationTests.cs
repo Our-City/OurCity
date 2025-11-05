@@ -29,7 +29,7 @@ public class MeIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebApplic
 
         var response = await client.GetAsync($"{_baseUrl}/me");
 
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
     [Fact]

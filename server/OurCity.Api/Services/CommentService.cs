@@ -42,14 +42,17 @@ public class CommentService : ICommentService
 {
     private readonly ICommentRepository _commentRepository;
     private readonly ICommentVoteRepository _commentVoteRepository;
+    private readonly IPostRepository _postRepository;
 
     public CommentService(
         ICommentRepository commentRepository,
-        ICommentVoteRepository commentVoteRepository
+        ICommentVoteRepository commentVoteRepository,
+        IPostRepository postRepository
     )
     {
         _commentRepository = commentRepository;
         _commentVoteRepository = commentVoteRepository;
+        _postRepository = postRepository;
     }
 
     public async Task<Result<PaginatedResponseDto<CommentResponseDto>>> GetCommentsForPost(
@@ -59,6 +62,14 @@ public class CommentService : ICommentService
         int limit
     )
     {
+        var post = await _postRepository.GetSlimPostbyId(postId);
+        if (post is null)
+        {
+            return Result<PaginatedResponseDto<CommentResponseDto>>.Failure(
+                ErrorMessages.PostNotFound
+            );
+        }
+
         var comments = await _commentRepository.GetCommentsForPost(postId, cursor, limit + 1);
 
         var hasNextPage = comments.Count() > limit;
@@ -73,22 +84,18 @@ public class CommentService : ICommentService
         return Result<PaginatedResponseDto<CommentResponseDto>>.Success(response);
     }
 
-    // public async Task<Result<IEnumerable<CommentResponseDto>>> GetCommentsByPostId(
-    //     Guid? userId,
-    //     Guid postId
-    // )
-    // {
-    //     var comments = await _commentRepository.GetCommentsByPostId(postId);
-
-    //     return Result<IEnumerable<CommentResponseDto>>.Success(comments.ToDtos(userId));
-    // }
-
     public async Task<Result<CommentResponseDto>> CreateComment(
         Guid userId,
         Guid postId,
         CommentRequestDto commentRequestDto
     )
     {
+        var post = await _postRepository.GetSlimPostbyId(postId);
+        if (post is null)
+        {
+            return Result<CommentResponseDto>.Failure(ErrorMessages.PostNotFound);
+        }
+
         var createdComment = await _commentRepository.CreateComment(
             commentRequestDto.CreateRequestToEntity(userId, postId)
         );
