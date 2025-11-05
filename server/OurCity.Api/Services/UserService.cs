@@ -1,8 +1,7 @@
-using System.Runtime.InteropServices.JavaScript;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos.User;
-using OurCity.Api.Infrastructure;
 using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Services.Mappings;
 
@@ -19,15 +18,20 @@ public interface IUserService
 public class UserService : IUserService
 {
     private readonly UserManager<User> _userManager;
+    private readonly AppDbContext _dbContext;
 
-    public UserService(UserManager<User> userManager)
+    public UserService(UserManager<User> userManager, AppDbContext dbContext)
     {
         _userManager = userManager;
+        _dbContext = dbContext;
     }
 
     public async Task<Result<UserResponseDto>> GetUserById(Guid id)
     {
-        var user = await _userManager.FindByIdAsync(id.ToString());
+        var user = await _userManager
+            .Users.Include(u => u.Posts)
+            .Include(u => u.Comments)
+            .FirstOrDefaultAsync(u => u.Id == id);
 
         if (user is null)
             return Result<UserResponseDto>.Failure("User not found.");
