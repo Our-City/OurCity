@@ -1,19 +1,34 @@
+<!-- Generative AI - CoPilot was used to assist in the creation of this file.
+  CoPilot was asked to provide help with CSS styling and for help with syntax.
+  
+  Additionally, Copilot assisted with refactoring the component to remove references
+  to any and replace them with MultiSelectObjectOption.-->
+
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
 
+type MultiSelectObjectOption = {
+  id: string;
+  name: string;
+  [key: string]: unknown;
+};
+
+type MultiSelectOption = string | MultiSelectObjectOption;
+
 interface Props {
-  modelValue: string[];
-  options: string[];
+  modelValue: MultiSelectOption[];
+  options: MultiSelectOption[];
   placeholder?: string;
   disabled?: boolean;
   maxSelected?: number;
   searchable?: boolean;
   maxHeight?: string;
+  optionLabel?: string;
 }
 
 interface Emits {
-  "update:modelValue": [value: string[]];
-  change: [value: string[]];
+  "update:modelValue": [value: MultiSelectOption[]];
+  change: [value: MultiSelectOption[]];
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -22,32 +37,49 @@ const props = withDefaults(defineProps<Props>(), {
   maxSelected: undefined,
   searchable: true,
   maxHeight: "200px",
+  optionLabel: "name",
 });
 
 const emit = defineEmits<Emits>();
 
 const isOpen = ref(false);
 const searchQuery = ref("");
-const multiSelectRef = ref<HTMLElement>();
-const searchInputRef = ref<HTMLInputElement>();
+const multiSelectRef = ref<HTMLElement | null>(null);
+const searchInputRef = ref<HTMLInputElement | null>(null);
 
 // Computed properties
-const selectedValues = computed({
+const selectedValues = computed<MultiSelectOption[]>({
   get: () => props.modelValue,
-  set: (value) => {
+  set: (value: MultiSelectOption[]) => {
     emit("update:modelValue", value);
     emit("change", value);
   },
 });
+
+const getOptionLabel = (option: MultiSelectOption): string => {
+  if (typeof option === "string") {
+    return option;
+  }
+
+  const labelValue = option[props.optionLabel];
+  if (typeof labelValue === "string" && labelValue.trim()) {
+    return labelValue;
+  }
+
+  return option.name;
+};
+
+const getOptionKey = (option: MultiSelectOption): string => {
+  return typeof option === "string" ? option : option.id;
+};
 
 const filteredOptions = computed(() => {
   if (!props.searchable || !searchQuery.value) {
     return props.options;
   }
 
-  return props.options.filter((option) =>
-    option.toLowerCase().includes(searchQuery.value.toLowerCase()),
-  );
+  const query = searchQuery.value.toLowerCase();
+  return props.options.filter((option) => getOptionLabel(option).toLowerCase().includes(query));
 });
 
 const isMaxSelected = computed(() => {
@@ -73,7 +105,7 @@ const closeDropdown = () => {
   searchQuery.value = "";
 };
 
-const selectOption = (option: string) => {
+const selectOption = (option: MultiSelectOption) => {
   if (props.disabled) return;
 
   const currentValues = [...selectedValues.value];
@@ -92,7 +124,7 @@ const selectOption = (option: string) => {
   selectedValues.value = currentValues;
 };
 
-const removeOption = (option: string, event?: Event) => {
+const removeOption = (option: MultiSelectOption, event?: Event) => {
   if (event) {
     event.stopPropagation();
   }
@@ -115,7 +147,7 @@ const clearAll = (event: Event) => {
   selectedValues.value = [];
 };
 
-const isSelected = (option: string) => {
+const isSelected = (option: MultiSelectOption) => {
   return selectedValues.value.includes(option);
 };
 
@@ -151,8 +183,12 @@ onUnmounted(() => {
       <div class="multiselect__content">
         <!-- Selected items display -->
         <div v-if="selectedValues.length > 0" class="multiselect__selected">
-          <span v-for="item in selectedValues.slice(0, 3)" :key="item" class="multiselect__tag">
-            {{ item }}
+          <span
+            v-for="item in selectedValues.slice(0, 3)"
+            :key="getOptionKey(item)"
+            class="multiselect__tag"
+          >
+            {{ getOptionLabel(item) }}
             <button
               type="button"
               class="multiselect__tag-remove"
@@ -161,6 +197,7 @@ onUnmounted(() => {
               ×
             </button>
           </span>
+
           <span v-if="selectedValues.length > 3" class="multiselect__more">
             +{{ selectedValues.length - 3 }} more
           </span>
@@ -204,7 +241,7 @@ onUnmounted(() => {
       <div class="multiselect__options">
         <div
           v-for="option in filteredOptions"
-          :key="option"
+          :key="getOptionKey(option)"
           class="multiselect__option"
           :class="{
             'multiselect__option--selected': isSelected(option),
@@ -213,7 +250,9 @@ onUnmounted(() => {
           @click="selectOption(option)"
         >
           <div class="multiselect__option-content">
-            <span class="multiselect__option-text">{{ option }}</span>
+            <span class="multiselect__option-text">
+              {{ getOptionLabel(option) }}
+            </span>
             <i v-if="isSelected(option)" class="multiselect__option-check"> ✓ </i>
           </div>
         </div>

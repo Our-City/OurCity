@@ -1,35 +1,43 @@
+<!-- Generative AI was used to assist in the creation of this file.
+  ChatGPT was asked to generate code to help integrate the Post service layer API calls-->
 <script setup lang="ts">
-import { computed } from "vue";
-import type { PostResponseDto } from "@/types/posts";
-import { mockUsers } from "@/data/mockData";
+import { ref, computed, onMounted } from "vue";
+import type { Post } from "@/models/post";
+import type { Media } from "@/models/media";
+import { getMediaByPostId } from "@/api/mediaService";
 
-const props = defineProps<{ post: PostResponseDto }>();
+const props = defineProps<{ post: Post }>();
 
-// Get the username from the author ID
+// fetch post media
+const media = ref<Media[]>([]);
+const isLoading = ref(false);
+
+onMounted(async () => {
+  try {
+    isLoading.value = true;
+    const res = await getMediaByPostId(props.post.id);
+    console.log("Fetched media for post", props.post.id, res);
+    media.value = res;
+  } catch (error) {
+    console.error("Failed to fetch post media:", error);
+  } finally {
+    isLoading.value = false;
+  }
+});
+
+// author name (uses authorName if available)
 const authorUsername = computed(() => {
-  const author = mockUsers.find((user) => user.id === props.post.authorId);
-  if (!author) {
-    return `User #${props.post.authorId}`;
-  }
-  // Use displayName if available, otherwise username, otherwise ID
-  if (author.displayName && author.displayName.trim()) {
-    return author.displayName;
-  }
-  if (author.username) {
-    return `@${author.username}`;
+  if (props.post.authorName && props.post.authorName.trim()) {
+    return props.post.authorName;
   }
   return `User #${props.post.authorId}`;
 });
 
-// Compute the number of comments
-const commentCount = computed(() => {
-  return props.post.commentIds?.length || 0;
-});
+// comment count from domain model
+const commentCount = computed(() => props.post.commentCount ?? 0);
 
-// Get the first image if available
-const postImage = computed(() => {
-  return props.post.images?.[0]?.url || null;
-});
+// first image from fetched media
+const postImage = computed(() => media.value[0]?.url || null);
 </script>
 
 <template>
@@ -46,13 +54,17 @@ const postImage = computed(() => {
       </div>
       <div class="post-votes-comments">
         <i class="pi pi-sort-alt"></i>
-        <div class="post-number-stats">{{ post.votes }}</div>
+        <div class="post-number-stats">{{ post.voteCount }}</div>
         <i class="pi pi-comments"></i>
         <div class="post-number-stats">{{ commentCount }}</div>
       </div>
     </div>
-    <div v-if="postImage" class="post-card-right">
+
+    <div v-if="postImage && !isLoading" class="post-card-right">
       <img :src="postImage" alt="Post Image" class="post-image" />
+    </div>
+    <div v-else-if="isLoading" class="post-card-right">
+      <i class="pi pi-spin pi-spinner"></i>
     </div>
   </div>
 </template>

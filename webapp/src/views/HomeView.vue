@@ -1,19 +1,50 @@
+<!-- Generative AI was used to assist in the creation of this file.
+  ChatGPT was asked to generate code to help integrate the Post service layer API calls.
+  e.g. loading posts, mounting, etc.-->
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import Card from "primevue/card";
 import PageHeader from "@/components/PageHeader.vue";
 import PostList from "@/components/PostList.vue";
-import { mockPosts } from "@/data/mockData.ts";
 import SideBar from "@/components/SideBar.vue";
 import { useRouter } from "vue-router";
-
-const posts = ref(mockPosts);
+import { getPosts } from "@/api/postService";
+import type { Post } from "@/models/post";
 
 const router = useRouter();
+
+const posts = ref<Post[]>([]);
+const nextCursor = ref<string | null>(null);
+const isLoading = ref(false);
+const errorMessage = ref<string | null>(null);
+
+async function loadPosts(initial = false) {
+  if (isLoading.value) return;
+
+  isLoading.value = true;
+  errorMessage.value = null;
+
+  try {
+    const { items, nextCursor: cursor } = await getPosts(25, initial ? null : nextCursor.value);
+
+    // replace or append
+    posts.value = initial ? items : [...posts.value, ...items];
+    nextCursor.value = cursor ?? null;
+  } catch (err) {
+    console.error("Failed to load posts:", err);
+    errorMessage.value = "Failed to load posts. Please try again later.";
+  } finally {
+    isLoading.value = false;
+  }
+}
 
 function handleCreatePost(): void {
   router.push("/create-post");
 }
+
+onMounted(() => {
+  loadPosts(true);
+});
 </script>
 
 <template>
@@ -21,11 +52,14 @@ function handleCreatePost(): void {
     <div class="page-header">
       <PageHeader />
     </div>
+
     <div class="home-page-layout">
       <div class="side-bar">
         <SideBar view="home" />
       </div>
+
       <div class="home-page-body">
+        <!-- Create Post Card -->
         <Card class="create-post-card">
           <template #title>
             <h1 class="create-post-title">A community for Winnipeg residents</h1>
@@ -39,10 +73,34 @@ function handleCreatePost(): void {
             <button class="create-post-button" @click="handleCreatePost">Create Post</button>
           </template>
         </Card>
+
+        <!-- Main Content -->
         <div class="home-page-content-layout">
           <div class="post-list">
-            <PostList :posts="posts" />
+            <!-- Loading and error handling -->
+            <div v-if="isLoading && posts.length === 0" class="loading-state">
+              <i class="pi pi-spin pi-spinner"></i>
+              <p>Loading posts...</p>
+            </div>
+
+            <div v-else-if="errorMessage" class="error-state">
+              <i class="pi pi-times-circle"></i>
+              <p>{{ errorMessage }}</p>
+            </div>
+
+            <template v-else>
+              <PostList :posts="posts" />
+
+              <!-- Load more -->
+              <div v-if="nextCursor" class="load-more-container">
+                <button class="load-more-button" @click="loadPosts()" :disabled="isLoading">
+                  {{ isLoading ? "Loading..." : "Load More" }}
+                </button>
+              </div>
+            </template>
           </div>
+
+          <!-- Map placeholder -->
           <div class="map-overview">
             Map Overview Coming Soon
             <div class="spinner"></div>
@@ -92,7 +150,7 @@ function handleCreatePost(): void {
   align-items: center;
   background: var(--primary-background-color);
   color: var(--primary-text-color);
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   font-weight: 600;
   border: none;
   border-radius: 0.75rem;

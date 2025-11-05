@@ -1,15 +1,20 @@
+<!-- Generative AI was used to assist in the creation of this file.
+  ChatGPT was asked to generate code to help integrate the Pinia authenticationStore
+  for global authentication in the PageHeader.-->
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import InputText from "primevue/inputtext";
 import Dropdown from "./utils/DropdownMenu.vue";
 import Toolbar from "./utils/ToolbarCmp.vue";
 import { usePostFilters } from "@/composables/usePostFilters";
+import { useAuthStore } from "@/stores/authenticationStore";
 
 const router = useRouter();
 const searchQuery = ref("");
 
 const { reset } = usePostFilters();
+const auth = useAuthStore();
 
 function goToHome(): void {
   reset();
@@ -24,7 +29,8 @@ function handleSignUp(): void {
   router.push("/register");
 }
 
-function handleLogout(): void {
+async function handleLogout(): Promise<void> {
+  await auth.logoutUser();
   router.push("/");
 }
 
@@ -36,10 +42,8 @@ function handleCreatePost(): void {
   router.push("/create-post");
 }
 
-function isLoggedIn(): boolean {
-  // Replace with actual authentication check
-  return false;
-}
+// reactive computed value from store
+const isLoggedIn = computed(() => auth.isAuthenticated);
 </script>
 
 <template>
@@ -58,16 +62,22 @@ function isLoggedIn(): boolean {
     </template>
 
     <template #end>
-      <button v-if="!isLoggedIn()" class="login-button" @click="handleLogin">Login</button>
-      <button v-if="!isLoggedIn()" class="signup-button" @click="handleSignUp">Sign Up</button>
-      <button v-if="isLoggedIn()" class="create-post-button" @click="handleCreatePost">
-        <i class="pi pi-plus"></i> Create Post
+      <!-- Not logged in -->
+      <button v-if="!isLoggedIn" class="login-button" @click="handleLogin">Login</button>
+
+      <button v-if="!isLoggedIn" class="signup-button" @click="handleSignUp">Sign Up</button>
+
+      <button v-if="isLoggedIn" class="create-post-button" @click="handleCreatePost">
+        <i class="pi pi-plus"></i>
+        Create Post
       </button>
-      <Dropdown v-if="isLoggedIn()" button-class="account-button">
+
+      <Dropdown v-if="isLoggedIn" button-class="account-button">
         <template #button>
           <i class="pi pi-user" />
           <i class="pi pi-angle-down" />
         </template>
+
         <template #dropdown="{ close }">
           <ul>
             <li
@@ -76,7 +86,8 @@ function isLoggedIn(): boolean {
                 close();
               "
             >
-              <i class="pi pi-user"></i> View Profile
+              <i class="pi pi-user"></i>
+              View Profile
             </li>
             <li
               @click="
@@ -84,7 +95,8 @@ function isLoggedIn(): boolean {
                 close();
               "
             >
-              <i class="pi pi-sign-out"></i> Log Out
+              <i class="pi pi-sign-out"></i>
+              Log Out
             </li>
           </ul>
         </template>
