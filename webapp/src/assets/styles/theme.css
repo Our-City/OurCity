@@ -1,0 +1,26 @@
+:root {
+  --primary-background-color: #ffffff;
+  --primary-background-color-hover: #e7f3fc;
+
+  --secondary-background-color: #ecf2f8;
+
+  --primary-text-color: #273649;
+  --secondary-text-color: #ffffff;
+  --tertiary-text-color: #51565c;
+
+  --border-color: #bcbcbc;
+
+  --neutral-color: #0265c2;
+  --neutral-color-hover: #025bb5;
+  --positive-color: #10b981;
+  --negative-color: #f87171;
+
+  /* Link colors */
+  --link-color: #0265c2;
+  --link-color-hover: #025bb5;
+
+  /* Error/validation color */
+  --error-color: #f87171;
+
+  --test-color: #fb00ff;
+}

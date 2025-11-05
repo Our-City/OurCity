@@ -1,6 +1,7 @@
 # For development
 services:
   ourcity.webapp.dev:
+    container_name: ourcity.webapp.dev
     build:
       context: .
       dockerfile: Dockerfile.dev

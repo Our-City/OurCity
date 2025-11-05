@@ -1,76 +1,276 @@
-<!-- Generative AI - CoPilot was used to assist in the creation of this file.
-  CoPilot was asked to create a page for users to log in with their email and password. -->
+<!-- Generative AI was used to assist in the creation of this file.
+  ChatGPT was asked to generate code to help integrate the service layer API calls,
+  validation, and integrating the Pinia authentication store.-->
 <script setup lang="ts">
-import PageHeader from "@/components/PageHeader.vue";
-import Button from "primevue/button";
-import Card from "primevue/card";
-import { toTypedSchema } from "@vee-validate/zod";
-import * as z from "zod";
-import { Form, Field } from "vee-validate";
+import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
+import Form from "@/components/utils/FormCmp.vue";
 import InputText from "primevue/inputtext";
+import { useAuthStore } from "@/stores/authenticationStore";
 
-import "@/assets/styles/forms.css";
-import WipMessage from "@/components/WipMessage.vue";
+const router = useRouter();
+const auth = useAuthStore();
 
-type LoginFormValues = {
-  username: "";
-};
-
-const initialValues = {
+const formData = ref({
   username: "",
+  password: "",
+});
+
+// Form state
+const isSubmitting = ref(false);
+const errors = ref<Record<string, string>>({});
+const showPassword = ref(false);
+const usernameTouched = ref(false);
+const passwordTouched = ref(false);
+
+// Computed properties
+const isFormValid = computed(() => {
+  return formData.value.username.trim() && formData.value.password.trim();
+});
+// Computed properties for showing errors only after touch
+const showUsernameError = computed(() => {
+  return usernameTouched.value && errors.value.username;
+});
+const showPasswordError = computed(() => {
+  return passwordTouched.value && errors.value.password;
+});
+// Form handlers
+const handleSubmit = async (event: Event) => {
+  event.preventDefault();
+  try {
+    await auth.loginUser(formData.value.username, formData.value.password);
+    console.log("Auth store after login:", auth.user);
+    router.push("/");
+  } catch {
+    errors.value.submit = "Invalid username or password";
+  }
 };
-
-const resolver = toTypedSchema(
-  z.object({
-    username: z.string().min(1, { message: "Username is required" }).nonempty(),
-  }),
-);
-
-const onFormSubmit = (values: unknown) => {
-  //API connection is not currently implemented.
-  const inputtedValues = values as LoginFormValues;
-  console.log("Login submit", inputtedValues);
+const handleReset = () => {
+  formData.value = {
+    username: "",
+    password: "",
+  };
+  errors.value = {};
+  usernameTouched.value = false;
+  passwordTouched.value = false;
+};
+const validateForm = () => {
+  errors.value = {};
+  // Username validation
+  if (!formData.value.username.trim()) {
+    errors.value.username = "Username is required";
+  }
+  // Password validation
+  if (!formData.value.password.trim()) {
+    errors.value.password = "Password is required";
+  } else if (formData.value.password.length < 6) {
+    errors.value.password = "Password must be at least 6 characters";
+  }
+};
+const navigateToRegister = () => {
+  router.push("/register");
+};
+const togglePasswordVisibility = () => {
+  showPassword.value = !showPassword.value;
+};
+const handleCancel = () => {
+  router.push("/");
 };
 </script>
-<template>
-  <div class="login-view form-layout">
-    <PageHeader />
-    <div class="form-container form-container-common">
-      <WipMessage
-        message="The Login Page is currently a work in progress"
-        description="The 'Log in' button is intended to NOT trigger a login API call yet"
-      />
 
-      <Card>
-        <template #title>
-          <h2 id="login-header">Login</h2>
+<template>
+  <div class="login-page">
+    <div class="login-container">
+      <Form
+        variant="card"
+        width="narrow"
+        title="Welcome Back"
+        subtitle="Sign in to your OurCity account"
+        :loading="isSubmitting"
+        @submit="handleSubmit"
+        @reset="handleReset"
+      >
+        <!-- Error display -->
+        <div v-if="errors.submit" class="form-section form-section--before">
+          <div class="form-error">{{ errors.submit }}</div>
+        </div>
+
+        <!-- Username Field -->
+        <div class="form-field">
+          <label class="form-label form-label--required" for="username">Username</label>
+          <InputText
+            id="username"
+            v-model="formData.username"
+            type="text"
+            class="form-input"
+            placeholder="Enter your username"
+            :class="{ 'p-invalid': showUsernameError }"
+            autocomplete="username"
+            @blur="
+              usernameTouched = true;
+              validateForm();
+            "
+          />
+          <div v-if="showUsernameError" class="form-error">{{ errors.username }}</div>
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-field">
+          <label class="form-label form-label--required" for="password">Password</label>
+          <div class="password-input-container">
+            <input
+              id="password"
+              v-model="formData.password"
+              :type="showPassword ? 'text' : 'password'"
+              class="form-input password-input"
+              :class="{ invalid: showPasswordError }"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+              @blur="
+                passwordTouched = true;
+                validateForm();
+              "
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              @click="togglePasswordVisibility"
+              :aria-label="showPassword ? 'Hide password' : 'Show password'"
+            >
+              <i :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+            </button>
+          </div>
+          <div v-if="showPasswordError" class="form-error">{{ errors.password }}</div>
+        </div>
+
+        <!-- Form Actions -->
+        <template #actions="{ loading }">
+          <button
+            type="button"
+            class="form-button form-button--outline"
+            @click="handleCancel"
+            :disabled="loading"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="form-button form-button--primary login-button"
+            :disabled="loading || !isFormValid"
+          >
+            {{ loading ? "Signing In..." : "Sign In" }}
+          </button>
         </template>
-        <template #content>
-          <Form :initialValues="initialValues" :resolver="resolver" @submit="onFormSubmit">
-            <div class="field-common">
-              <label id="username-label" for="username">username</label>
-              <Field id="username-field" name="username" v-slot="{ field }">
-                <InputText id="uesrname-inputText" v-bind="field" placeholder="John Doe" />
-              </Field>
-            </div>
-            <Button id="login-btn" type="submit" label="Log in" class="mt-2" />
-          </Form>
-          <div class="card-footer">
-            <span>New here? </span><router-link to="/register">Create an account</router-link>
+
+        <!-- Footer -->
+        <template #footer>
+          <div class="login-footer">
+            <p>
+              Don't have an account?
+              <button type="button" class="link-button" @click="navigateToRegister">
+                Sign up here
+              </button>
+            </p>
           </div>
         </template>
-      </Card>
+      </Form>
     </div>
   </div>
 </template>
 
-<style>
-#login-header {
-  margin-top: 1rem;
-  margin-bottom: 2rem;
+<style scoped>
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    135deg,
+    var(--neutral-color) 0%,
+    var(--secondary-background-color) 100%
+  );
+  padding: 2rem;
 }
+.login-container {
+  width: 100%;
+  max-width: 400px;
+}
+.login-options {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+.login-footer {
+  color: var(--primary-text-color);
+  text-align: center;
+}
+.link-button {
+  background: none;
+  border: none;
+  color: var(--link-color);
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: inherit;
+  padding: 0;
+  margin: 0;
+  transition: color 0.2s ease;
+}
+.link-button:hover {
+  color: var(--link-color-hover);
+}
+.login-button {
+  flex: 1;
+  justify-content: center;
+}
+/* Custom password input styling */
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.password-input {
+  padding-right: 3rem !important;
+  width: 100%;
+}
+.password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: var(--tertiary-text-color);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.password-toggle:hover {
+  color: var(--primary-text-color);
+  background: var(--primary-background-color-hover);
+}
+.password-toggle:focus {
+  outline: 2px solid var(--neutral-color);
+  outline-offset: 2px;
+}
+.password-input.invalid {
+  border-color: var(--error-color);
+}
+/* Remove PrimeVue Password component styles */
+:deep(.p-inputtext.p-invalid) {
+  border-color: var(--error-color);
+}
+/* Responsive design */
+@media (max-width: 768px) {
+  .login-page {
+    padding: 1rem;
+  }
 
-#login-btn {
-  margin-top: 2rem;
+  .login-container {
+    max-width: 100%;
+  }
 }
 </style>

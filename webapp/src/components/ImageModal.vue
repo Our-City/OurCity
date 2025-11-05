@@ -9,7 +9,7 @@ const emit = defineEmits(["close"]);
 
 <template>
   <transition name="smooth-transition">
-    <div v-if="props.show" class="image-modal">
+    <div v-if="props.show" class="modal-layout" @click="emit('close')">
       <button class="close-modal-btn" @click="emit('close')">&times;</button>
       <div class="modal-content" @click.stop>
         <img :src="props.imageUrl" :alt="props.title" class="modal-image" />
@@ -19,16 +19,17 @@ const emit = defineEmits(["close"]);
 </template>
 
 <style scoped>
-.image-modal {
+.modal-layout {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0, 0, 0, 0.95);
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 3;
 }
 .close-modal-btn {
   position: absolute;
@@ -38,13 +39,13 @@ const emit = defineEmits(["close"]);
   border: none;
   font-size: 4rem;
   cursor: pointer;
-  color: var(--surface-color);
+  color: var(--secondary-text-color);
 }
 .close-modal-btn:hover {
-  color: var(--danger-color, #d9534f);
+  color: var(--negative-color, #d9534f);
 }
 .modal-image {
-  max-width: 100vw;
-  max-height: 100vh;
+  max-width: 85vw;
+  max-height: 85vh;
 }
 </style>

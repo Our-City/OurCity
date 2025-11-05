@@ -1,291 +1,343 @@
-<!-- Generative AI - CoPilot was used to assist in the creation of this file.
-  CoPilot was asked to provide help with CSS styling and for help with syntax -->
+<!-- Generative AI was used to assist in the creation of this file.
+  ChatGPT was asked to generate code to help integrate the Post service layer API calls.
+  e.g, loading posts, creating new posts, etc.-->
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
+import TextArea from "primevue/textarea";
 import PageHeader from "@/components/PageHeader.vue";
-import ImageModal from "@/components/ImageModal.vue";
+import SideBar from "@/components/SideBar.vue";
+import ImageGalleria from "@/components/ImageGalleria.vue";
 import VoteBox from "@/components/VoteBox.vue";
-import CommentInput from "@/components/CommentInput.vue";
 import CommentList from "@/components/CommentList.vue";
-import type { PostProps } from "@/types/interfaces";
-import posts from "@/data/mockPosts";
-import WipMessage from "@/components/WipMessage.vue";
+
+import { getPostById, voteOnPost } from "@/api/postService";
+import { getMediaByPostId } from "@/api/mediaService";
+import { getCommentsByPostId, createComment } from "@/api/commentService";
+
+import type { Post } from "@/models/post";
+import type { Media } from "@/models/media";
+import type { Comment } from "@/models/comment";
+import { VoteType } from "@/types/enums";
+import { useAuthStore } from "@/stores/authenticationStore";
 
 const route = useRoute();
-const router = useRouter();
-const postId = route.params.id;
-const post = ref<PostProps | undefined>(undefined);
-const currentImageIndex = ref(0);
-const showImageModal = ref(false);
+const postId = route.params.id as string;
+
+const post = ref<Post | null>(null);
+const images = ref<Media[]>([]);
+const comments = ref<Comment[]>([]);
 const commentText = ref("");
+const isSubmitting = ref(false);
+const isLoading = ref(true);
+const errorMessage = ref<string | null>(null);
 
-onMounted(() => {
-  post.value = posts.find((p) => p.id == Number(postId));
-});
+const auth = useAuthStore();
 
-function openImageModal() {
-  showImageModal.value = true;
-}
+// fetch the post, its media, and its comments
+async function loadPostData() {
+  try {
+    isLoading.value = true;
 
-function closeImageModal() {
-  showImageModal.value = false;
-}
-
-function editPost() {
-  const id = post?.value?.id;
-  if (id == null) return;
-  router.push({ name: "edit", query: { id: String(id) } });
-}
-
-function deletePost() {
-  if (confirm("Are you sure you want to delete this post?")) {
-    console.log("Delete post", post?.value?.id);
+    console.log("Loading post data for postId:", postId);
+    post.value = await getPostById(postId);
+    images.value = await getMediaByPostId(postId);
+    const { items } = await getCommentsByPostId(postId);
+    comments.value = items;
+    console.log("Loaded post data:", post.value, images.value, comments.value);
+  } catch (err) {
+    console.error("Failed to load post details:", err);
+    errorMessage.value = "Failed to load post details.";
+  } finally {
+    isLoading.value = false;
   }
 }
+
+// submit a new comment on the post
+async function submitComment() {
+  // replace with authorization endpoint
+  if (!auth.user) {
+    alert("You must be logged in to comment.");
+    return;
+  }
+
+  const text = commentText.value.trim();
+  if (!text) return;
+
+  isSubmitting.value = true;
+
+  try {
+    const newComment: Comment = {
+      id: "",
+      authorId: auth.user.id,
+      postId,
+      content: text,
+      authorName: auth.user.username,
+      upvoteCount: 0,
+      downvoteCount: 0,
+      voteCount: 0,
+      voteStatus: 0,
+      isDeleted: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const created = await createComment(postId, newComment);
+
+    // Optimistically prepend
+    comments.value.unshift(created);
+    commentText.value = "";
+  } catch (err) {
+    console.error("Failed to create comment:", err);
+  } finally {
+    isSubmitting.value = false;
+  }
+}
+
+// handle voting on the post
+async function handleVote(voteType: VoteType) {
+  if (!post.value) return;
+  try {
+    post.value = await voteOnPost(post.value.id, voteType);
+  } catch (err) {
+    console.error("Vote failed:", err);
+  }
+}
+
+onMounted(loadPostData);
 </script>
 
 <template>
-  <PageHeader />
-  <div class="post-detail-view">
-    <WipMessage
-      message="The Post Details page is currently a work in progress"
-      description="The 'Delete', 'Upvote', 'Downvote', and 'Submit Comment' buttons  will NOT trigger an API call yet"
-    />
+  <div class="page-header">
+    <PageHeader />
+  </div>
 
-    <h1 class="post-title">{{ post?.title }}</h1>
-    <div class="post-meta">
-      <div class="post-author">By @{{ post?.author }}</div>
-      <div class="post-actions" v-if="post">
-        <button class="post-action-btn edit-btn" @click="editPost" aria-label="Edit post">
-          Edit
-        </button>
-        <button class="post-action-btn delete-btn" @click="deletePost" aria-label="Delete post">
-          Delete
-        </button>
-      </div>
+  <div class="post-detail-layout">
+    <div class="side-bar">
+      <SideBar view="home" />
     </div>
-    <div v-if="post?.location" class="post-location">
-      <div class="location-icon">
-        <i class="pi pi-map-marker"></i>
-      </div>
-      <span>{{ post.location }}</span>
-    </div>
-    <div v-if="post?.imageUrls && post.imageUrls.length" class="post-image-wrapper">
-      <div class="image-hover-wrapper">
-        <img
-          :src="post.imageUrls[currentImageIndex]"
-          :alt="post.title"
-          class="post-image"
-          @click="openImageModal()"
-        />
-        <div class="image-zoom-icon">
-          <i class="pi pi-arrow-up-right-and-arrow-down-left-from-center"></i>
+
+    <div class="post-detail-body">
+      <div v-if="isLoading" class="loading-state">Loading post...</div>
+      <div v-else-if="errorMessage" class="error-state">{{ errorMessage }}</div>
+
+      <div v-else-if="post" class="post-detail-content-layout">
+        <div class="post-content">
+          <div class="post-card">
+            <div class="post-tags">
+              <span v-for="tag in post.tags" :key="tag.id" class="tag-pill">
+                {{ tag.name }}
+              </span>
+            </div>
+
+            <h1 class="post-title">{{ post.title }}</h1>
+            <div class="post-author">
+              @{{ post.authorName }} ·
+              {{ post.createdAt.toLocaleDateString() }}
+            </div>
+
+            <div v-if="post.location" class="post-location">
+              {{ post.location }}
+            </div>
+
+            <div v-if="images.length" class="post-images">
+              <ImageGalleria
+                :images="
+                  images.map((m) => ({
+                    src: m.url,
+                  }))
+                "
+              />
+            </div>
+
+            <div class="post-description">
+              {{ post.description }}
+            </div>
+
+            <div class="post-footer">
+              <div class="post-voting">
+                <VoteBox :votes="post.voteCount" :userVote="post.voteStatus" @vote="handleVote" />
+              </div>
+            </div>
+          </div>
+
+          <div class="comment-card">
+            <h1 class="comment-header">Comments ({{ comments.length }})</h1>
+
+            <div class="comment-input-container">
+              <TextArea
+                class="comment-input"
+                v-model="commentText"
+                placeholder="Add your thoughts here..."
+                rows="3"
+                :disabled="isSubmitting"
+              ></TextArea>
+
+              <button
+                class="comment-submit-button"
+                :disabled="isSubmitting || !commentText.trim()"
+                @click="submitComment"
+              >
+                {{ isSubmitting ? "Submitting..." : "Submit" }}
+              </button>
+            </div>
+
+            <CommentList :comments="comments" />
+          </div>
         </div>
-        <button
-          v-if="currentImageIndex > 0"
-          class="image-btn image-prev"
-          @click="currentImageIndex--"
-          aria-label="Previous image"
-        >
-          <i class="pi pi-chevron-left"></i>
-        </button>
-        <button
-          v-if="post.imageUrls && currentImageIndex < post.imageUrls.length - 1"
-          class="image-btn image-next"
-          @click="currentImageIndex++"
-          aria-label="Next image"
-        >
-          <i class="pi pi-chevron-right"></i>
-        </button>
+
+        <!-- Sidebar -->
+        <div class="map-overview">
+          Map Overview Coming Soon
+          <div class="spinner"></div>
+        </div>
       </div>
     </div>
-    <div class="post-description">
-      <p>{{ post?.description }}</p>
-    </div>
-    <VoteBox class="post-votes" :votes="post?.votes ?? 0" />
-    <div>
-      <CommentInput @submit="(text: string) => (commentText = text)" />
-      <div v-if="post?.comments && post.comments.length > 0" class="content">
-        <CommentList :comments="post.comments" />
-      </div>
-      <div v-else class="no-comments">Start a discussion!</div>
-    </div>
-    <ImageModal
-      :show="showImageModal"
-      :imageUrl="post?.imageUrls && post.imageUrls[currentImageIndex]"
-      :title="post?.title"
-      @close="closeImageModal"
-    />
   </div>
 </template>
 
 <style scoped>
-.post-detail-view {
+.post-detail-layout {
   display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.post-detail-body {
+  flex: 1;
+  background: var(--secondary-background-color);
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.post-detail-content-layout {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 1.5rem 1rem 1rem;
+  padding: 1rem 0 0 1rem;
+}
+
+.post-content {
+  display: flex;
+  flex: 1;
   flex-direction: column;
-  gap: 1rem;
-  padding: 1rem;
-  max-width: 50rem;
-  margin: 2rem auto;
 }
-.post-title {
-  font-size: 2.5rem;
-  font-weight: bold;
-  text-align: left;
-  color: var(--surface-color);
-}
-.post-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+
+.post-card {
+  border-radius: 1rem;
   width: 100%;
+  background: var(--primary-background-color);
+  border: 0.1rem solid var(--border-color);
+  padding: 4rem 4rem;
 }
+
+.post-tags {
+  font-size: 1.25rem;
+  color: var(--tertiary-text-color);
+}
+
+.post-title {
+  font-size: 3rem;
+}
+
 .post-author {
-  font-size: 1rem;
-  color: var(--text-color);
+  font-size: 1.25rem;
+  color: var(--tertiary-text-color);
 }
-.post-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  align-items: flex-end;
-}
-.post-action-btn {
-  padding: 0.35rem 0.75rem;
-  border-radius: 0.5rem;
-  font-size: 0.9rem;
-  border: none;
-  cursor: pointer;
-}
-.post-action-btn.edit-btn {
-  background: var(--surface-variant);
-  color: var(--text-color);
-  transition:
-    transform 0.12s ease,
-    box-shadow 0.12s ease,
-    filter 0.12s ease;
-}
-.post-action-btn.edit-btn:hover,
-.post-action-btn.edit-btn:focus,
-.post-action-btn.edit-btn:focus-visible {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
-  filter: brightness(0.98);
-  outline: none;
-}
-.post-action-btn.delete-btn {
-  background: var(--danger-color);
-  color: white;
-  transition:
-    transform 0.12s ease,
-    box-shadow 0.12s ease,
-    filter 0.12s ease;
-}
-.post-action-btn.delete-btn:hover,
-.post-action-btn.delete-btn:focus,
-.post-action-btn.delete-btn:focus-visible {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(255, 77, 79, 0.18);
-  filter: brightness(0.95);
-  outline: none;
-}
+
 .post-location {
+  font-size: 1.25rem;
+  color: var(--tertiary-text-color);
+}
+
+.post-images {
+  width: 100%;
+  aspect-ratio: 4/3;
+  position: relative;
   display: flex;
   align-items: center;
-  font-size: 1rem;
-  color: var(--text-color);
+  justify-content: center;
+  padding: 0 2rem;
 }
-.location-icon {
-  margin-right: 0.25rem;
-}
+
 .post-description {
   font-size: 1.25rem;
-  text-align: left;
-  color: var(--text-color);
+  margin-bottom: 2rem;
 }
-.post-image-wrapper {
+
+.post-footer {
   display: flex;
-  margin-bottom: 1rem;
-  justify-content: center;
-  width: 100%;
-  height: 30rem;
-  max-width: 100%;
-  position: relative;
-}
-.image-hover-wrapper {
-  position: relative;
-  display: flex;
+  justify-content: flex-start;
   align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
 }
-.image-hover-wrapper:hover .image-zoom-icon {
-  opacity: 1;
-}
-.post-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 2rem;
-  display: block;
-}
-.image-zoom-icon {
-  position: absolute;
-  right: 1rem;
-  bottom: 1rem;
-  font-size: 1.5rem;
-  color: var(--text-color);
-  background: rgba(0, 0, 0, 0.4);
-  border-radius: 50%;
-  width: 2.5rem;
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
-}
-.image-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.4);
-  border: none;
-  border-radius: 50%;
-  width: 2.5rem;
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-color);
-  cursor: pointer;
-  z-index: 2;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
-}
-.image-hover-wrapper:hover .image-btn {
-  opacity: 1;
-  pointer-events: auto;
-}
-.image-prev {
-  left: 1rem;
-}
-.image-next {
-  right: 1rem;
-}
-.no-comments {
-  margin: 1.5rem 0;
-  padding: 1rem;
-  text-align: center;
-  color: var(--text-color);
+
+.comment-card {
   border-radius: 1rem;
+  width: 100%;
+  background: var(--primary-background-color);
+  border: 0.1rem solid var(--border-color);
+  margin-top: 2rem;
+  padding: 2rem 2rem;
   font-size: 1.5rem;
-  font-weight: 500;
+}
+
+.comment-header {
+  padding: 2rem 2rem 0 2rem;
+  font-size: 2rem;
+}
+
+.comment-input-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.comment-input {
+  padding: 1rem;
+  margin: 1rem 2rem;
+  border-radius: 1rem;
+  resize: vertical;
+  box-sizing: border-box;
+  width: calc(100% - 4rem);
+  border: 0.1rem solid var(--border-color);
+}
+
+.comment-submit-button {
+  margin-right: 2rem;
+  color: var(--secondary-text-color);
+  background: var(--neutral-color);
+}
+
+.comment-submit-button:hover {
+  background: var(--neutral-color-hover);
+}
+
+.map-overview {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  width: 30rem;
+  height: 65rem;
+  background: var(--primary-background-color);
+  border: 0.1rem solid var(--border-color);
+}
+
+.spinner {
+  margin-top: 1rem;
+  width: 4rem;
+  height: 4rem;
+  border: 0.25rem solid #ccc;
+  border-top: 0.25rem solid #1976d2;
+  border-radius: 100%;
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

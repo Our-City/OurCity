@@ -1,154 +1,159 @@
-<!-- Generative AI - CoPilot was used to assist in the creation of this file.
-  CoPilot was asked to create a page header component with a title, search bar, create, login, logout, and account buttons. -->
+<!-- Generative AI was used to assist in the creation of this file.
+  ChatGPT was asked to generate code to help integrate the Pinia authenticationStore
+  for global authentication in the PageHeader.-->
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
-import Menubar from "primevue/menubar";
 import InputText from "primevue/inputtext";
-
-type MenuItem = {
-  label: string;
-  icon: string;
-  command: () => void;
-};
+import Dropdown from "./utils/DropdownMenu.vue";
+import Toolbar from "./utils/ToolbarCmp.vue";
+import { usePostFilters } from "@/composables/usePostFilters";
+import { useAuthStore } from "@/stores/authenticationStore";
 
 const router = useRouter();
 const searchQuery = ref("");
-// Currently keeping this here as our login authentication is
-// not yet fully implemented.
-const isLoggedIn = ref(false);
 
-function handleLogout(): void {
-  // Currently logout is not yet implemented.
-  isLoggedIn.value = false;
+const { reset } = usePostFilters();
+const auth = useAuthStore();
+
+function goToHome(): void {
+  reset();
+  router.push("/");
+}
+
+function handleLogin(): void {
   router.push("/login");
 }
 
-const items = computed<MenuItem[]>(() => [
-  ...(!isLoggedIn.value
-    ? [
-        {
-          label: "Log In",
-          icon: "pi pi-sign-in",
-          command: () => {
-            router.push("/login");
-          },
-        },
-      ]
-    : [
-        {
-          label: "Create",
-          icon: "pi pi-plus",
-          command: () => {
-            router.push("/create");
-          },
-        },
-        {
-          label: "Log Out",
-          icon: "pi pi-sign-out",
-          command: handleLogout,
-        },
-        {
-          label: "Account",
-          icon: "pi pi-user",
-          command: () => {
-            router.push("/account");
-          },
-        },
-      ]),
-]);
+function handleSignUp(): void {
+  router.push("/register");
+}
 
-function goToHome(): void {
+async function handleLogout(): Promise<void> {
+  await auth.logoutUser();
   router.push("/");
 }
+
+function handleViewProfile(): void {
+  router.push("/profile");
+}
+
+function handleCreatePost(): void {
+  router.push("/create-post");
+}
+
+// reactive computed value from store
+const isLoggedIn = computed(() => auth.isAuthenticated);
 </script>
 
 <template>
-  <header class="app-header">
-    <Menubar :model="items" class="app-menubar">
-      <template #start>
-        <h1 class="app-title" @click="goToHome">
-          <i class="pi pi-map-marker title-icon"></i>
-          OurCity
-        </h1>
-        <div class="search-container">
-          <span class="p-input-icon-left">
-            <i class="pi pi-search" />
-            <InputText
-              disabled="true"
-              v-model="searchQuery"
-              placeholder="Work In Progress... Coming Soon"
-              class="search-input"
-            />
-          </span>
-        </div>
-      </template>
-    </Menubar>
-  </header>
+  <Toolbar variant="header">
+    <template #start>
+      <h1 class="app-title" @click="goToHome">OurCity</h1>
+    </template>
+
+    <template #center>
+      <div class="search-container w-full">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search" />
+          <InputText v-model="searchQuery" placeholder="Search..." class="search-input" />
+        </span>
+      </div>
+    </template>
+
+    <template #end>
+      <!-- Not logged in -->
+      <button v-if="!isLoggedIn" class="login-button" @click="handleLogin">Login</button>
+
+      <button v-if="!isLoggedIn" class="signup-button" @click="handleSignUp">Sign Up</button>
+
+      <button v-if="isLoggedIn" class="create-post-button" @click="handleCreatePost">
+        <i class="pi pi-plus"></i>
+        Create Post
+      </button>
+
+      <Dropdown v-if="isLoggedIn" button-class="account-button">
+        <template #button>
+          <i class="pi pi-user" />
+          <i class="pi pi-angle-down" />
+        </template>
+
+        <template #dropdown="{ close }">
+          <ul>
+            <li
+              @click="
+                handleViewProfile();
+                close();
+              "
+            >
+              <i class="pi pi-user"></i>
+              View Profile
+            </li>
+            <li
+              @click="
+                handleLogout();
+                close();
+              "
+            >
+              <i class="pi pi-sign-out"></i>
+              Log Out
+            </li>
+          </ul>
+        </template>
+      </Dropdown>
+    </template>
+  </Toolbar>
 </template>
 
 <style scoped>
-.app-header {
-  background-color: var(--primary-color);
-  color: var(--surface-color);
-  padding: 0;
-}
-
 .app-title {
-  margin: 0 1.5rem 0 0;
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: var(--surface-color);
-  align-self: center;
-  cursor: pointer;
-  user-select: none;
+  height: 100%;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-}
-
-.title-icon {
-  font-size: 1.2rem;
-}
-
-.app-menubar {
-  background: transparent;
-  border: none;
-  color: var(--surface-color);
-  display: flex;
-  justify-content: space-between;
+  font-size: 2.5rem;
+  padding: 0rem 1rem 0rem 3rem;
+  cursor: pointer;
 }
 
 .search-container {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  background: var(--secondary-background-color);
+  height: 2rem;
+  max-width: 500px;
+  border-radius: 3rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
   flex: 1;
-  margin: 0 2rem;
+  min-width: 0;
+}
+
+.p-input-icon-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
 }
 
 .search-input {
-  width: 30rem;
-  max-width: 100%;
-  margin-left: 0.5rem;
+  background: var(--primary-background-color-hover);
+  padding-left: 1rem;
+  padding-right: 0.5rem;
+  width: 100%;
 }
 
-.app-menubar :deep(.p-inputtext) {
-  background-color: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: var(--surface-color);
+.account-button {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
 }
 
-.app-menubar :deep(.p-inputtext:hover),
-.app-menubar :deep(.p-inputtext:focus) {
-  border-color: rgba(255, 255, 255, 0.4);
-  box-shadow: none;
+.signup-button {
+  background: var(--neutral-color);
+  color: var(--secondary-text-color);
 }
 
-.app-menubar :deep(.p-inputtext::placeholder) {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.app-menubar :deep(.pi-search) {
-  color: rgba(255, 255, 255, 0.7);
+.signup-button:hover {
+  background: var(--neutral-color-hover);
 }
 </style>
