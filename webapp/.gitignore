@@ -26,6 +26,7 @@ coverage
 
 # Playwright
 /test-results/
+/test-results/.last-run.json
 /playwright-report/
 /blob-report/
 /playwright/.cache/

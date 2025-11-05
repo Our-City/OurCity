@@ -1,3 +1,7 @@
+/// Generative AI - CoPilot was used to assist in the creation of this file.
+///   CoPilot was asked to help write e2e tests by being given a description of
+///   what should be tested for this and giving back the needed functions
+///   and syntax to implement the tests.
 import { test, expect } from '@playwright/test';
 
 test.describe('Navigation', () => {

@@ -58,9 +58,11 @@ const showConfirmPasswordError = computed(() => {
 // form handlers
 const handleSubmit = async (event: Event) => {
   event.preventDefault();
+
   usernameTouched.value = true;
   passwordTouched.value = true;
   confirmPasswordTouched.value = true;
+  validateForm();
 
   if (!isFormValid.value) {
     validateForm();
@@ -265,7 +267,7 @@ const handleCancel = () => {
           <button
             type="submit"
             class="form-button form-button--primary register-button"
-            :disabled="loading || !isFormValid"
+            :disabled="loading"
           >
             {{ loading ? "Signing Up..." : "Sign Up" }}
           </button>

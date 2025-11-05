@@ -97,9 +97,9 @@ const handleSubmit = async (event: Event) => {
   titleTouched.value = true;
   locationTouched.value = true;
   descriptionTouched.value = true;
+  validateForm();
 
   if (!isFormValid.value) {
-    validateForm();
     return;
   }
 
@@ -387,7 +387,7 @@ const removeImage = (index: number) => {
               <button
                 type="submit"
                 class="form-button form-button--primary"
-                :disabled="loading || !isFormValid"
+                :disabled="loading"
               >
                 {{ loading ? "Creating Post..." : "Create Post" }}
               </button>

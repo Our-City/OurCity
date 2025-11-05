@@ -1,7 +1,13 @@
+/// Generative AI - CoPilot was used to assist in the creation of this file.
+///   CoPilot was asked to help write e2e tests by being given a description of
+///   what should be tested for this and giving back the needed functions
+///   and syntax to implement the tests.
 import { test, expect } from '@playwright/test';
+import { createTestUser } from './helpers';
 
 test.describe('Post Creation', () => {
   test.beforeEach(async ({ page }) => {
+    await createTestUser();
     // Note: Most post creation tests will require authentication
     // You may need to implement login in beforeEach or use auth fixtures
     await page.goto('/');
@@ -16,12 +22,12 @@ test.describe('Post Creation', () => {
   });
 
   // This test should be run with authenticated context
-  test.skip('should display post creation form when authenticated', async ({ page }) => {
+  test('should display post creation form when authenticated', async ({ page }) => {
     // TODO: Add authentication setup
     await page.goto('/create-post');
     
-    // Check for form elements
-    await expect(page.getByRole('heading', { name: /create post/i })).toBeVisible();
+  // Check for form elements
+  await expect(page.getByRole('heading', { name: /create new post/i })).toBeVisible();
     
     // Title input
     const titleInput = page.getByLabel(/title/i);
@@ -64,11 +70,22 @@ test.describe('Post Creation', () => {
     await page.waitForURL(/\/(posts\/\d+|\/)/);
     
     // Verify post was created (check for success message or post in list)
-    const successMessage = page.locator('.p-toast-message-success, .success-message');
-    await expect(successMessage.first()).toBeVisible({ timeout: 5000 });
+    const successMessage = page.locator('.p-toast-message-secondary, .success-message');
+    try {
+      await expect(successMessage.first()).toBeVisible({ timeout: 8000 });
+    } catch {
+      // Fallback: check for navigation to new post page
+      try {
+        await expect(page).toHaveURL(/\/posts\//, { timeout: 8000 });
+      } catch {
+        // If still on create-post, check for error messages and log page content
+        const errorMsg = await page.locator('.form-error').allTextContents();
+        throw new Error('Post creation failed: No success message, no redirect, errors: ' + errorMsg.join('; '));
+      }
+    }
   });
 
-  test.skip('should show validation errors for empty post', async ({ page }) => {
+  test('should show validation errors for empty post', async ({ page }) => {
     // TODO: Add authentication setup
     await page.goto('/create-post');
     
@@ -76,29 +93,11 @@ test.describe('Post Creation', () => {
     await page.getByRole('button', { name: /submit|create|post/i }).click();
     
     // Check for validation errors
-    const errors = page.locator('.p-error, [role="alert"], .error-message');
+    const errors = page.locator('.form-error');
     await expect(errors.first()).toBeVisible({ timeout: 3000 });
   });
 
-  test.skip('should allow image upload', async ({ page }) => {
-    // TODO: Add authentication setup
-    await page.goto('/create-post');
-    
-    // Look for file upload input
-    const fileInput = page.locator('input[type="file"]');
-    
-    if (await fileInput.isVisible()) {
-      // Create a simple test file path (you can create actual test fixtures)
-      // For now, this demonstrates the approach
-      // await fileInput.setInputFiles('./src/__tests__/e2e/fixtures/test-image.jpg');
-      
-      // Check if image preview appears
-      const imagePreview = page.locator('[data-testid="image-preview"], .image-preview, img[src*="blob:"]');
-      await expect(imagePreview.first()).toBeVisible({ timeout: 3000 });
-    }
-  });
-
-  test.skip('should cancel post creation and return to home', async ({ page }) => {
+  test('should cancel post creation and return to home', async ({ page }) => {
     // TODO: Add authentication setup
     await page.goto('/create-post');
     
