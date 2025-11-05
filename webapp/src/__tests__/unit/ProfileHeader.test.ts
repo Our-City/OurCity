@@ -13,6 +13,8 @@ import { mount } from "@vue/test-utils";
 import ProfileHeader from "@/components/profile/ProfileHeader.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import { createPinia } from "pinia";
+import Toast from "primevue/toast";
+import ToastService from "primevue/toastservice";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -25,7 +27,8 @@ const router = createRouter({
 const pinia = createPinia();
 const mountOptions = {
   global: {
-    plugins: [router, pinia],
+    plugins: [router, pinia, ToastService],
+    components: { Toast },
   },
 };
 
