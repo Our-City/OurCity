@@ -25,7 +25,6 @@ describe("DropdownMenu", () => {
 
     wrapper.vm.closeDropdown();
     await wrapper.vm.$nextTick();
-    const dropdown = wrapper.find(".dropdown-menu");
     expect(wrapper.vm.isDropdownVisible).toBe(false);
   });
 

@@ -29,11 +29,14 @@ describe("CommentItem.vue", () => {
     voteStatus: 1,
   };
 
-  let mockAuthStore: any;
+  interface MockAuthStore {
+    user: { id: number; name: string } | null;
+  }
+  let mockAuthStore: MockAuthStore;
 
   beforeEach(() => {
     mockAuthStore = { user: { id: 1, name: "Tester" } };
-    (useAuthStore as any).mockReturnValue(mockAuthStore);
+    (useAuthStore as unknown as { mockReturnValue: (store: MockAuthStore) => void }).mockReturnValue(mockAuthStore);
     vi.clearAllMocks();
   });
 

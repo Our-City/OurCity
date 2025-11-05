@@ -5,8 +5,6 @@ import { ref } from "vue";
 import CommentItem from "./CommentItem.vue";
 import type { Comment } from "@/models/comment";
 
-const emit = defineEmits(["deleted"]);
-
 const props = defineProps<{
   comments: Comment[];
 }>();

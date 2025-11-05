@@ -4,7 +4,7 @@
 ///   back the needed functions and syntax to implement the tests.
 
 import { mount } from "@vue/test-utils";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { createPinia } from "pinia";
 import CommentList from "@/components/CommentList.vue";
 import CommentItem from "@/components/CommentItem.vue";
