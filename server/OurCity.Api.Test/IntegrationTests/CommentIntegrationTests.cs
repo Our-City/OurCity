@@ -4,9 +4,8 @@ using OurCity.Api.Common.Dtos.Comments;
 using OurCity.Api.Common.Dtos.Pagination;
 using OurCity.Api.Common.Dtos.User;
 using OurCity.Api.Common.Enum;
-using OurCity.Api.Test.IntegrationTests;
 
-namespace OurCity.Api.Test.EndpointTests;
+namespace OurCity.Api.Test.IntegrationTests;
 
 [Trait("Type", "Endpoint")]
 [Trait("Domain", "Comment")]
