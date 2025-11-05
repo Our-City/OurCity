@@ -5,6 +5,9 @@ import PrimeVue from "primevue/config";
 import "primeicons/primeicons.css";
 import "./assets/styles/theme.css";
 import "./assets/styles/base.css";
+import "./assets/styles/toast-custom.css";
+import Toast from "primevue/toast";
+import ToastService from "primevue/toastservice";
 
 import { createPinia } from "pinia";
 import { useAuthStore } from "@/stores/authenticationStore";
@@ -16,6 +19,8 @@ const pinia = createPinia();
 app.use(pinia);
 app.use(router);
 app.use(PrimeVue);
+app.use(ToastService);
+app.component("Toast", Toast);
 
 // restore auth session on app start
 const auth = useAuthStore(pinia);

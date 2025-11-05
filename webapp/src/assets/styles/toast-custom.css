@@ -1,0 +1,18 @@
+.p-toast {
+  z-index: 10;
+  font-family: "Inter";
+}
+
+.p-toast .p-toast-message {
+  background: var(--toast-color);
+  color: var(--primary-text-color);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  padding: 1rem 1.5rem;
+  border-width: 0.05rem;
+  border-style: solid;
+}
+
+.p-toast .p-toast-message-secondary {
+  background: var(--toast-color);
+}
