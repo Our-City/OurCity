@@ -4,6 +4,7 @@
 using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos;
 using OurCity.Api.Common.Dtos.Comments;
+using OurCity.Api.Common.Dtos.Pagination;
 using OurCity.Api.Common.Enum;
 using OurCity.Api.Infrastructure;
 using OurCity.Api.Infrastructure.Database;

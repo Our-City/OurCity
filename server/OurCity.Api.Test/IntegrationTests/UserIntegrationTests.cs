@@ -1,216 +1,189 @@
-// /// Generative AI - CoPilot was used to assist in the creation of this file,
-// /// as it was largely based off of PostIntegrationTests.cs (see that file)
-// using Microsoft.EntityFrameworkCore;
-// using OurCity.Api.Common.Dtos.User;
-// using OurCity.Api.Infrastructure;
-// using OurCity.Api.Infrastructure.Database;
-// using OurCity.Api.Services;
-// using Testcontainers.PostgreSql;
+﻿using System.Net;
+using System.Net.Http.Json;
+using OurCity.Api.Common.Dtos.User;
 
-// namespace OurCity.Api.Test.IntegrationTests;
+namespace OurCity.Api.Test.IntegrationTests;
 
-// /// Generative AI - CoPilot was used to assist in the creation of this file,
-// /// as it was largely based off of PostIntegrationTests.cs (see that file)
-// [Trait("Type", "Integration")]
-// [Trait("Domain", "User")]
-// public class UserIntegrationTests : IAsyncLifetime
-// {
-//     private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder()
-//         .WithImage("postgres:16.10")
-//         .Build();
-//     private AppDbContext _dbContext = null!;
-//     private User _testUser = null!;
+[Trait("Type", "Integration")]
+[Trait("Domain", "User")]
+public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebApplicationFactory>
+{
+    private OurCityWebApplicationFactory _ourCityApi = null!;
+    private readonly string _baseUrl = "/apis/v1";
 
-//     public async Task InitializeAsync()
-//     {
-//         await _postgres.StartAsync();
+    public async Task InitializeAsync()
+    {
+        _ourCityApi = new OurCityWebApplicationFactory();
+        await _ourCityApi.StartDbAsync();
+    }
 
-//         var options = new DbContextOptionsBuilder<AppDbContext>()
-//             .UseNpgsql(_postgres.GetConnectionString())
-//             .Options;
+    public async Task DisposeAsync()
+    {
+        await _ourCityApi.StopDbAsync();
+    }
 
-//         _dbContext = new AppDbContext(options);
-//         await _dbContext.Database.EnsureCreatedAsync();
+    [Fact]
+    public async Task CreatingUserWithTooLongUsernameFails()
+    {
+        using var client = _ourCityApi.CreateClient();
 
-//         _testUser = new User
-//         {
-//             Username = "Test",
-//             DisplayName = "Display Test",
-//             IsDeleted = false,
-//             CreatedAt = DateTime.UtcNow,
-//             UpdatedAt = DateTime.UtcNow,
-//         };
-//         _dbContext.Users.Add(_testUser);
-//         await _dbContext.SaveChangesAsync();
-//     }
+        var userRequest = new UserCreateRequestDto
+        {
+            Username = "SubterraneanHomesickAlienSubterraneanHomesickAlien1",
+            Password = "Femsi1!fm",
+        };
 
-//     public async Task DisposeAsync()
-//     {
-//         await _dbContext.DisposeAsync();
-//         await _postgres.DisposeAsync();
-//     }
+        var response = await client.PostAsJsonAsync($"{_baseUrl}/users", userRequest);
 
-//     [Fact]
-//     public async Task GetCreatedUserShouldSucceed()
-//     {
-//         var userService = new UserService(new UserRepository(_dbContext));
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
 
-//         var retrievedUser = await userService.GetUserById(_testUser.Id);
-//         Assert.True(retrievedUser.IsSuccess);
-//         Assert.NotNull(retrievedUser.Data);
+    [Fact]
+    public async Task PasswordMustContainUppercase()
+    {
+        using var client = _ourCityApi.CreateClient();
 
-//         Assert.Multiple(() =>
-//         {
-//             Assert.Equal(_testUser.Username, retrievedUser.Data.Username);
-//             Assert.Equal(_testUser.DisplayName, retrievedUser.Data.DisplayName);
-//         });
-//     }
+        var userRequest = new UserCreateRequestDto
+        {
+            Username = "InvalidUser",
+            Password = "femsi1!fm",
+        };
 
-//     [Fact]
-//     public async Task CreateUserShouldAddAndReturnUser()
-//     {
-//         var userService = new UserService(new UserRepository(_dbContext));
-//         var createDto = new UserCreateRequestDto { Username = "Test Username" };
+        var response = await client.PostAsJsonAsync($"{_baseUrl}/users", userRequest);
 
-//         var createdUser = await userService.CreateUser(createDto);
-//         Assert.True(createdUser.IsSuccess);
-//         Assert.NotNull(createdUser.Data);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
 
-//         Assert.Multiple(() =>
-//         {
-//             Assert.Equal("Test Username", createdUser.Data.Username);
-//             Assert.Null(createdUser.Data.DisplayName);
-//             Assert.False(createdUser.Data.IsAdmin);
-//         });
-//     }
+    [Fact]
+    public async Task PasswordMustContainLowercase()
+    {
+        using var client = _ourCityApi.CreateClient();
 
-//     [Fact]
-//     public async Task CreateUserWithExistingUsernameShouldFail()
-//     {
-//         var userService = new UserService(new UserRepository(_dbContext));
-//         var createDto = new UserCreateRequestDto { Username = _testUser.Username };
+        var userRequest = new UserCreateRequestDto
+        {
+            Username = "InvalidUser",
+            Password = "FEMSI1!FM",
+        };
 
-//         var createdUser = await userService.CreateUser(createDto);
+        var response = await client.PostAsJsonAsync($"{_baseUrl}/users", userRequest);
 
-//         Assert.False(createdUser.IsSuccess);
-//         Assert.Equal("Username already exists.", createdUser.Error);
-//     }
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
 
-//     [Fact]
-//     public async Task UpdateUserShouldModifyAndReturnUser()
-//     {
-//         var userService = new UserService(new UserRepository(_dbContext));
-//         var updateDto = new UserUpdateRequestDto
-//         {
-//             Username = "Updated Username",
-//             DisplayName = "Updated Display Name",
-//         };
-//         var updatedUser = await userService.UpdateUser(_testUser.Id, updateDto);
+    [Fact]
+    public async Task PasswordMustContainDigit()
+    {
+        using var client = _ourCityApi.CreateClient();
 
-//         Assert.True(updatedUser.IsSuccess);
-//         Assert.NotNull(updatedUser.Data);
-//         Assert.Equal("Updated Display Name", updatedUser.Data.DisplayName);
-//         Assert.Equal("Updated Username", updatedUser.Data.Username);
-//     }
+        var userRequest = new UserCreateRequestDto
+        {
+            Username = "InvalidUser",
+            Password = "Femsi!fm",
+        };
 
-//     [Fact]
-//     public async Task UpdateNonExistentUserShouldFail()
-//     {
-//         var userService = new UserService(new UserRepository(_dbContext));
-//         var updateDto = new UserUpdateRequestDto
-//         {
-//             Username = "NonExistent",
-//             DisplayName = "Non Existent",
-//         };
-//         var updatedUser = await userService.UpdateUser(67, updateDto);
+        var response = await client.PostAsJsonAsync($"{_baseUrl}/users", userRequest);
 
-//         Assert.False(updatedUser.IsSuccess);
-//         Assert.Equal("User not found.", updatedUser.Error);
-//     }
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
 
-//     [Fact]
-//     public async Task GetUserByUsernameShouldReturnCreatedUser()
-//     {
-//         var userService = new UserService(new UserRepository(_dbContext));
-//         var retrievedUser = await userService.GetUserByUsername(_testUser.Username);
+    [Fact]
+    public async Task PasswordMustContainNonAlphanumericChar()
+    {
+        using var client = _ourCityApi.CreateClient();
 
-//         Assert.True(retrievedUser.IsSuccess);
-//         Assert.NotNull(retrievedUser.Data);
-//         Assert.Equal(_testUser.Username, retrievedUser.Data.Username);
-//         Assert.Equal(_testUser.DisplayName, retrievedUser.Data.DisplayName);
-//     }
+        var userRequest = new UserCreateRequestDto
+        {
+            Username = "InvalidUser",
+            Password = "Femsi1fm",
+        };
 
-//     [Fact]
-//     public async Task GetUserByNonExistentUsernameShouldFail()
-//     {
-//         var userService = new UserService(new UserRepository(_dbContext));
-//         var retrievedUser = await userService.GetUserByUsername("NonExistentUsername");
+        var response = await client.PostAsJsonAsync($"{_baseUrl}/users", userRequest);
 
-//         Assert.False(retrievedUser.IsSuccess);
-//         Assert.Equal("User not found.", retrievedUser.Error);
-//         Assert.Null(retrievedUser.Data);
-//     }
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
 
-//     [Fact]
-//     public async Task GetUsersShouldReturnMultipleUsers()
-//     {
-//         var userService = new UserService(new UserRepository(_dbContext));
+    [Fact]
+    public async Task CreatingUserWithValidPasswordAndUsernameWorks()
+    {
+        using var client = _ourCityApi.CreateClient();
 
-//         var new_user = new User
-//         {
-//             Username = "AnotherUser",
-//             DisplayName = "Another Display",
-//             IsDeleted = false,
-//             CreatedAt = DateTime.UtcNow,
-//             UpdatedAt = DateTime.UtcNow,
-//         };
-//         _dbContext.Users.Add(new_user);
-//         await _dbContext.SaveChangesAsync();
+        var userRequest = new UserCreateRequestDto
+        {
+            Username = "ValidUser",
+            Password = "Femsi1!fm",
+        };
 
-//         var users = await userService.GetUsers();
+        var response = await client.PostAsJsonAsync($"{_baseUrl}/users", userRequest);
+        var responseMessage = await response.Content.ReadFromJsonAsync<UserResponseDto>();
 
-//         Assert.NotNull(users);
-//         Assert.True(users.Count() >= 2);
-//         Assert.Contains(users, u => u.Username == _testUser.Username);
-//         Assert.Contains(users, u => u.Username == "AnotherUser");
-//     }
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("ValidUser", responseMessage?.Username);
+    }
 
-//     [Fact]
-//     public async Task GetUsersWhenNoneExistShouldReturnEmptyList()
-//     {
-//         // clear existing users
-//         _dbContext.Users.RemoveRange(_dbContext.Users);
-//         await _dbContext.SaveChangesAsync();
+    [Fact]
+    public async Task UpdatingNonexistentUserFails()
+    {
+        using var client = _ourCityApi.CreateClient();
 
-//         var userService = new UserService(new UserRepository(_dbContext));
-//         var users = await userService.GetUsers();
+        var userRequest = new UserUpdateRequestDto { Username = "ThisShouldNotWork" };
 
-//         Assert.NotNull(users);
-//         Assert.Empty(users);
-//     }
+        var response = await client.PutAsJsonAsync($"{_baseUrl}/users/{Guid.Empty}", userRequest);
 
-//     [Fact]
-//     public async Task DeleteUserShouldMarkUserAsDeleted()
-//     {
-//         var userService = new UserService(new UserRepository(_dbContext));
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
 
-//         var deleteResult = await userService.DeleteUser(_testUser.Id);
-//         Assert.True(deleteResult.IsSuccess);
+    [Fact]
+    public async Task UpdatingExistentUserWithTooLongNameFails()
+    {
+        using var client = _ourCityApi.CreateClient();
 
-//         // verify user is marked as deleted (database shouldn't return deleted users)
-//         var retrievedUser = await userService.GetUserById(_testUser.Id);
-//         Assert.False(retrievedUser.IsSuccess);
-//         Assert.Null(retrievedUser.Data);
-//         Assert.Equal("User not found.", retrievedUser.Error);
-//     }
+        var userRequest = new UserUpdateRequestDto
+        {
+            Username = "SubterraneanHomesickAlienSubterraneanHomesickAlien1",
+        };
 
-//     [Fact]
-//     public async Task DeleteNonExistentUserShouldFail()
-//     {
-//         var userService = new UserService(new UserRepository(_dbContext));
-//         var deleteResult = await userService.DeleteUser(999);
+        var response = await client.PutAsJsonAsync(
+            $"{_baseUrl}/users/{_ourCityApi.StubUserId}",
+            userRequest
+        );
 
-//         Assert.False(deleteResult.IsSuccess);
-//         Assert.Equal("User not found.", deleteResult.Error);
-//     }
-// }
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdatingExistentUserSucceeds()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        var userRequest = new UserUpdateRequestDto { Username = "NewUserNameWhoDis" };
+
+        var response = await client.PutAsJsonAsync(
+            $"{_baseUrl}/users/{_ourCityApi.StubUserId}",
+            userRequest
+        );
+        var responseMessage = await response.Content.ReadFromJsonAsync<UserResponseDto>();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("NewUserNameWhoDis", responseMessage?.Username);
+    }
+
+    [Fact]
+    public async Task DeletingNonExistentUserFails()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        var response = await client.DeleteAsync($"{_baseUrl}/users/{Guid.Empty}");
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task DeletingExistentUserSucceeds()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        var response = await client.DeleteAsync($"{_baseUrl}/users/{_ourCityApi.StubUserId}");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+}
