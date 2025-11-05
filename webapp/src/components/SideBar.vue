@@ -23,7 +23,7 @@ onMounted(fetchTags);
 </script>
 
 <template>
-  <div :class="['side-bar', `toolbar--${props.view}`]">
+  <div :class="['side-bar', `toolbar--${props.view}`]" data-testid="sidebar">
     <button class="home-button" @click="goToHome"><i class="pi pi-home"></i> Home</button>
 
     <button

@@ -46,7 +46,7 @@ const sortButtonLabel = computed(() => {
   </div>
 
   <!-- Post list -->
-  <div class="post-list">
+  <div class="post-list" data-testid="post-list">
     <div v-if="postFilters.loading.value" class="loading-state">
       <i class="pi pi-spin pi-spinner"></i>
       <p>Loading posts...</p>

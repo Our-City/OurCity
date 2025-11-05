@@ -38,6 +38,15 @@ const showPasswordError = computed(() => {
 // Form handlers
 const handleSubmit = async (event: Event) => {
   event.preventDefault();
+
+  usernameTouched.value = true;
+  passwordTouched.value = true;
+  validateForm();
+
+  if (!isFormValid.value) {
+    return;
+  }
+
   try {
     await auth.loginUser(formData.value.username, formData.value.password);
     router.push("/");
@@ -156,7 +165,7 @@ const handleCancel = () => {
           <button
             type="submit"
             class="form-button form-button--primary login-button"
-            :disabled="loading || !isFormValid"
+            :disabled="loading"
           >
             {{ loading ? "Signing In..." : "Sign In" }}
           </button>
