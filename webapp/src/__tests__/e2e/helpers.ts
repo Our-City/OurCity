@@ -41,7 +41,7 @@ export async function logout(page: Page) {
  */
 export async function createTestUser() {
   const api = await request.newContext();
-  const response = await api.post("http://localhost:8000/apis/v1/users", {
+  await api.post("http://localhost:8000/apis/v1/users", {
     data: {
       username: "testuser",
       password: "Testpassword123!",
@@ -63,22 +63,9 @@ export async function createTestPost() {
   const tags = ["test", "sample"];
 
   // Authenticate and get token
-  const loginRes = await api.post("http://localhost:8000/apis/v1/authentication/login", {
+  await api.post("http://localhost:8000/apis/v1/authentication/login", {
     data: { username, password },
   });
-  // // if (loginRes.status() !== 200) {
-  // //   const errorText = await loginRes.text();
-  // //   throw new Error(`Login failed: ${loginRes.status()} - ${errorText}`);
-  // // }
-  // let loginJson;
-  // try {
-  //   loginJson = await loginRes.json();
-  // } catch (e) {
-  //   const errorText = await loginRes.text();
-  //   throw new Error(`Login response not JSON: ${errorText}`);
-  // }
-  // const token = loginJson?.token || loginJson?.accessToken;
-  // if (!token) throw new Error('Failed to get auth token for post creation');
 
   // Create post
   const postRes = await api.post("http://localhost:8000/apis/v1/posts", {
