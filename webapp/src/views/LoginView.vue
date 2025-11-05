@@ -42,7 +42,7 @@ const handleSubmit = async (event: Event) => {
   usernameTouched.value = true;
   passwordTouched.value = true;
   validateForm();
-  
+
   if (!isFormValid.value) {
     return;
   }

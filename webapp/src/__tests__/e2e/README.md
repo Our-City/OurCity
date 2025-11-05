@@ -42,11 +42,13 @@ npm run test:e2e:report
 ## Best Practices
 
 1. **Use data-testid attributes** in your Vue components for stable selectors:
+
    ```vue
    <div data-testid="post-item">...</div>
    ```
 
 2. **Wait for elements properly**:
+
    ```typescript
    await expect(element).toBeVisible({ timeout: 5000 });
    ```
@@ -54,8 +56,9 @@ npm run test:e2e:report
 3. **Handle authentication** using fixtures or before hooks
 
 4. **Skip tests** that require authentication with `test.skip()` until auth is set up:
+
    ```typescript
-   test.skip('authenticated test', async ({ page }) => {
+   test.skip("authenticated test", async ({ page }) => {
      // TODO: Add authentication setup
    });
    ```
@@ -73,6 +76,7 @@ Test configuration is in `playwright.config.ts` at the project root. Key setting
 ## CI/CD
 
 Tests are configured to:
+
 - Retry failed tests 2 times on CI
 - Run in a single worker on CI for stability
 - Capture traces on first retry

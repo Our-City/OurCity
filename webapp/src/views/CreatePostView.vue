@@ -384,11 +384,7 @@ const removeImage = (index: number) => {
               <button type="reset" class="form-button form-button--secondary" :disabled="loading">
                 Clear Form
               </button>
-              <button
-                type="submit"
-                class="form-button form-button--primary"
-                :disabled="loading"
-              >
+              <button type="submit" class="form-button form-button--primary" :disabled="loading">
                 {{ loading ? "Creating Post..." : "Create Post" }}
               </button>
             </template>

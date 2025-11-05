@@ -1,4 +1,4 @@
-import { test as base } from '@playwright/test';
+import { test as base } from "@playwright/test";
 
 /**
  * Test fixture for authenticated user sessions
@@ -9,4 +9,4 @@ export const test = base.extend({
   // For example, you can create a fixture that logs in a user before each test
 });
 
-export { expect } from '@playwright/test';
+export { expect } from "@playwright/test";
