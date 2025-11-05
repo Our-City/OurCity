@@ -8,25 +8,25 @@ import { mount } from "@vue/test-utils";
 import WipMessage from "@/components/WipMessage.vue";
 
 describe("WipMessage", () => {
-	it("renders the message prop", () => {
-		const wrapper = mount(WipMessage, {
-			props: { message: "Work in progress!" },
-		});
-		expect(wrapper.find("#wip-msg").text()).toBe("Work in progress!");
-	});
+  it("renders the message prop", () => {
+    const wrapper = mount(WipMessage, {
+      props: { message: "Work in progress!" },
+    });
+    expect(wrapper.find("#wip-msg").text()).toBe("Work in progress!");
+  });
 
-	it("renders the description prop", () => {
-		const wrapper = mount(WipMessage, {
-			props: { description: "This feature is not yet available." },
-		});
-		expect(wrapper.find("#wip-description").text()).toBe("This feature is not yet available.");
-	});
+  it("renders the description prop", () => {
+    const wrapper = mount(WipMessage, {
+      props: { description: "This feature is not yet available." },
+    });
+    expect(wrapper.find("#wip-description").text()).toBe("This feature is not yet available.");
+  });
 
-	it("renders both message and description", () => {
-		const wrapper = mount(WipMessage, {
-			props: { message: "WIP", description: "Coming soon." },
-		});
-		expect(wrapper.find("#wip-msg").text()).toBe("WIP");
-		expect(wrapper.find("#wip-description").text()).toBe("Coming soon.");
-	});
+  it("renders both message and description", () => {
+    const wrapper = mount(WipMessage, {
+      props: { message: "WIP", description: "Coming soon." },
+    });
+    expect(wrapper.find("#wip-msg").text()).toBe("WIP");
+    expect(wrapper.find("#wip-description").text()).toBe("Coming soon.");
+  });
 });

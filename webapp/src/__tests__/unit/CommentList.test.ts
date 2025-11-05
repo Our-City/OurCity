@@ -11,8 +11,22 @@ import CommentItem from "@/components/CommentItem.vue";
 
 describe("CommentList.vue", () => {
   const mockComments = [
-    { id: "1", authorName: "Alice", content: "First comment", createdAt: new Date(), voteCount: 2, voteStatus: 1 },
-    { id: "2", authorName: "Bob", content: "Second comment", createdAt: new Date(), voteCount: 0, voteStatus: 1 },
+    {
+      id: "1",
+      authorName: "Alice",
+      content: "First comment",
+      createdAt: new Date(),
+      voteCount: 2,
+      voteStatus: 1,
+    },
+    {
+      id: "2",
+      authorName: "Bob",
+      content: "Second comment",
+      createdAt: new Date(),
+      voteCount: 0,
+      voteStatus: 1,
+    },
   ];
 
   let wrapper: ReturnType<typeof mount>;

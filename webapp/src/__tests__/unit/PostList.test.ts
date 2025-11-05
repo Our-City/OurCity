@@ -14,7 +14,7 @@ const posts = [
     content: "Content of first post",
     upvotes: 10,
     createdAt: new Date("2023-01-01T00:00:00Z"),
-    category: "general"
+    category: "general",
   },
   {
     id: 2,
@@ -22,8 +22,8 @@ const posts = [
     content: "Content of second post",
     upvotes: 5,
     createdAt: new Date("2023-01-02T00:00:00Z"),
-    category: "general"
-  }
+    category: "general",
+  },
 ];
 
 describe("PostList", () => {
@@ -32,9 +32,9 @@ describe("PostList", () => {
       props: { posts },
       global: {
         stubs: {
-          'router-link': true
-        }
-      }
+          "router-link": true,
+        },
+      },
     });
     const links = wrapper.findAll(".post-link");
     expect(links.length).toBe(posts.length);
@@ -45,9 +45,9 @@ describe("PostList", () => {
       props: { posts: [] },
       global: {
         stubs: {
-          'router-link': true
-        }
-      }
+          "router-link": true,
+        },
+      },
     });
     expect(wrapper.find(".empty-message").exists()).toBe(true);
     expect(wrapper.find(".empty-message p").text()).toContain("No posts found");

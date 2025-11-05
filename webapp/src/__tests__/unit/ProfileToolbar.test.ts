@@ -8,15 +8,15 @@ import { mount } from "@vue/test-utils";
 import ProfileToolbar from "@/components/profile/ProfileToolbar.vue";
 
 describe("ProfileToolbar", () => {
-	it("renders all toolbar buttons", () => {
-		const wrapper = mount(ProfileToolbar);
-		expect(wrapper.find(".posts-button").exists()).toBe(true);
-	});
+  it("renders all toolbar buttons", () => {
+    const wrapper = mount(ProfileToolbar);
+    expect(wrapper.find(".posts-button").exists()).toBe(true);
+  });
 
-	it("buttons are clickable", async () => {
-		const wrapper = mount(ProfileToolbar);
-		await wrapper.find(".posts-button").trigger("click");
-		
-		expect(true).toBe(true);
-	});
+  it("buttons are clickable", async () => {
+    const wrapper = mount(ProfileToolbar);
+    await wrapper.find(".posts-button").trigger("click");
+
+    expect(true).toBe(true);
+  });
 });

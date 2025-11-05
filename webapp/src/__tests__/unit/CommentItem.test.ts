@@ -105,10 +105,7 @@ describe("CommentItem.vue", () => {
     await voteBox.vm.$emit("vote", VoteType.UPVOTE);
 
     await Promise.resolve();
-    expect(consoleSpy).toHaveBeenCalledWith(
-      "Failed to vote on comment:",
-      expect.any(Error)
-    );
+    expect(consoleSpy).toHaveBeenCalledWith("Failed to vote on comment:", expect.any(Error));
 
     consoleSpy.mockRestore();
   });

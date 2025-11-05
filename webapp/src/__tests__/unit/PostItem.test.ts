@@ -8,7 +8,7 @@ import { mount } from "@vue/test-utils";
 import PostItem from "@/components/PostItem.vue";
 
 vi.mock("@/api/mediaService", () => ({
-  getMediaByPostId: vi.fn()
+  getMediaByPostId: vi.fn(),
 }));
 
 import { getMediaByPostId } from "@/api/mediaService";
@@ -21,14 +21,14 @@ const post = {
   location: "Test Location",
   voteCount: 12,
   commentCount: 3,
-  createdAt: "2023-01-01T00:00:00Z"
+  createdAt: "2023-01-01T00:00:00Z",
 };
 
 describe("PostItem", () => {
   it("renders author, title, votes, and comment count", async () => {
     getMediaByPostId.mockResolvedValue([{ url: "https://test.com/image.jpg" }]);
     const wrapper = mount(PostItem, {
-      props: { post }
+      props: { post },
     });
     await Promise.resolve();
     await wrapper.vm.$nextTick();
@@ -42,7 +42,7 @@ describe("PostItem", () => {
   it("renders post image if available", async () => {
     getMediaByPostId.mockResolvedValue([{ url: "https://test.com/image.jpg" }]);
     const wrapper = mount(PostItem, {
-      props: { post }
+      props: { post },
     });
     await Promise.resolve();
     await wrapper.vm.$nextTick();
@@ -54,7 +54,7 @@ describe("PostItem", () => {
   it("does not render post image if not available", async () => {
     getMediaByPostId.mockResolvedValue([]);
     const wrapper = mount(PostItem, {
-      props: { post }
+      props: { post },
     });
     await Promise.resolve();
     await wrapper.vm.$nextTick();
