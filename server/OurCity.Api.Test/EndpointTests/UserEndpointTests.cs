@@ -142,7 +142,10 @@ public class UserEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebApplica
             Username = "SubterraneanHomesickAlienSubterraneanHomesickAlien1",
         };
 
-        var response = await client.PutAsJsonAsync($"{_baseUrl}/users/{_ourCityApi.StubUserId}", userRequest);
+        var response = await client.PutAsJsonAsync(
+            $"{_baseUrl}/users/{_ourCityApi.StubUserId}",
+            userRequest
+        );
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -154,7 +157,10 @@ public class UserEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebApplica
 
         var userRequest = new UserUpdateRequestDto { Username = "NewUserNameWhoDis" };
 
-        var response = await client.PutAsJsonAsync($"{_baseUrl}/users/{_ourCityApi.StubUserId}", userRequest);
+        var response = await client.PutAsJsonAsync(
+            $"{_baseUrl}/users/{_ourCityApi.StubUserId}",
+            userRequest
+        );
         var responseMessage = await response.Content.ReadFromJsonAsync<UserResponseDto>();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

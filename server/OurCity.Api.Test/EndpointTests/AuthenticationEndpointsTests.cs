@@ -53,7 +53,10 @@ public class AuthenticationEndpointsTests
 
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/register", userRequest);
 
-        var loginResponse = await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", userRequest);
+        var loginResponse = await client.PostAsJsonAsync(
+            $"{_baseUrl}/authentication/login",
+            userRequest
+        );
         var meResponse = await client.GetAsync($"{_baseUrl}/authentication/me");
 
         Assert.Equal(HttpStatusCode.NoContent, loginResponse.StatusCode);
@@ -94,7 +97,10 @@ public class AuthenticationEndpointsTests
 
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/register", userRequest);
 
-        var loginResponse = await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", userRequest);
+        var loginResponse = await client.PostAsJsonAsync(
+            $"{_baseUrl}/authentication/login",
+            userRequest
+        );
         var meAfterLoginResponse = await client.GetAsync($"{_baseUrl}/authentication/me");
 
         var logoutResponse = await client.PostAsync($"{_baseUrl}/authentication/logout", null);
