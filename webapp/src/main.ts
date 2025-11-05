@@ -20,7 +20,7 @@ app.use(pinia);
 app.use(router);
 app.use(PrimeVue);
 app.use(ToastService);
-app.component("Toast", ToastCmp);
+app.component("ToastCmp", ToastCmp);
 
 // restore auth session on app start
 const auth = useAuthStore(pinia);

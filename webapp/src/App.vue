@@ -3,7 +3,7 @@
 
 <!-- Where the HTML goes -->
 <template>
-  <Toast />
+  <ToastCmp />
   <main>
     <router-view />
   </main>
