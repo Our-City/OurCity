@@ -5,10 +5,14 @@ import { ref, computed, onMounted } from "vue";
 import type { Post } from "@/models/post";
 import type { Media } from "@/models/media";
 import { getMediaByPostId } from "@/api/mediaService";
+import { useAuthStore } from "@/stores/authenticationStore";
 
 const props = defineProps<{ post: Post }>();
 
-// fetch post media
+// Store for current user
+const auth = useAuthStore();
+
+// Media state
 const media = ref<Media[]>([]);
 const isLoading = ref(false);
 
@@ -24,33 +28,37 @@ onMounted(async () => {
   }
 });
 
-// author name (uses authorName if available)
+// computed properties
+// dynamically resolve author username based on current user store
 const authorUsername = computed(() => {
+  const currentUser = auth.user;
+  if (currentUser && props.post.authorId === currentUser.id) {
+    return currentUser.username;
+  }
+
   if (props.post.authorName && props.post.authorName.trim()) {
     return props.post.authorName;
   }
-  return `User #${props.post.authorId}`;
+
+  return `User #${props.post.authorId.slice(0, 6)}`;
 });
-
-// comment count from domain model
 const commentCount = computed(() => props.post.commentCount ?? 0);
-
-// first image from fetched media
 const postImage = computed(() => media.value[0]?.url || null);
 </script>
 
 <template>
   <div class="post-card">
     <div class="post-card-left">
-      <div class="post-author-date">
-        {{ authorUsername }}
-      </div>
+      <div class="post-author-date">@{{ authorUsername }}</div>
+
       <h1 class="post-title">
         {{ post.title }}
       </h1>
+
       <div class="post-tags">
         {{ post.location }}
       </div>
+
       <div class="post-votes-comments">
         <i class="pi pi-sort-alt"></i>
         <div class="post-number-stats">{{ post.voteCount }}</div>
@@ -62,6 +70,7 @@ const postImage = computed(() => media.value[0]?.url || null);
     <div v-if="postImage && !isLoading" class="post-card-right">
       <img :src="postImage" alt="Post Image" class="post-image" />
     </div>
+
     <div v-else-if="isLoading" class="post-card-right">
       <i class="pi pi-spin pi-spinner"></i>
     </div>

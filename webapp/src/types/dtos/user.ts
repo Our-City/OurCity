@@ -25,10 +25,8 @@ export interface UserVoteRequestDto {
 export interface UserResponseDto {
   id: string;
   username: string;
-  posts: string[];
-  savedPosts: string[];
-  reportedPosts: string[];
-  comments: string[];
+  postIds: string[];
+  commentIds: string[];
   isAdmin: boolean;
   isBanned: boolean;
   createdAt: string;
