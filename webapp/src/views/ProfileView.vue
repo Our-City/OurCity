@@ -31,9 +31,7 @@ async function fetchProfileData() {
     await authStore.fetchCurrentUser();
 
     if (authStore.user?.posts?.length) {
-      const fetchedPosts = await Promise.all(
-        authStore.user.posts.map((id) => getPostById(id))
-      );
+      const fetchedPosts = await Promise.all(authStore.user.posts.map((id) => getPostById(id)));
       posts.value = fetchedPosts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     } else {
       posts.value = [];

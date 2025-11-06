@@ -67,7 +67,7 @@ async function submitComment() {
 
   try {
     const created = await createComment(postId, { content: text } as Comment);
-    
+
     // add the server response to the beginning of the comments array
     comments.value = [created, ...comments.value];
     commentText.value = "";
@@ -84,11 +84,7 @@ function handleCommentUpdated(updated: Comment) {
   const idx = comments.value.findIndex((c) => c.id === updated.id);
   if (idx !== -1) {
     // create new array to ensure reactivity
-    comments.value = [
-      ...comments.value.slice(0, idx),
-      updated,
-      ...comments.value.slice(idx + 1),
-    ];
+    comments.value = [...comments.value.slice(0, idx), updated, ...comments.value.slice(idx + 1)];
   }
 }
 
