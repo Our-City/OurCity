@@ -117,9 +117,11 @@ function reset() {
   fetchPosts();
 }
 
-// watchers
-watch(searchTerm, fetchPosts);
-watch(filters, fetchPosts, { deep: true });
+// watch searchTerm and automatically update filters + fetch
+watch(searchTerm, () => {
+  filters.value.searchTerm = searchTerm.value.trim() || undefined;
+  fetchPosts();
+});
 
 export function usePostFilters() {
   return {

@@ -66,25 +66,10 @@ async function submitComment() {
   isSubmitting.value = true;
 
   try {
-    const newComment: Comment = {
-      id: "",
-      authorId: auth.user.id,
-      postId,
-      content: text,
-      authorName: auth.user.username,
-      upvoteCount: 0,
-      downvoteCount: 0,
-      voteCount: 0,
-      voteStatus: 0,
-      isDeleted: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    const created = await createComment(postId, newComment);
-
-    // Remove the reload, just update the local state
-    comments.value.unshift(created);
+    const created = await createComment(postId, { content: text } as Comment);
+    
+    // add the server response to the beginning of the comments array
+    comments.value = [created, ...comments.value];
     commentText.value = "";
   } catch (err) {
     console.error("Failed to create comment:", err);
@@ -97,7 +82,14 @@ async function submitComment() {
 // handle updated comment from CommentList
 function handleCommentUpdated(updated: Comment) {
   const idx = comments.value.findIndex((c) => c.id === updated.id);
-  if (idx !== -1) comments.value.splice(idx, 1, updated);
+  if (idx !== -1) {
+    // create new array to ensure reactivity
+    comments.value = [
+      ...comments.value.slice(0, idx),
+      updated,
+      ...comments.value.slice(idx + 1),
+    ];
+  }
 }
 
 // handle voting on the post

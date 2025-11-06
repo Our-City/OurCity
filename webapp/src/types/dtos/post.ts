@@ -18,7 +18,6 @@ export interface PostResponseDto {
   location?: string;
   upvoteCount: number;
   downvoteCount: number;
-  reportCount: number;
   commentCount: number;
   visibility: PostVisibility;
   tags: TagDto[];

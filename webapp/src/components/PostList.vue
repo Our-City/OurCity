@@ -4,28 +4,37 @@
 <script setup lang="ts">
 import PostItem from "./PostItem.vue";
 import { computed } from "vue";
-import { usePostFilters } from "@/composables/usePostFilters";
+import type { Post } from "@/models/post";
 
-// composable instance
-const postFilters = usePostFilters();
-
-// toggle sort order
-function toggleSortOrder() {
-  postFilters.filters.value.sortOrder =
-    postFilters.filters.value.sortOrder === "Desc" ? "Asc" : "Desc";
-  postFilters.fetchPosts();
+interface Props {
+  posts: Post[];
+  loading?: boolean;
+  error?: string | null;
+  sortOrder?: "Asc" | "Desc";
+  currentSort?: "popular" | "recent" | "nearby";
+  showSortControls?: boolean;
 }
+
+const props = withDefaults(defineProps<Props>(), {
+  loading: false,
+  error: null,
+  sortOrder: "Desc",
+  currentSort: "recent",
+  showSortControls: true,
+});
+
+const emit = defineEmits<{
+  toggleSort: [];
+}>();
 
 // dynamic icon depending on order
 const sortOrderIcon = computed(() =>
-  postFilters.filters.value.sortOrder === "Desc"
-    ? "pi pi-sort-amount-down"
-    : "pi pi-sort-amount-up",
+  props.sortOrder === "Desc" ? "pi pi-sort-amount-down" : "pi pi-sort-amount-up",
 );
 
 // dynamic label for sort button
 const sortButtonLabel = computed(() => {
-  switch (postFilters.currentSort.value) {
+  switch (props.currentSort) {
     case "popular":
       return "Popular";
     case "recent":
@@ -37,47 +46,73 @@ const sortButtonLabel = computed(() => {
 </script>
 
 <template>
-  <!-- Sort toggle button -->
-  <div class="sort-order-container">
-    <button class="sort-order-button" @click="toggleSortOrder">
-      <i :class="sortOrderIcon" class="sort-icon" />
-      {{ sortButtonLabel }}
-    </button>
-  </div>
-
-  <!-- Post list -->
-  <div class="post-list" data-testid="post-list">
-    <div v-if="postFilters.loading.value" class="loading-state">
-      <i class="pi pi-spin pi-spinner"></i>
-      <p>Loading posts...</p>
+  <div>
+    <!-- Sort toggle button -->
+    <div v-if="showSortControls" class="sort-order-container">
+      <button class="sort-order-button" @click="emit('toggleSort')">
+        <i :class="sortOrderIcon" class="sort-icon" />
+        {{ sortButtonLabel }}
+      </button>
     </div>
 
-    <div v-else-if="postFilters.error.value" class="error-state">
-      <i class="pi pi-times-circle"></i>
-      <p>{{ postFilters.error.value }}</p>
-    </div>
+    <!-- Post list -->
+    <div class="post-list" data-testid="post-list">
+      <div v-if="loading" class="loading-state">
+        <i class="pi pi-spin pi-spinner"></i>
+        <p>Loading posts...</p>
+      </div>
 
-    <div v-else-if="postFilters.posts.value.length === 0" class="empty-message">
-      <i class="pi pi-inbox"></i>
-      <p>No posts found</p>
-      <p class="empty-subtitle">Try adjusting your filters or check back later</p>
-    </div>
+      <div v-else-if="error" class="error-state">
+        <i class="pi pi-times-circle"></i>
+        <p>{{ error }}</p>
+      </div>
 
-    <router-link
-      v-else
-      v-for="post in postFilters.posts.value"
-      :key="post.id"
-      :to="`/posts/${post.id}`"
-      class="post-link"
-    >
-      <PostItem :post="post" />
-    </router-link>
+      <div v-else-if="posts.length === 0" class="empty-message">
+        <i class="pi pi-inbox"></i>
+        <p>No posts found</p>
+        <p class="empty-subtitle">Try adjusting your filters or check back later</p>
+      </div>
+
+      <router-link
+        v-else
+        v-for="post in posts"
+        :key="post.id"
+        :to="`/posts/${post.id}`"
+        class="post-link"
+      >
+        <PostItem :post="post" />
+      </router-link>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.sort-dropdown-container :deep(.dropdown-menu) {
-  right: auto;
+.sort-order-container {
+  padding: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.sort-order-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--primary-background-color);
+  color: var(--primary-text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sort-order-button:hover {
+  background: var(--primary-background-color-hover);
+}
+
+.sort-icon {
+  font-size: 1rem;
 }
 
 .post-list {
@@ -93,6 +128,26 @@ const sortButtonLabel = computed(() => {
   text-decoration: none;
   max-width: 100%;
   display: block;
+}
+
+.loading-state,
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  color: var(--primary-text-color);
+}
+
+.loading-state i,
+.error-state i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.error-state {
+  color: var(--primary-text-color);
 }
 
 .empty-message {
