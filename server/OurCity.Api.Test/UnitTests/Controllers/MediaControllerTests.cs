@@ -10,7 +10,6 @@ using OurCity.Api.Common.Dtos.Media;
 
 namespace OurCity.Api.Test.UnitTests.Controllers;
 
-
 [Trait("Type", "Unit")]
 [Trait("Domain", "Media")]
 public class MediaControllerTests
