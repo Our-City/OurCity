@@ -283,6 +283,11 @@ const handleReset = (event: Event) => {
     box-shadow 0.2s ease;
 }
 
+.form :deep(.form-input::placeholder) {
+  color: var(--tertiary-text-color);
+  opacity: 0.6;
+}
+
 .form :deep(.form-input:focus) {
   outline: none;
   border-color: var(--link-color);
@@ -473,6 +478,18 @@ const handleReset = (event: Event) => {
 }
 
 /* Custom styles for PrimeVue components */
+:deep(.p-inputtext) {
+  padding: 0.75rem;
+  border: 1px solid var(--neutral-color);
+  border-radius: 0.375rem;
+  font-size: 1rem;
+}
+
+:deep(.p-inputtext::placeholder) {
+  color: var(--tertiary-text-color);
+  opacity: 0.6;
+}
+
 :deep(.p-inputtext.p-invalid) {
   border-color: var(--error-color);
 }
