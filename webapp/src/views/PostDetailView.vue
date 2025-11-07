@@ -5,7 +5,7 @@
   Also assisted with handling comment updates from child CommentList. -->
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import TextArea from "primevue/textarea";
 import PageHeader from "@/components/PageHeader.vue";
 import SideBar from "@/components/SideBar.vue";
@@ -24,6 +24,7 @@ import { VoteType } from "@/types/enums";
 import { useAuthStore } from "@/stores/authenticationStore";
 
 const route = useRoute();
+const router = useRouter();
 const postId = route.params.id as string;
 
 const post = ref<Post | null>(null);
@@ -56,7 +57,7 @@ async function loadPostData() {
 // submit a new comment on the post
 async function submitComment() {
   if (!auth.user) {
-    alert("You must be logged in to comment.");
+    router.push("/login");
     return;
   }
 
