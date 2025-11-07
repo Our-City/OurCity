@@ -71,7 +71,11 @@ public class CommentRepository : ICommentRepository
     {
         _appDbContext.Comments.Add(comment);
         await _appDbContext.SaveChangesAsync();
-        return comment;
+        
+        return await _appDbContext
+            .Comments.Include(c => c.Author)
+            .Include(c => c.Votes)
+            .FirstAsync(c => c.Id == comment.Id);
     }
 
     public async Task SaveChangesAsync()

@@ -94,7 +94,8 @@ async function handleVote(voteType: VoteType) {
   try {
     const updated = await voteOnPost(post.value.id, voteType);
 
-    // only update fields that actually changed from the vote request
+    // update the post with the new vote data
+    // voteCount is calculated in the mapper as upvoteCount - downvoteCount
     post.value = {
       ...post.value,
       voteCount: updated.voteCount,

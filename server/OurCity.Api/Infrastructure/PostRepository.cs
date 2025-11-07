@@ -87,7 +87,9 @@ public class PostRepository : IPostRepository
 
     public async Task<Post?> GetSlimPostbyId(Guid postId)
     {
-        return await _appDbContext.Posts.FirstOrDefaultAsync(p => p.Id == postId);
+        return await _appDbContext
+            .Posts.Include(p => p.Votes)
+            .FirstOrDefaultAsync(p => p.Id == postId);
     }
 
     public async Task<Post> CreatePost(Post post)
