@@ -8,8 +8,11 @@ using Moq;
 using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos.Media;
 
-namespace OurCity.Api.Tests.Controllers;
+namespace OurCity.Api.Test.UnitTests.Controllers;
 
+
+[Trait("Type", "Unit")]
+[Trait("Domain", "Media")]
 public class MediaControllerTests
 {
     private readonly Mock<IMediaService> _mockMediaService;

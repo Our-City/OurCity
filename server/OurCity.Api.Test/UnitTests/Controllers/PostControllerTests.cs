@@ -17,8 +17,10 @@ using OurCity.Api.Common.Enum;
 using OurCity.Api.Controllers;
 using OurCity.Api.Services;
 
-namespace OurCity.Api.Test.Controllers;
+namespace OurCity.Api.Test.UnitTests.Controllers;
 
+[Trait("Type", "Unit")]
+[Trait("Domain", "Post")]
 public class PostControllerTests
 {
     private readonly Mock<IPostService> _mockPostService;

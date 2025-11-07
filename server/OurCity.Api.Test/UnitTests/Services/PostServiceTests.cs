@@ -13,8 +13,10 @@ using OurCity.Api.Infrastructure;
 using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Services;
 
-namespace OurCity.Api.Test.Services;
+namespace OurCity.Api.Test.UnitTests.Services;
 
+[Trait("Type", "Unit")]
+[Trait("Domain", "Post")]
 public class PostServiceTests
 {
     private readonly Mock<IPostRepository> _mockPostRepository;
