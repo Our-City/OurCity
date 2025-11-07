@@ -8,6 +8,7 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { login, logout, me } from "@/api/authenticationService";
+import { getCurrentUser } from "@/api/userService";
 import type { User } from "@/models/user";
 
 export const useAuthStore = defineStore("auth", () => {
@@ -35,10 +36,30 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
+  async function fetchCurrentUser() {
+    loading.value = true;
+    try {
+      user.value = await getCurrentUser();
+    } catch (error) {
+      console.error("Failed to fetch current user:", error);
+      throw error;
+    } finally {
+      loading.value = false;
+    }
+  }
+
   async function logoutUser() {
     await logout();
     user.value = null;
   }
 
-  return { user, isAuthenticated, loading, loginUser, restoreSession, logoutUser };
+  return {
+    user,
+    isAuthenticated,
+    loading,
+    loginUser,
+    restoreSession,
+    fetchCurrentUser,
+    logoutUser,
+  };
 });

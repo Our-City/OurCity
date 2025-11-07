@@ -14,7 +14,7 @@ import { usePostFilters } from "@/composables/usePostFilters";
 
 const router = useRouter();
 const auth = useAuthStore();
-const { posts, loading, error, nextCursor, fetchPosts } = usePostFilters();
+const postFilters = usePostFilters();
 
 function handleCreatePost(): void {
   if (isLoggedIn.value) {
@@ -24,8 +24,14 @@ function handleCreatePost(): void {
   }
 }
 
+function toggleSortOrder() {
+  postFilters.filters.value.sortOrder =
+    postFilters.filters.value.sortOrder === "Desc" ? "Asc" : "Desc";
+  postFilters.fetchPosts();
+}
+
 onMounted(() => {
-  fetchPosts(); // initial load
+  postFilters.fetchPosts(); // initial load
 });
 
 const isLoggedIn = computed(() => auth.isAuthenticated);
@@ -59,25 +65,27 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
 
         <div class="home-page-content-layout">
           <div class="post-list">
-            <div v-if="loading && posts.length === 0" class="loading-state">
-              <i class="pi pi-spin pi-spinner"></i>
-              <p>Loading posts...</p>
+            <PostList
+              :posts="postFilters.posts.value"
+              :loading="postFilters.loading.value"
+              :error="postFilters.error.value"
+              :sort-order="postFilters.filters.value.sortOrder"
+              :current-sort="postFilters.currentSort.value"
+              @toggle-sort="toggleSortOrder"
+            />
+
+            <div
+              v-if="postFilters.nextCursor.value && !postFilters.loading.value"
+              class="load-more-container"
+            >
+              <button
+                class="load-more-button"
+                @click="postFilters.fetchPosts"
+                :disabled="postFilters.loading.value"
+              >
+                Load More
+              </button>
             </div>
-
-            <div v-else-if="error" class="error-state">
-              <i class="pi pi-times-circle"></i>
-              <p>{{ error }}</p>
-            </div>
-
-            <template v-else>
-              <PostList />
-
-              <div v-if="nextCursor" class="load-more-container">
-                <button class="load-more-button" @click="fetchPosts" :disabled="loading">
-                  {{ loading ? "Loading..." : "Load More" }}
-                </button>
-              </div>
-            </template>
           </div>
 
           <div class="map-overview">Map Overview Coming Soon</div>
@@ -171,6 +179,33 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
   height: 65rem;
   background: var(--primary-background-color);
   border: 0.1rem solid var(--border-color);
+}
+
+.load-more-container {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.load-more-button {
+  background: var(--primary-background-color);
+  color: var(--primary-text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.load-more-button:hover:not(:disabled) {
+  background: var(--primary-background-color-hover);
+}
+
+.load-more-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .spinner {

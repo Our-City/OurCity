@@ -11,12 +11,12 @@ import { usePostFilters } from "@/composables/usePostFilters";
 import { useAuthStore } from "@/stores/authenticationStore";
 
 const router = useRouter();
-const { reset, searchTerm } = usePostFilters(); // <-- shared searchTerm
+const { reset, searchTerm, fetchPosts } = usePostFilters(); // <-- shared searchTerm
 const auth = useAuthStore();
 
-function goToHome(): void {
+async function goToHome(): Promise<void> {
+  await router.push("/");
   reset();
-  router.push("/");
 }
 
 function handleLogin(): void {
@@ -29,7 +29,8 @@ function handleSignUp(): void {
 
 async function handleLogout(): Promise<void> {
   await auth.logoutUser();
-  router.push("/");
+  await router.push("/");
+  await fetchPosts(); // Refresh posts after logout
 }
 
 function handleViewProfile(): void {

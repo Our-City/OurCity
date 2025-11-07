@@ -5,7 +5,7 @@
   Also assisted with handling comment updates from child CommentList. -->
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import TextArea from "primevue/textarea";
 import PageHeader from "@/components/PageHeader.vue";
 import SideBar from "@/components/SideBar.vue";
@@ -24,6 +24,7 @@ import { VoteType } from "@/types/enums";
 import { useAuthStore } from "@/stores/authenticationStore";
 
 const route = useRoute();
+const router = useRouter();
 const postId = route.params.id as string;
 
 const post = ref<Post | null>(null);
@@ -56,7 +57,7 @@ async function loadPostData() {
 // submit a new comment on the post
 async function submitComment() {
   if (!auth.user) {
-    alert("You must be logged in to comment.");
+    router.push("/login");
     return;
   }
 
@@ -66,25 +67,10 @@ async function submitComment() {
   isSubmitting.value = true;
 
   try {
-    const newComment: Comment = {
-      id: "",
-      authorId: auth.user.id,
-      postId,
-      content: text,
-      authorName: auth.user.username,
-      upvoteCount: 0,
-      downvoteCount: 0,
-      voteCount: 0,
-      voteStatus: 0,
-      isDeleted: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    const created = await createComment(postId, { content: text } as Comment);
 
-    const created = await createComment(postId, newComment);
-
-    // Remove the reload, just update the local state
-    comments.value.unshift(created);
+    // add the server response to the beginning of the comments array
+    comments.value = [created, ...comments.value];
     commentText.value = "";
   } catch (err) {
     console.error("Failed to create comment:", err);
@@ -97,7 +83,10 @@ async function submitComment() {
 // handle updated comment from CommentList
 function handleCommentUpdated(updated: Comment) {
   const idx = comments.value.findIndex((c) => c.id === updated.id);
-  if (idx !== -1) comments.value.splice(idx, 1, updated);
+  if (idx !== -1) {
+    // create new array to ensure reactivity
+    comments.value = [...comments.value.slice(0, idx), updated, ...comments.value.slice(idx + 1)];
+  }
 }
 
 // handle voting on the post
@@ -106,7 +95,8 @@ async function handleVote(voteType: VoteType) {
   try {
     const updated = await voteOnPost(post.value.id, voteType);
 
-    // only update fields that actually changed from the vote request
+    // update the post with the new vote data
+    // voteCount is calculated in the mapper as upvoteCount - downvoteCount
     post.value = {
       ...post.value,
       voteCount: updated.voteCount,
