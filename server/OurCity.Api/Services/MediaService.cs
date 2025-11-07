@@ -5,6 +5,8 @@ using OurCity.Api.Infrastructure;
 using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Services.Mappings;
 
+namespace OurCity.Api.Services;
+
 public interface IMediaService
 {
     Task<Result<MediaResponseDto>> UploadMediaAsync(

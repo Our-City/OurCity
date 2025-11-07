@@ -3,6 +3,8 @@ using Amazon.S3;
 using Amazon.S3.Transfer;
 using Microsoft.Extensions.Options;
 
+namespace OurCity.Api.Services;
+
 public class AwsS3Service
 {
     private readonly IAmazonS3 _s3Client;

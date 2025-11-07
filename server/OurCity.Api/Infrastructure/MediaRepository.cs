@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using OurCity.Api.Infrastructure.Database;
 
+namespace OurCity.Api.Infrastructure;
+
 public interface IMediaRepository
 {
     Task<Media> AddMediaAsync(Media media);

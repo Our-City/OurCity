@@ -4,6 +4,8 @@ using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos.Media;
 using OurCity.Api.Extensions;
 
+namespace OurCity.Api.Controllers;
+
 [ApiController]
 [Route("apis/v1/media")]
 public class MediaController : ControllerBase
