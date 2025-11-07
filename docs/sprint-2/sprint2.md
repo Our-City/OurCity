@@ -137,9 +137,6 @@
 
 ## **6\. Show Off**
 
-* Each team member highlights their **best work** (code, UI, design, integration, mocks, etc.).  
-* Remember: good refactored code should be simple and elegant.  
-* **Each member must commit their own update** — commit logs will be checked.  
 * Jade:   
   * Updated Post and Comment endpoint implementations for the new detailed API contract for proper and smooth api request handling and responses.  
     * Narrowed down to necessary response properties and DTOs to have a consistent and clear workflow.   
@@ -150,6 +147,9 @@
   * Implemented Media attachment endpoints with AWS S3 integration.   
 * Nathan  
   * Worked on frontend UI and components and created frontend testing.  
+    * Views: Home page and post detail page  
+    * Components: vote box, post and comment list and items, image galleria, image modal  
+    * Unit tests and end-to-end tests  
 * Harkeet  
   * Implemented the frontend API service layer which communicates with backend endpoints, and implemented domain models for representing application entities in the frontend.  
     * This is my best code because the domain models and API service layer are designed with decoupling in mind. Rather than using raw DTO responses from the backend in our frontend, the frontend uses mapper functions to map the DTO responses into domain models that can be used in components. This ensures that our frontend components are not tightly coupled to the backend responses.  
