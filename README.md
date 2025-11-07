@@ -6,6 +6,8 @@
 
 [Sprint 1 Deliverable](./docs/sprint-1/)
 
+[Sprint 2 Deliverable](./docs/sprint-2/)
+
 
 ## Documentation
 
