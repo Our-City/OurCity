@@ -1,12 +1,12 @@
 # OurCity
 
-## Deliverables
+**Comp 4350 Fall 2025, Group #1**
 
-[Sprint 0 Deliverable](./docs/sprint-0/)
+*Harkeet Bal, Jade Lee, Nathan Nguyen, Mann Patel, Will Reimer, Andre Ulep*
 
-[Sprint 1 Deliverable](./docs/sprint-1/)
+OurCity is a hub for the citizens of Winnipeg, Canada to post their suggestions for improvements to the city.
 
-[Sprint 2 Deliverable](./docs/sprint-2/)
+This is a student project for COMP 4350 (Software Engineering 2) at the University of Manitoba. This is an educational prototype, and is not officially associated with the City of Winnipeg.
 
 
 ## Documentation
@@ -16,3 +16,11 @@ Please refer to the respective backend `/server` and frontend `/webapp` `README.
 [.NET Backend Setup](./server/README.md)
 
 [Vue.js Frontend Setup](./webapp/README.md)
+
+## Deliverables
+
+[Sprint 0 Deliverable](./docs/sprint-0/)
+
+[Sprint 1 Deliverable](./docs/sprint-1/)
+
+[Sprint 2 Deliverable](./docs/sprint-2/)
