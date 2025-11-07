@@ -122,6 +122,14 @@
   * Whether the slowdown is fixable — and why/why not.  
 * Include profiler output (linked or attached).
 
+For the profiling, we ran a K6 load test that simulated 10 users going through all of the endpoints. 
+
+In this test, the endpoint for creating users (POST /apis/v1/users) had the highest average execution time.
+
+It is not really fixable as we are using the built in [ASP.NET](http://ASP.NET) Core Identity solution for user management. Identity does numerous things related to security like hashing and validation, which increases the amount of time for the request, but we like that tradeoff to make sure our API is secure. 
+
+![Profiler Report](/docs/sprint-2/images/profiler.png)
+
 ---
 
 ## **5\. Last Dash**
@@ -145,6 +153,9 @@
   * Further, ensuring all API paths to follow a common practice allows preventing potential mixups when working with API calls from the frontend.   
 * Mann  
   * Implemented Media attachment endpoints with AWS S3 integration.   
+    * In order to reduce latency when it comes to user experience we decided to integrate AWS S3 service for handling media uploads for faster content delivery and retrieval.  
+    * Unit tests for Media endpoints.  
+    * Implemented pagination for delivery of posts and comments to not overload the server with long fetch requests.   
 * Nathan  
   * Worked on frontend UI and components and created frontend testing.  
     * Views: Home page and post detail page  
