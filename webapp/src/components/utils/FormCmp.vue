@@ -323,6 +323,11 @@ const handleReset = (event: Event) => {
     box-shadow 0.2s ease;
 }
 
+.form :deep(.form-textarea::placeholder) {
+  color: var(--tertiary-text-color);
+  opacity: 0.6;
+}
+
 .form :deep(.form-textarea:focus) {
   outline: none;
   border-color: var(--link-color);
@@ -492,6 +497,18 @@ const handleReset = (event: Event) => {
 
 :deep(.p-inputtext.p-invalid) {
   border-color: var(--error-color);
+}
+
+:deep(.p-inputtextarea) {
+  padding: 0.75rem;
+  border: 1px solid var(--neutral-color);
+  border-radius: 0.375rem;
+  font-size: 1rem;
+}
+
+:deep(.p-inputtextarea::placeholder) {
+  color: var(--tertiary-text-color);
+  opacity: 0.6;
 }
 
 :deep(.p-inputtextarea.p-invalid) {
