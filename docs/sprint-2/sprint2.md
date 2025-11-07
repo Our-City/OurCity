@@ -21,7 +21,7 @@
   * Which tool(s) are used?  
     * Frontend:   
       * Vitest  
-      * Vue-Test-Utils (component)  
+      * Vue-Test-Utils (component testing)  
     * Backend:  
       * Testcontainers  
       * Moq  
@@ -45,7 +45,6 @@
     * We were able to implement integration testing for our major endpoints, including those for Posts, Comments, Users, Authentication, and Me.   
 * Have you created **different test plans** for different release types? Explain.  
   * No, we don’t have different test plans for different release types. Since our project is fairly small at this point in development, we would like to ensure all common checks no matter the size or impact of new code.  
-    * **“And we dont even have a deployment”**
 
 ---
 
@@ -65,11 +64,14 @@
 
 ![Systems diagram](/docs/sprint-2/images/systems_diagram.jpg)
 
-* For each tier, indicate which layers are:  
+### **Layer Coverage:**  
   * Fully tested (80%+)  
   * Mostly tested (20–80%)  
   * Somewhat tested (0–20%)  
   * Not tested  
+
+---
+
   * Integration Tests:   
     * Frontend:   
       * Not tested  
@@ -116,12 +118,6 @@
 
 ## **4\. Profiler**
 
-* Run a profiler on your API while exercising **every endpoint**.  
-* Identify:  
-  * Which endpoint is the slowest.  
-  * Whether the slowdown is fixable — and why/why not.  
-* Include profiler output (linked or attached).
-
 For the profiling, we ran a K6 load test that simulated 10 users going through all of the endpoints. 
 
 In this test, the endpoint for creating users (POST /apis/v1/users) had the highest average execution time.
@@ -134,7 +130,7 @@ It is not really fixable as we are using the built in [ASP.NET](http://ASP.NET) 
 
 ## **5\. Last Dash**
 
-* What issues do you foresee in the **final sprint**?  
+* What issues do you foresee in the final sprint?  
   * Lack of time to complete every feature that we initially proposed in sprint 0\.  
   * Trying to implement “nice to have” features or small changes that might cause delays in delivering core features on time   
   * Having too many other things to work on in our other classes with end of semester time crunch  
@@ -165,9 +161,10 @@ It is not really fixable as we are using the built in [ASP.NET](http://ASP.NET) 
   * Implemented the frontend API service layer which communicates with backend endpoints, and implemented domain models for representing application entities in the frontend.  
     * This is my best code because the domain models and API service layer are designed with decoupling in mind. Rather than using raw DTO responses from the backend in our frontend, the frontend uses mapper functions to map the DTO responses into domain models that can be used in components. This ensures that our frontend components are not tightly coupled to the backend responses.  
 * Andre  
-  * Setting a good foundation for the codebase in [https://github.com/Our-City/OurCity/commit/8c021ff303ceb16b9cdf41d4d62bec19f26867cd](https://github.com/Our-City/OurCity/commit/8c021ff303ceb16b9cdf41d4d62bec19f26867cd)   
-    * E.g. pull request template, CI pipeline, dockerfiles \+ docker compose, migrations, testcontainers,  
-  * As part of that foundation, a specific thing I think was really good was Working on the CI from an early point has helped catch regressions (testing) \+ code quality/formatting issues (running linters \+ formatters)  
+  * I would say my best work in this project was the work I did setting up the repository.   
+    * Commit: 8c021ff  
+    * I set up many things in this commit, including a pull request template, a CI script that runs tests and linting, Dockerfiles and docker-compose.ymls, database migrations, backend integration tests using Testcontainers, etc.  
+  * The CI script gave us more confidence that our code was properly formatted and not breaking anything. And the skeleton structure for the webapp and server made it easy to start on our features.  
 * Will  
   * Created several frontend components and views including the profile page and login, register, and create post views.  
   * Implemented frontend post sorting and filtering logic and related components.  

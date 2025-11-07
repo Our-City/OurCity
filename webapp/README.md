@@ -35,6 +35,8 @@ Configuration is done through .env
     docker compose down -v
     ```
 
+4. Include VITE_API_BASE_URL in .env.development file (refer to .env.example)
+
 ### Production Environment
 
 **Recommended: Use the Docker image from DockerHub built by our CD pipeline.**
