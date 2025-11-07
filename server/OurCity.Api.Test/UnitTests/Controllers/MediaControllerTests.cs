@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos.Media;
+using OurCity.Api.Controllers;  
+using OurCity.Api.Services;
 
 namespace OurCity.Api.Tests.Controllers;
 
