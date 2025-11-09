@@ -1,3 +1,5 @@
+namespace OurCity.Api.Configuration;
+
 /// Generative AI - CoPilot was used to assist in the creation of this file.
 ///
 public class AwsS3Options

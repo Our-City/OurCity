@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos.Media;
 using OurCity.Api.Extensions;
+using OurCity.Api.Services;
+
+namespace OurCity.Api.Controllers;
 
 [ApiController]
 [Route("apis/v1/media")]

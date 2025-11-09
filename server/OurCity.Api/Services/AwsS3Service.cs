@@ -2,6 +2,9 @@
 using Amazon.S3;
 using Amazon.S3.Transfer;
 using Microsoft.Extensions.Options;
+using OurCity.Api.Configuration;
+
+namespace OurCity.Api.Services;
 
 public class AwsS3Service
 {
