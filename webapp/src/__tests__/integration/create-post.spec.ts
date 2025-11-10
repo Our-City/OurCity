@@ -1,3 +1,7 @@
+/// Generative AI - CoPilot was used to assist in the creation of this file.
+///   CoPilot was asked to help write unit tests for the components by being given
+///   a description of what exactly should be tested for this component and giving
+///   back the needed functions and syntax to implement the tests.
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 // Mock API modules before importing the view
@@ -187,9 +191,9 @@ describe("CreatePostView - integration", () => {
     await wrapper.find("#title").setValue("A title");
     await wrapper.find("#description").setValue("A long enough description");
 
-  // ensure user is null
-  const auth = useAuthStore();
-  auth.user = null as unknown as User | null;
+    // ensure user is null
+    const auth = useAuthStore();
+    auth.user = null as unknown as User | null;
 
     // submit
     const form = wrapper.find("form");
@@ -206,7 +210,7 @@ describe("CreatePostView - integration", () => {
   });
 
   it("creates a post, uploads images if present, shows toast and navigates to the new post", async () => {
-  const fakeCreated = { id: "p123" };
+    const fakeCreated = { id: "p123" };
     (createPost as unknown as vi.Mock).mockResolvedValue(fakeCreated);
     (uploadMedia as unknown as vi.Mock).mockResolvedValue({});
     // return some tags so MultiSelect has options
@@ -226,9 +230,9 @@ describe("CreatePostView - integration", () => {
       },
     });
 
-  // ensure the auth store has a user
-  const auth = useAuthStore();
-  auth.user = { id: "u1", username: "me" } as unknown as User;
+    // ensure the auth store has a user
+    const auth = useAuthStore();
+    auth.user = { id: "u1", username: "me" } as unknown as User;
 
     // set form fields
     await wrapper.find("#title").setValue("A new event");

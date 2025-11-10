@@ -1,3 +1,7 @@
+/// Generative AI - CoPilot was used to assist in the creation of this file.
+///   CoPilot was asked to help write unit tests for the components by being given
+///   a description of what exactly should be tested for this component and giving
+///   back the needed functions and syntax to implement the tests.
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 // Mock modules used by RegisterView before importing the view
 vi.mock("@/api/userService", () => ({
@@ -66,9 +70,16 @@ describe("RegisterView - integration", () => {
   });
 
   it("successful registration calls createUser, auto-logins, shows toast and navigates to /", async () => {
-  const fakeUser = { id: "10", username: "newbie", isAdmin: false, isBanned: false, createdAt: new Date(), updatedAt: new Date() } as unknown as User;
-  (createUser as unknown as vi.Mock).mockResolvedValue({});
-  (login as unknown as vi.Mock).mockResolvedValue(fakeUser);
+    const fakeUser = {
+      id: "10",
+      username: "newbie",
+      isAdmin: false,
+      isBanned: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as unknown as User;
+    (createUser as unknown as vi.Mock).mockResolvedValue({});
+    (login as unknown as vi.Mock).mockResolvedValue(fakeUser);
 
     const wrapper = mount(RegisterView, {
       global: {

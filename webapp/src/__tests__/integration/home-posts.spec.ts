@@ -1,3 +1,7 @@
+/// Generative AI - CoPilot was used to assist in the creation of this file.
+///   CoPilot was asked to help write unit tests for the components by being given
+///   a description of what exactly should be tested for this component and giving
+///   back the needed functions and syntax to implement the tests.
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { ref } from "vue";
 // Mock the usePostFilters composable before importing the view
@@ -84,8 +88,8 @@ describe("HomeView - integration", () => {
   });
 
   it("navigates to login when Create Post clicked and user not logged in, otherwise to create-post", async () => {
-  const auth = useAuthStore();
-  auth.user = null; // not logged in
+    const auth = useAuthStore();
+    auth.user = null; // not logged in
 
     const wrapper = mount(HomeView, {
       global: {
@@ -104,8 +108,15 @@ describe("HomeView - integration", () => {
     expect(pushSpy).toHaveBeenCalledWith("/login");
 
     // Now simulate logged in
-  const u = { id: "u1", username: "me", isAdmin: false, isBanned: false, createdAt: new Date(), updatedAt: new Date() } as unknown as User;
-  auth.user = u;
+    const u = {
+      id: "u1",
+      username: "me",
+      isAdmin: false,
+      isBanned: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as unknown as User;
+    auth.user = u;
     await wrapper.find(".create-post-button").trigger("click");
     expect(pushSpy).toHaveBeenCalledWith("/create-post");
   });

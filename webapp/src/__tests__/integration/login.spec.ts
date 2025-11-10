@@ -1,3 +1,7 @@
+/// Generative AI - CoPilot was used to assist in the creation of this file.
+///   CoPilot was asked to help write unit tests for the components by being given
+///   a description of what exactly should be tested for this component and giving
+///   back the needed functions and syntax to implement the tests.
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 // Mock the authentication service before importing modules that use it
 vi.mock("@/api/authenticationService", () => ({
@@ -62,8 +66,16 @@ describe("LoginView - integration", () => {
 
   it("successful login calls auth service, updates store and navigates to /", async () => {
     // Arrange - mock successful login response
-  const fakeUser = { id: "1", username: "alice", displayName: "Alice", isAdmin: false, isBanned: false, createdAt: new Date(), updatedAt: new Date() } as unknown as User;
-  (login as unknown as vi.Mock).mockResolvedValue(fakeUser);
+    const fakeUser = {
+      id: "1",
+      username: "alice",
+      displayName: "Alice",
+      isAdmin: false,
+      isBanned: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as unknown as User;
+    (login as unknown as vi.Mock).mockResolvedValue(fakeUser);
 
     const wrapper = mount(LoginView, {
       global: {

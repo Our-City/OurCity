@@ -1,3 +1,7 @@
+/// Generative AI - CoPilot was used to assist in the creation of this file.
+///   CoPilot was asked to help write unit tests for the components by being given
+///   a description of what exactly should be tested for this component and giving
+///   back the needed functions and syntax to implement the tests.
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { ref } from "vue";
 
@@ -126,10 +130,17 @@ describe("PageHeader - integration", () => {
   });
 
   it("shows create post and account dropdown when authenticated and supports profile/logout actions", async () => {
-  const auth = useAuthStore();
-  // simulate logged in
-  const u = { id: "u1", username: "me", isAdmin: false, isBanned: false, createdAt: new Date(), updatedAt: new Date() } as unknown as User;
-  auth.user = u;
+    const auth = useAuthStore();
+    // simulate logged in
+    const u = {
+      id: "u1",
+      username: "me",
+      isAdmin: false,
+      isBanned: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as unknown as User;
+    auth.user = u;
     // spy on logoutUser
     auth.logoutUser = vi.fn(async () => {});
 

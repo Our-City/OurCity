@@ -1,3 +1,7 @@
+/// Generative AI - CoPilot was used to assist in the creation of this file.
+///   CoPilot was asked to help write unit tests for the components by being given
+///   a description of what exactly should be tested for this component and giving
+///   back the needed functions and syntax to implement the tests.
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
 // Mock API modules before importing the view
@@ -241,9 +245,16 @@ describe("PostDetailView - integration (comments)", () => {
 
     await new Promise((r) => setTimeout(r, 0));
 
-  const auth = useAuthStore();
-  const u = { id: "u1", username: "me", isAdmin: false, isBanned: false, createdAt: new Date(), updatedAt: new Date() } as unknown as User;
-  auth.user = u;
+    const auth = useAuthStore();
+    const u = {
+      id: "u1",
+      username: "me",
+      isAdmin: false,
+      isBanned: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as unknown as User;
+    auth.user = u;
 
     // set textarea and submit
     const textarea = wrapper.find("textarea");

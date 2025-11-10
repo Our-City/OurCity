@@ -1,3 +1,7 @@
+/// Generative AI - CoPilot was used to assist in the creation of this file.
+///   CoPilot was asked to help write unit tests for the components by being given
+///   a description of what exactly should be tested for this component and giving
+///   back the needed functions and syntax to implement the tests.
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createRouter, createMemoryHistory } from "vue-router";
@@ -43,9 +47,16 @@ describe("VoteBox - integration", () => {
   });
 
   it("emits correct vote types when authenticated", async () => {
-  const auth = useAuthStore();
-  const fakeUser = { id: "u1", username: "tester", isAdmin: false, isBanned: false, createdAt: new Date(), updatedAt: new Date() } as unknown as User;
-  auth.user = fakeUser;
+    const auth = useAuthStore();
+    const fakeUser = {
+      id: "u1",
+      username: "tester",
+      isAdmin: false,
+      isBanned: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as unknown as User;
+    auth.user = fakeUser;
 
     // No existing vote -> upvote should emit UPVOTE
     const wrapperNoVote = mount(VoteBox, {
