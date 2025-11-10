@@ -30,8 +30,8 @@ import PostDetailView from "@/views/PostDetailView.vue";
 import { getPostById } from "@/api/postService";
 import { getMediaByPostId } from "@/api/mediaService";
 import { getCommentsByPostId, createComment } from "@/api/commentService";
-import { ref } from "vue";
 import { useAuthStore } from "@/stores/authenticationStore";
+import { User } from "@/models/user";
 
 describe("PostDetailView - integration (comments)", () => {
   let router: ReturnType<typeof createRouter>;
@@ -64,9 +64,18 @@ describe("PostDetailView - integration (comments)", () => {
 
     (getPostById as unknown as vi.Mock).mockResolvedValue(fakePost);
     (getMediaByPostId as unknown as vi.Mock).mockResolvedValue([]);
-    (getCommentsByPostId as unknown as vi.Mock).mockResolvedValue({ items: [
-      { id: "c1", content: "First", authorName: "Bob", createdAt: new Date(), voteCount: 0, voteStatus: 0 },
-    ] });
+    (getCommentsByPostId as unknown as vi.Mock).mockResolvedValue({
+      items: [
+        {
+          id: "c1",
+          content: "First",
+          authorName: "Bob",
+          createdAt: new Date(),
+          voteCount: 0,
+          voteStatus: 0,
+        },
+      ],
+    });
 
     // set route and wait for router to be ready so route.params.id is available
     await router.push("/posts/p1");
@@ -108,7 +117,7 @@ describe("PostDetailView - integration (comments)", () => {
     expect(getCommentsByPostId).toHaveBeenCalledWith("p1");
 
     // Title rendered
-    const title = wrapper.find("[data-testid=\"post-title\"]");
+    const title = wrapper.find('[data-testid="post-title"]');
     expect(title.exists()).toBe(true);
     expect(title.text()).toContain("Test Post");
 
@@ -118,12 +127,21 @@ describe("PostDetailView - integration (comments)", () => {
   });
 
   it("redirects to login when submitting a comment while not authenticated", async () => {
-    (getPostById as unknown as vi.Mock).mockResolvedValue({ id: "p1", title: "x", authorName: "a", createdAt: new Date(), tags: [], description: "", voteCount: 0, voteStatus: 0 });
+    (getPostById as unknown as vi.Mock).mockResolvedValue({
+      id: "p1",
+      title: "x",
+      authorName: "a",
+      createdAt: new Date(),
+      tags: [],
+      description: "",
+      voteCount: 0,
+      voteStatus: 0,
+    });
     (getMediaByPostId as unknown as vi.Mock).mockResolvedValue([]);
     (getCommentsByPostId as unknown as vi.Mock).mockResolvedValue({ items: [] });
 
-  await router.push("/posts/p1");
-  await router.isReady();
+    await router.push("/posts/p1");
+    await router.isReady();
 
     const wrapper = mount(PostDetailView, {
       global: {
@@ -162,15 +180,42 @@ describe("PostDetailView - integration (comments)", () => {
   });
 
   it("submits a comment when authenticated and prepends it to the list", async () => {
-    (getPostById as unknown as vi.Mock).mockResolvedValue({ id: "p1", title: "x", authorName: "a", createdAt: new Date(), tags: [], description: "", voteCount: 0, voteStatus: 0 });
+    (getPostById as unknown as vi.Mock).mockResolvedValue({
+      id: "p1",
+      title: "x",
+      authorName: "a",
+      createdAt: new Date(),
+      tags: [],
+      description: "",
+      voteCount: 0,
+      voteStatus: 0,
+    });
     (getMediaByPostId as unknown as vi.Mock).mockResolvedValue([]);
-    (getCommentsByPostId as unknown as vi.Mock).mockResolvedValue({ items: [ { id: "c1", content: "Existing", authorName: "B", createdAt: new Date(), voteCount:0, voteStatus:0 } ] });
+    (getCommentsByPostId as unknown as vi.Mock).mockResolvedValue({
+      items: [
+        {
+          id: "c1",
+          content: "Existing",
+          authorName: "B",
+          createdAt: new Date(),
+          voteCount: 0,
+          voteStatus: 0,
+        },
+      ],
+    });
 
-    const created = { id: "c2", content: "Hello new", authorName: "Me", createdAt: new Date(), voteCount:0, voteStatus:0 };
+    const created = {
+      id: "c2",
+      content: "Hello new",
+      authorName: "Me",
+      createdAt: new Date(),
+      voteCount: 0,
+      voteStatus: 0,
+    };
     (createComment as unknown as vi.Mock).mockResolvedValue(created);
 
-  await router.push("/posts/p1");
-  await router.isReady();
+    await router.push("/posts/p1");
+    await router.isReady();
 
     // stub CommentList to reflect comments prop
     const wrapper = mount(PostDetailView, {
@@ -196,8 +241,9 @@ describe("PostDetailView - integration (comments)", () => {
 
     await new Promise((r) => setTimeout(r, 0));
 
-    const auth = useAuthStore();
-    auth.user = { id: "u1", username: "me" } as any;
+  const auth = useAuthStore();
+  const u = { id: "u1", username: "me", isAdmin: false, isBanned: false, createdAt: new Date(), updatedAt: new Date() } as unknown as User;
+  auth.user = u;
 
     // set textarea and submit
     const textarea = wrapper.find("textarea");
@@ -207,7 +253,10 @@ describe("PostDetailView - integration (comments)", () => {
     // allow async
     await new Promise((r) => setTimeout(r, 0));
 
-    expect(createComment).toHaveBeenCalledWith("p1", expect.objectContaining({ content: "Hello new" }));
+    expect(createComment).toHaveBeenCalledWith(
+      "p1",
+      expect.objectContaining({ content: "Hello new" }),
+    );
 
     // Comment list should now include the new comment at the top
     const items = wrapper.findAll(".comment-item");

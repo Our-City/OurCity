@@ -9,6 +9,7 @@ import { createRouter, createMemoryHistory } from "vue-router";
 import LoginView from "@/views/LoginView.vue";
 import { setActivePinia, createPinia } from "pinia";
 import { useAuthStore } from "@/stores/authenticationStore";
+import { User } from "@/models/user";
 import { login } from "@/api/authenticationService";
 
 // Simple Form stub that exposes named slots (actions/footer) and emits submit
@@ -61,8 +62,8 @@ describe("LoginView - integration", () => {
 
   it("successful login calls auth service, updates store and navigates to /", async () => {
     // Arrange - mock successful login response
-    const fakeUser = { id: "1", username: "alice", displayName: "Alice" } as any;
-    (login as unknown as vi.Mock).mockResolvedValue(fakeUser);
+  const fakeUser = { id: "1", username: "alice", displayName: "Alice", isAdmin: false, isBanned: false, createdAt: new Date(), updatedAt: new Date() } as unknown as User;
+  (login as unknown as vi.Mock).mockResolvedValue(fakeUser);
 
     const wrapper = mount(LoginView, {
       global: {
@@ -85,9 +86,9 @@ describe("LoginView - integration", () => {
     // Spy on router.push
     const pushSpy = vi.spyOn(router, "push");
 
-  // Trigger the stubbed form's submit event directly
-  const form = wrapper.find("form");
-  await form.trigger("submit");
+    // Trigger the stubbed form's submit event directly
+    const form = wrapper.find("form");
+    await form.trigger("submit");
 
     // Wait a tick for promises
     await new Promise((r) => setTimeout(r, 0));

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
+import { ref } from "vue";
 // Mock the usePostFilters composable before importing the view
 vi.mock("@/composables/usePostFilters", () => {
-  const { ref } = require("vue");
   const posts = ref([]);
   const loading = ref(false);
   const error = ref(null);
@@ -18,7 +18,7 @@ vi.mock("@/composables/usePostFilters", () => {
       currentFilter: ref("all"),
       sortOrder: ref("Desc"),
       filters,
-      searchTerm: ref("") ,
+      searchTerm: ref(""),
       loading,
       error,
       nextCursor,
@@ -31,8 +31,8 @@ import { mount } from "@vue/test-utils";
 import { createRouter, createMemoryHistory } from "vue-router";
 import { setActivePinia, createPinia } from "pinia";
 import { useAuthStore } from "@/stores/authenticationStore";
+import { User } from "@/models/user";
 import HomeView from "@/views/HomeView.vue";
-import { ref } from "vue";
 
 describe("HomeView - integration", () => {
   let router: ReturnType<typeof createRouter>;
@@ -64,9 +64,12 @@ describe("HomeView - integration", () => {
         plugins: [router],
         stubs: {
           PageHeader: { template: "<div/>" },
-          PostList: { template: "<div data-testid=\"post-list-stub\"></div>", props: ["posts", "loading", "error"] },
+          PostList: {
+            template: '<div data-testid="post-list-stub"></div>',
+            props: ["posts", "loading", "error"],
+          },
           SideBar: { template: "<div/>" },
-          Card: { template: "<div><slot name=\"footer\"></slot></div>" },
+          Card: { template: '<div><slot name="footer"></slot></div>' },
         },
       },
     });
@@ -76,13 +79,13 @@ describe("HomeView - integration", () => {
     expect(pf.fetchPosts).toHaveBeenCalled();
 
     // Ensure the PostList stub is present
-    const stub = wrapper.find("[data-testid=\"post-list-stub\"]");
+    const stub = wrapper.find('[data-testid="post-list-stub"]');
     expect(stub.exists()).toBe(true);
   });
 
   it("navigates to login when Create Post clicked and user not logged in, otherwise to create-post", async () => {
-    const auth = useAuthStore();
-    auth.user = null; // not logged in
+  const auth = useAuthStore();
+  auth.user = null; // not logged in
 
     const wrapper = mount(HomeView, {
       global: {
@@ -91,7 +94,7 @@ describe("HomeView - integration", () => {
           PageHeader: { template: "<div/>" },
           PostList: { template: "<div/>" },
           SideBar: { template: "<div/>" },
-          Card: { template: "<div><slot name=\"footer\"></slot></div>" },
+          Card: { template: '<div><slot name="footer"></slot></div>' },
         },
       },
     });
@@ -101,7 +104,8 @@ describe("HomeView - integration", () => {
     expect(pushSpy).toHaveBeenCalledWith("/login");
 
     // Now simulate logged in
-    auth.user = { id: "u1", username: "me" } as any;
+  const u = { id: "u1", username: "me", isAdmin: false, isBanned: false, createdAt: new Date(), updatedAt: new Date() } as unknown as User;
+  auth.user = u;
     await wrapper.find(".create-post-button").trigger("click");
     expect(pushSpy).toHaveBeenCalledWith("/create-post");
   });

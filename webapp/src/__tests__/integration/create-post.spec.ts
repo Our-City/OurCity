@@ -30,9 +30,10 @@ import { useAuthStore } from "@/stores/authenticationStore";
 import { createPost } from "@/api/postService";
 import { uploadMedia } from "@/api/mediaService";
 import { getTags } from "@/api/tagService";
+import type { User } from "@/models/user";
 
 // Will hold original URL.createObjectURL to restore after tests
-let originalCreateObjectURL: any;
+let originalCreateObjectURL: unknown;
 
 // Simple Form stub that exposes named slots (actions/footer) and emits submit/reset
 const FormStub = {
@@ -113,7 +114,7 @@ describe("CreatePostView - integration", () => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       URL.createObjectURL = originalCreateObjectURL;
-    } catch (e) {
+    } catch {
       // ignore
     }
   });
@@ -140,25 +141,29 @@ describe("CreatePostView - integration", () => {
     await new Promise((r) => setTimeout(r, 0));
 
     // Title and description errors should be shown
-    const titleError = wrapper.findAll(".form-error").filter((n) => n.text().includes("Title is required"));
-    const descError = wrapper.findAll(".form-error").filter((n) => n.text().includes("Description is required"));
+    const titleError = wrapper
+      .findAll(".form-error")
+      .filter((n) => n.text().includes("Title is required"));
+    const descError = wrapper
+      .findAll(".form-error")
+      .filter((n) => n.text().includes("Description is required"));
 
     expect(titleError.length).toBeGreaterThan(0);
     expect(descError.length).toBeGreaterThan(0);
 
     // provide a short description and ensure length validation prevents submission
-    await wrapper.find('#title').setValue('Short title');
-    const descTextarea = wrapper.find('textarea#description');
+    await wrapper.find("#title").setValue("Short title");
+    const descTextarea = wrapper.find("textarea#description");
     if (descTextarea.exists()) {
-      await descTextarea.setValue('short');
+      await descTextarea.setValue("short");
     } else {
-      await wrapper.find('#description').setValue('short');
+      await wrapper.find("#description").setValue("short");
     }
-    await form.trigger('submit');
+    await form.trigger("submit");
     await new Promise((r) => setTimeout(r, 0));
 
     // There should still be form errors and createPost must not be called
-    const anyErrors = wrapper.findAll('.form-error');
+    const anyErrors = wrapper.findAll(".form-error");
     expect(anyErrors.length).toBeGreaterThan(0);
     expect(createPost).not.toHaveBeenCalled();
   });
@@ -179,31 +184,33 @@ describe("CreatePostView - integration", () => {
     });
 
     // fill required fields
-    await wrapper.find('#title').setValue('A title');
-    await wrapper.find('#description').setValue('A long enough description');
+    await wrapper.find("#title").setValue("A title");
+    await wrapper.find("#description").setValue("A long enough description");
 
-    // ensure user is null
-    const auth = useAuthStore();
-    auth.user = null as any;
+  // ensure user is null
+  const auth = useAuthStore();
+  auth.user = null as unknown as User | null;
 
     // submit
-    const form = wrapper.find('form');
-    await form.trigger('submit');
+    const form = wrapper.find("form");
+    await form.trigger("submit");
 
     await new Promise((r) => setTimeout(r, 0));
 
     // form-level submit error should be displayed (resolveErrorMessage returns fallback)
-    const submitError = wrapper.findAll('.form-error').filter((n) => n.text().includes('Failed to create post'));
+    const submitError = wrapper
+      .findAll(".form-error")
+      .filter((n) => n.text().includes("Failed to create post"));
     expect(submitError.length).toBeGreaterThan(0);
     expect(createPost).not.toHaveBeenCalled();
   });
 
   it("creates a post, uploads images if present, shows toast and navigates to the new post", async () => {
-    const fakeCreated = { id: 'p123' } as any;
+  const fakeCreated = { id: "p123" };
     (createPost as unknown as vi.Mock).mockResolvedValue(fakeCreated);
     (uploadMedia as unknown as vi.Mock).mockResolvedValue({});
     // return some tags so MultiSelect has options
-    (getTags as unknown as vi.Mock).mockResolvedValue([{ id: 't1', name: 'Community' }]);
+    (getTags as unknown as vi.Mock).mockResolvedValue([{ id: "t1", name: "Community" }]);
 
     const wrapper = mount(CreatePostView, {
       global: {
@@ -219,37 +226,37 @@ describe("CreatePostView - integration", () => {
       },
     });
 
-    // ensure the auth store has a user
-    const auth = useAuthStore();
-    auth.user = { id: 'u1', username: 'me' } as any;
+  // ensure the auth store has a user
+  const auth = useAuthStore();
+  auth.user = { id: "u1", username: "me" } as unknown as User;
 
     // set form fields
-    await wrapper.find('#title').setValue('A new event');
-    await wrapper.find('#description').setValue('This is a description long enough.');
+    await wrapper.find("#title").setValue("A new event");
+    await wrapper.find("#description").setValue("This is a description long enough.");
 
     // simulate selecting a tag via the MultiSelect stub
-    const select = wrapper.find('select#tags');
+    const select = wrapper.find("select#tags");
     if (select.exists()) {
       // select the first option
-      const option = select.element.querySelector('option');
+      const option = select.element.querySelector("option");
       if (option) {
         option.selected = true;
-        await select.trigger('change');
+        await select.trigger("change");
       }
     }
 
     // simulate file input (one image)
-    const file = new File(['abc'], 'photo.png', { type: 'image/png' });
-    const input = wrapper.find('#images');
+    const file = new File(["abc"], "photo.png", { type: "image/png" });
+    const input = wrapper.find("#images");
     // trigger change with files list
-    Object.defineProperty(input.element, 'files', { value: [file] });
-    await input.trigger('change');
+    Object.defineProperty(input.element, "files", { value: [file] });
+    await input.trigger("change");
 
-    const pushSpy = vi.spyOn(router, 'push');
+    const pushSpy = vi.spyOn(router, "push");
 
     // submit
-    const form = wrapper.find('form');
-    await form.trigger('submit');
+    const form = wrapper.find("form");
+    await form.trigger("submit");
 
     // wait async operations
     await new Promise((r) => setTimeout(r, 0));
@@ -259,7 +266,7 @@ describe("CreatePostView - integration", () => {
     expect(uploadMedia).toHaveBeenCalledWith(expect.any(File), fakeCreated.id);
 
     // toast.add was mocked by useToast; ensure it was called
-    const { useToast } = await import('primevue/usetoast');
+    const { useToast } = await import("primevue/usetoast");
     expect(useToast().add).toHaveBeenCalled();
 
     expect(pushSpy).toHaveBeenCalledWith(`/posts/${fakeCreated.id}`);

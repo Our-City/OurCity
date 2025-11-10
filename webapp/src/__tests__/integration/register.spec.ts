@@ -14,6 +14,7 @@ vi.mock("primevue/usetoast", () => ({
 }));
 
 import { mount } from "@vue/test-utils";
+import { User } from "@/models/user";
 import { createRouter, createMemoryHistory } from "vue-router";
 import RegisterView from "@/views/RegisterView.vue";
 import { setActivePinia, createPinia } from "pinia";
@@ -56,9 +57,7 @@ describe("RegisterView - integration", () => {
 
     router = createRouter({
       history: createMemoryHistory(),
-      routes: [
-        { path: "/", name: "home", component: { template: "<div/>" } },
-      ],
+      routes: [{ path: "/", name: "home", component: { template: "<div/>" } }],
     });
   });
 
@@ -67,9 +66,9 @@ describe("RegisterView - integration", () => {
   });
 
   it("successful registration calls createUser, auto-logins, shows toast and navigates to /", async () => {
-    const fakeUser = { id: "10", username: "newbie" } as any;
-    (createUser as unknown as vi.Mock).mockResolvedValue({});
-    (login as unknown as vi.Mock).mockResolvedValue(fakeUser);
+  const fakeUser = { id: "10", username: "newbie", isAdmin: false, isBanned: false, createdAt: new Date(), updatedAt: new Date() } as unknown as User;
+  (createUser as unknown as vi.Mock).mockResolvedValue({});
+  (login as unknown as vi.Mock).mockResolvedValue(fakeUser);
 
     const wrapper = mount(RegisterView, {
       global: {

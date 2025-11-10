@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { ref } from "vue";
 
 // Mock the usePostFilters composable before importing the component
 vi.mock("@/composables/usePostFilters", () => {
-  const { ref } = require("vue");
   const searchTerm = ref("");
   const reset = vi.fn();
   const fetchPosts = vi.fn();
@@ -30,6 +30,7 @@ import { createRouter, createMemoryHistory } from "vue-router";
 import PageHeader from "@/components/PageHeader.vue";
 import { setActivePinia, createPinia } from "pinia";
 import { useAuthStore } from "@/stores/authenticationStore";
+import { User } from "@/models/user";
 
 describe("PageHeader - integration", () => {
   let router: ReturnType<typeof createRouter>;
@@ -61,7 +62,9 @@ describe("PageHeader - integration", () => {
       global: {
         plugins: [router],
         stubs: {
-          Toolbar: { template: `<div><slot name="start"/><slot name="center"/><slot name="end"/></div>` },
+          Toolbar: {
+            template: `<div><slot name="start"/><slot name="center"/><slot name="end"/></div>`,
+          },
         },
       },
     });
@@ -86,7 +89,9 @@ describe("PageHeader - integration", () => {
       global: {
         plugins: [router],
         stubs: {
-          Toolbar: { template: `<div><slot name="start"/><slot name="center"/><slot name="end"/></div>` },
+          Toolbar: {
+            template: `<div><slot name="start"/><slot name="center"/><slot name="end"/></div>`,
+          },
         },
       },
     });
@@ -111,19 +116,20 @@ describe("PageHeader - integration", () => {
       },
     });
 
-  const pushSpy = vi.spyOn(router, "push");
-  await wrapper.find(".app-title").trigger("click");
-  // wait for the async handler to finish (router.push then reset)
-  await new Promise((r) => setTimeout(r, 0));
+    const pushSpy = vi.spyOn(router, "push");
+    await wrapper.find(".app-title").trigger("click");
+    // wait for the async handler to finish (router.push then reset)
+    await new Promise((r) => setTimeout(r, 0));
 
-  expect(pushSpy).toHaveBeenCalledWith("/");
-  expect(resetSpy).toHaveBeenCalled();
+    expect(pushSpy).toHaveBeenCalledWith("/");
+    expect(resetSpy).toHaveBeenCalled();
   });
 
   it("shows create post and account dropdown when authenticated and supports profile/logout actions", async () => {
-    const auth = useAuthStore();
-    // simulate logged in
-    auth.user = { id: "u1", username: "me" } as any;
+  const auth = useAuthStore();
+  // simulate logged in
+  const u = { id: "u1", username: "me", isAdmin: false, isBanned: false, createdAt: new Date(), updatedAt: new Date() } as unknown as User;
+  auth.user = u;
     // spy on logoutUser
     auth.logoutUser = vi.fn(async () => {});
 
@@ -140,7 +146,9 @@ describe("PageHeader - integration", () => {
       global: {
         plugins: [router],
         stubs: {
-          Toolbar: { template: `<div><slot name="start"/><slot name="center"/><slot name="end"/></div>` },
+          Toolbar: {
+            template: `<div><slot name="start"/><slot name="center"/><slot name="end"/></div>`,
+          },
           Dropdown: DropdownStub,
         },
       },
@@ -153,24 +161,24 @@ describe("PageHeader - integration", () => {
     await createBtn.trigger("click");
     expect(pushSpy).toHaveBeenCalledWith("/create-post");
 
-  // Click view profile list item inside dropdown
-  const view = wrapper.find("li");
-  expect(view.exists()).toBe(true);
-  // first li is View Profile (per template)
-  await view.trigger("click");
-  await new Promise((r) => setTimeout(r, 0));
-  expect(pushSpy).toHaveBeenCalledWith("/profile");
+    // Click view profile list item inside dropdown
+    const view = wrapper.find("li");
+    expect(view.exists()).toBe(true);
+    // first li is View Profile (per template)
+    await view.trigger("click");
+    await new Promise((r) => setTimeout(r, 0));
+    expect(pushSpy).toHaveBeenCalledWith("/profile");
 
-  // find the logout li - it's the second li
-  const items = wrapper.findAll("li");
-  const logout = items[1];
-  await logout.trigger("click");
-  // wait for async logout -> router.push -> fetchPosts
-  await new Promise((r) => setTimeout(r, 0));
+    // find the logout li - it's the second li
+    const items = wrapper.findAll("li");
+    const logout = items[1];
+    await logout.trigger("click");
+    // wait for async logout -> router.push -> fetchPosts
+    await new Promise((r) => setTimeout(r, 0));
 
-  expect(auth.logoutUser).toHaveBeenCalled();
-  // logout should navigate to home and refresh posts
-  expect(pushSpy).toHaveBeenCalledWith("/");
-  expect(fetchSpy).toHaveBeenCalled();
+    expect(auth.logoutUser).toHaveBeenCalled();
+    // logout should navigate to home and refresh posts
+    expect(pushSpy).toHaveBeenCalledWith("/");
+    expect(fetchSpy).toHaveBeenCalled();
   });
 });

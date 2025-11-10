@@ -15,6 +15,7 @@ vi.mock("@/api/userService", () => ({
 }));
 
 import { mount } from "@vue/test-utils";
+import { User } from "@/models/user";
 import { createRouter, createMemoryHistory } from "vue-router";
 import ProfileView from "@/views/ProfileView.vue";
 import { setActivePinia, createPinia } from "pinia";
@@ -48,11 +49,12 @@ describe("ProfileView - integration", () => {
 
     // spy and mock fetchCurrentUser to set a user with posts
     vi.spyOn(auth, "fetchCurrentUser").mockImplementation(async () => {
-      auth.user = { id: "u1", username: "me", posts: ["p1", "p2"] } as any;
+      const u = { id: "u1", username: "me", posts: ["p1", "p2"], isAdmin: false, isBanned: false, createdAt: new Date(), updatedAt: new Date() } as unknown as User;
+      auth.user = u;
     });
 
-    const fake1 = { id: "p1", title: "First", createdAt: new Date() } as any;
-    const fake2 = { id: "p2", title: "Second", createdAt: new Date() } as any;
+  const fake1 = { id: "p1", title: "First", createdAt: new Date() };
+  const fake2 = { id: "p2", title: "Second", createdAt: new Date() };
     (getPostById as unknown as vi.Mock).mockResolvedValueOnce(fake1).mockResolvedValueOnce(fake2);
 
     const wrapper = mount(ProfileView, {
@@ -66,7 +68,9 @@ describe("ProfileView - integration", () => {
             props: ["posts"],
             template: `<div><div v-for="p in posts" :key="p.id" class="profile-post-item">{{ p.title }}</div></div>`,
           },
-          ProfileHeader: { template: `<div><button class="create-post-button">Create Post</button></div>` },
+          ProfileHeader: {
+            template: `<div><button class="create-post-button">Create Post</button></div>`,
+          },
           ProfileToolbar: { template: `<div/>` },
         },
       },
@@ -88,7 +92,8 @@ describe("ProfileView - integration", () => {
   it("shows no-posts message when user has no posts", async () => {
     const auth = useAuthStore();
     vi.spyOn(auth, "fetchCurrentUser").mockImplementation(async () => {
-      auth.user = { id: "u2", username: "other", posts: [] } as any;
+      const u = { id: "u2", username: "other", posts: [], isAdmin: false, isBanned: false, createdAt: new Date(), updatedAt: new Date() } as unknown as User;
+      auth.user = u;
     });
 
     const wrapper = mount(ProfileView, {
@@ -114,7 +119,8 @@ describe("ProfileView - integration", () => {
   it("navigates to create-post when the profile header create button is clicked", async () => {
     const auth = useAuthStore();
     vi.spyOn(auth, "fetchCurrentUser").mockImplementation(async () => {
-      auth.user = { id: "u3", username: "me", posts: [] } as any;
+      const u = { id: "u3", username: "me", posts: [], isAdmin: false, isBanned: false, createdAt: new Date(), updatedAt: new Date() } as unknown as User;
+      auth.user = u;
     });
 
     // use the real ProfileHeader so the button exists; stub other heavy children
@@ -145,11 +151,15 @@ describe("ProfileView - integration", () => {
   // Additional ProfileHeader-focused integration tests
   describe("ProfileHeader - integration", () => {
     it("shows username and allows editing, save updates auth store and shows toast", async () => {
-      const auth = useAuthStore();
-      auth.user = { id: "u5", username: "oldname" } as any;
+  const auth = useAuthStore();
+  const u = { id: "u5", username: "oldname", isAdmin: false, isBanned: false, createdAt: new Date(), updatedAt: new Date() } as unknown as User;
+  auth.user = u;
 
       // mock successful update
-      (updateCurrentUser as unknown as vi.Mock).mockResolvedValue({ id: "u5", username: "newname" });
+      (updateCurrentUser as unknown as vi.Mock).mockResolvedValue({
+        id: "u5",
+        username: "newname",
+      });
 
       const wrapper = mount(ProfileHeader, {
         props: { username: "oldname" },
@@ -180,8 +190,9 @@ describe("ProfileView - integration", () => {
     });
 
     it("validates username input and shows error messages", async () => {
-      const auth = useAuthStore();
-      auth.user = { id: "u6", username: "me" } as any;
+  const auth = useAuthStore();
+  const u = { id: "u6", username: "me", isAdmin: false, isBanned: false, createdAt: new Date(), updatedAt: new Date() } as unknown as User;
+  auth.user = u;
 
       const wrapper = mount(ProfileHeader, {
         props: { username: "me" },
@@ -207,12 +218,15 @@ describe("ProfileView - integration", () => {
       await input.setValue("bad name$");
       await wrapper.find(".save-button").trigger("click");
       await new Promise((r) => setTimeout(r, 0));
-      expect(wrapper.find(".form-error").text()).toContain("only contain letters, numbers, and underscores");
+      expect(wrapper.find(".form-error").text()).toContain(
+        "only contain letters, numbers, and underscores",
+      );
     });
 
     it("cancel edit resets input and leaves username unchanged", async () => {
-      const auth = useAuthStore();
-      auth.user = { id: "u7", username: "keepme" } as any;
+  const auth = useAuthStore();
+  const u = { id: "u7", username: "keepme", isAdmin: false, isBanned: false, createdAt: new Date(), updatedAt: new Date() } as unknown as User;
+  auth.user = u;
 
       const wrapper = mount(ProfileHeader, {
         props: { username: "keepme" },
@@ -228,8 +242,9 @@ describe("ProfileView - integration", () => {
     });
 
     it("create post button navigates to create-post", async () => {
-      const auth = useAuthStore();
-      auth.user = { id: "u8", username: "me" } as any;
+  const auth = useAuthStore();
+  const u = { id: "u8", username: "me", isAdmin: false, isBanned: false, createdAt: new Date(), updatedAt: new Date() } as unknown as User;
+  auth.user = u;
 
       const wrapper = mount(ProfileHeader, {
         props: { username: "me" },

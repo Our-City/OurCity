@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createRouter, createMemoryHistory } from "vue-router";
 import { setActivePinia, createPinia } from "pinia";
+import { User } from "@/models/user";
 import { useAuthStore } from "@/stores/authenticationStore";
 import VoteBox from "@/components/VoteBox.vue";
 import { VoteType } from "@/types/enums";
@@ -25,7 +26,7 @@ describe("VoteBox - integration", () => {
     const auth = useAuthStore();
     auth.user = null;
 
-  const pushSpy = vi.spyOn(router, "push");
+    const pushSpy = vi.spyOn(router, "push");
 
     const wrapper = mount(VoteBox, {
       global: { plugins: [router] },
@@ -42,8 +43,9 @@ describe("VoteBox - integration", () => {
   });
 
   it("emits correct vote types when authenticated", async () => {
-    const auth = useAuthStore();
-    auth.user = { id: "u1", username: "tester" } as any;
+  const auth = useAuthStore();
+  const fakeUser = { id: "u1", username: "tester", isAdmin: false, isBanned: false, createdAt: new Date(), updatedAt: new Date() } as unknown as User;
+  auth.user = fakeUser;
 
     // No existing vote -> upvote should emit UPVOTE
     const wrapperNoVote = mount(VoteBox, {
@@ -81,5 +83,3 @@ describe("VoteBox - integration", () => {
     expect(wrapperNoVote2.emitted("vote")?.[0]).toEqual([VoteType.DOWNVOTE]);
   });
 });
-
-
