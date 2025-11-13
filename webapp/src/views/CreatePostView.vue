@@ -548,7 +548,7 @@ const removeImage = (index: number) => {
 
 .form-file-preview-remove {
   position: absolute;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
   color: var(--primary-background-color);
   border: none;
   border-radius: 10rem;
@@ -557,5 +557,4 @@ const removeImage = (index: number) => {
   justify-content: center;
   line-height: 1;
 }
-
 </style>
