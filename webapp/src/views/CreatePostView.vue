@@ -106,20 +106,6 @@ const onDrop = (event: DragEvent, targetIndex: number) => {
   dragIndex.value = null;
 };
 
-const moveImageLeft = (index: number) => {
-  if (index <= 0) return;
-  const files = formData.value.images;
-  const [item] = files.splice(index, 1);
-  files.splice(index - 1, 0, item);
-};
-
-const moveImageRight = (index: number) => {
-  const files = formData.value.images;
-  if (index >= files.length - 1) return;
-  const [item] = files.splice(index, 1);
-  files.splice(index + 1, 0, item);
-};
-
 // Computed properties for showing errors only after touch
 const showTitleError = computed(() => {
   return titleTouched.value && errors.value.title;
