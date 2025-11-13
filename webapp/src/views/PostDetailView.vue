@@ -4,7 +4,7 @@
   e.g, loading posts, creating new posts, etc.
   Also assisted with handling comment updates from child CommentList. -->
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import TextArea from "primevue/textarea";
 import PageHeader from "@/components/PageHeader.vue";
@@ -12,6 +12,8 @@ import SideBar from "@/components/SideBar.vue";
 import ImageGalleria from "@/components/ImageGalleria.vue";
 import VoteBox from "@/components/VoteBox.vue";
 import CommentList from "@/components/CommentList.vue";
+import Dropdown from "@/components/utils/DropdownMenu.vue";
+import { useToast } from "primevue/usetoast";
 
 import { getPostById, voteOnPost } from "@/api/postService";
 import { getMediaByPostId } from "@/api/mediaService";
@@ -26,6 +28,7 @@ import { useAuthStore } from "@/stores/authenticationStore";
 const route = useRoute();
 const router = useRouter();
 const postId = route.params.id as string;
+const toast = useToast();
 
 const post = ref<Post | null>(null);
 const images = ref<Media[]>([]);
@@ -36,6 +39,11 @@ const isLoading = ref(true);
 const errorMessage = ref<string | null>(null);
 
 const auth = useAuthStore();
+
+const isOwner = computed(() => {
+  if (!auth.user || !post.value) return false;
+  return auth.user.id === post.value.authorId;
+});
 
 // fetch the post, its media, and its comments
 async function loadPostData() {
@@ -110,6 +118,64 @@ async function handleVote(voteType: VoteType) {
   }
 }
 
+async function handleShare() {
+  try {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const path =
+      route?.fullPath ??
+      (typeof window !== "undefined"
+        ? window.location.pathname + window.location.search + window.location.hash
+        : "");
+    const url = `${origin}${path}`;
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(url);
+    } else {
+      // Fallback for older browsers
+      const ta = document.createElement("textarea");
+      ta.value = url;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "absolute";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+
+    toast.add({ severity: "secondary", summary: "Link copied to clipboard.", life: 3000 });
+  } catch (err) {
+    console.error("Failed to copy link:", err);
+    alert("Failed to copy link to clipboard");
+  }
+}
+
+async function handleReport() {
+  if (!auth.user) {
+    router.push("/login");
+    return;
+  }
+
+  // implement report api call
+}
+
+async function handleDelete() {
+  if (!isOwner.value) {
+    return;
+  }
+
+  // implement delete api call
+}
+
+async function handleBookmark() {
+  if (!auth.user) {
+    router.push("/login");
+    return;
+  }
+
+  // implement bookmark api call
+}
+
 onMounted(loadPostData);
 </script>
 
@@ -137,7 +203,52 @@ onMounted(loadPostData);
                 </span>
               </div>
 
-              <h1 class="post-title" data-testid="post-title">{{ post.title }}</h1>
+              <div class="post-header">
+                <h1 class="post-title" data-testid="post-title">{{ post.title }}</h1>
+                <Dropdown>
+                  <template #button>
+                    <i class="pi pi-ellipsis-v"></i>
+                  </template>
+                  <template #dropdown="{ close }">
+                    <ul>
+                      <li
+                        @click="
+                          handleShare();
+                          close();
+                        "
+                      >
+                        <i class="pi pi-share-alt"></i> Save
+                      </li>
+                      <li
+                        @click="
+                          handleBookmark();
+                          close();
+                        "
+                      >
+                        <i class="pi pi-bookmark"></i> Save
+                      </li>
+                      <li
+                        @click="
+                          handleReport();
+                          close();
+                        "
+                      >
+                        <i class="pi pi-flag"></i> Report
+                      </li>
+                      <li
+                        v-if="isOwner"
+                        @click="
+                          handleDelete();
+                          close();
+                        "
+                      >
+                        <i class="pi pi-trash"></i> Delete
+                      </li>
+                    </ul>
+                  </template>
+                </Dropdown>
+              </div>
+
               <div class="post-author" data-testid="post-author">
                 @{{ post.authorName }} ·
                 {{ post.createdAt.toLocaleDateString() }}
@@ -247,6 +358,13 @@ onMounted(loadPostData);
 .post-tags {
   font-size: 1.25rem;
   color: var(--tertiary-text-color);
+}
+
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
 }
 
 .post-title {
