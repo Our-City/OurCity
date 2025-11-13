@@ -10,6 +10,8 @@ public class PostResponseDto
     public required string Title { get; set; }
     public required string Description { get; set; }
     public string? Location { get; set; }
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
     public string? AuthorName { get; set; }
     public int UpvoteCount { get; set; }
     public int DownvoteCount { get; set; }

@@ -16,6 +16,8 @@ export interface PostResponseDto {
   description: string;
   authorName?: string;
   location?: string;
+  latitude?: number;
+  longitude?: number;
   upvoteCount: number;
   downvoteCount: number;
   commentCount: number;
@@ -47,6 +49,8 @@ export interface PostCreateRequestDto {
   title: string;
   description: string;
   location?: string;
+  latitude?: number;
+  longitude?: number;
   tags?: string[]; // array of tag IDs
 }
 
@@ -54,6 +58,8 @@ export interface PostUpdateRequestDto {
   title?: string;
   description?: string;
   location?: string;
+  latitude?: number;
+  longitude?: number;
   tags?: string[]; // array of tag IDs
 }
 

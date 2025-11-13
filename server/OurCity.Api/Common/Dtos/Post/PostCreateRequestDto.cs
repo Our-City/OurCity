@@ -22,8 +22,12 @@ public class PostCreateRequestDto
     [RegularExpression(@"^(?!\s*$).+", ErrorMessage = "Description cannot be only whitespace")]
     public required string Description { get; set; }
 
-    [StringLength(50, ErrorMessage = "Location cannot exceed 50 characters")]
+    [StringLength(150, ErrorMessage = "Location cannot exceed 50 characters")]
     public string? Location { get; set; }
+
+    public double? Latitude { get; set; }
+
+    public double? Longitude { get; set; }
 
     public List<Guid> TagIds { get; set; } = new();
 }

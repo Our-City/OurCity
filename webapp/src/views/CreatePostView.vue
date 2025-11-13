@@ -11,6 +11,7 @@ import PageHeader from "@/components/PageHeader.vue";
 import SideBar from "@/components/SideBar.vue";
 import Form from "@/components/utils/FormCmp.vue";
 import MultiSelect from "@/components/utils/MultiSelect.vue";
+import MapPicker from "@/components/MapPicker.vue";
 import { useToast } from "primevue/usetoast";
 
 import InputText from "primevue/inputtext";
@@ -38,6 +39,11 @@ const formData = ref({
   description: "",
   tags: [] as Tag[],
   images: [] as File[],
+  locationData: null as {
+    latitude: number;
+    longitude: number;
+    name: string;
+  } | null,
 });
 
 // Form state
@@ -116,7 +122,9 @@ const handleSubmit = async (event: Event) => {
       id: "", // backend will assign this
       authorId: auth.user.id,
       title: formData.value.title.trim(),
-      location: formData.value.location.trim(),
+      location: formData.value.locationData?.name || formData.value.location.trim() || undefined,
+      latitude: formData.value.locationData?.latitude,
+      longitude: formData.value.locationData?.longitude,
       description: formData.value.description.trim(),
       tags: formData.value.tags,
       createdAt: new Date(),
@@ -161,6 +169,7 @@ const handleReset = () => {
     description: "",
     tags: [],
     images: [],
+    locationData: null,
   };
   errors.value = {};
   titleTouched.value = false;
@@ -273,7 +282,7 @@ const removeImage = (index: number) => {
                 class="form-input"
                 placeholder="e.g., Downtown Winnipeg, University of Manitoba"
                 :class="{ 'p-invalid': showLocationError }"
-                maxlength="50"
+                maxlength="150"
                 @blur="
                   locationTouched = true;
                   validateForm();
@@ -281,7 +290,15 @@ const removeImage = (index: number) => {
               />
               <div v-if="showLocationError" class="form-error">{{ errors.location }}</div>
               <div class="form-help">
-                Where is this post about? {{ formData.location.length }}/50 characters (optional)
+                Where is this post about? {{ formData.location.length }}/150 characters (optional)
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label">Select Location on Map (Optional)</label>
+              <MapPicker v-model="formData.locationData" height="400px" />
+              <div class="form-help">
+                Click on the map to select a location for your post
               </div>
             </div>
 
