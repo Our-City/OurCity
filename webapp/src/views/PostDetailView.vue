@@ -12,6 +12,7 @@ import SideBar from "@/components/SideBar.vue";
 import ImageGalleria from "@/components/ImageGalleria.vue";
 import VoteBox from "@/components/VoteBox.vue";
 import CommentList from "@/components/CommentList.vue";
+import MapDisplay from "@/components/MapDisplay.vue";
 
 import { getPostById, voteOnPost } from "@/api/postService";
 import { getMediaByPostId } from "@/api/mediaService";
@@ -195,8 +196,17 @@ onMounted(loadPostData);
 
           <!-- Sidebar -->
           <div class="map-overview">
-            Map Overview Coming Soon
-            <div class="spinner"></div>
+            <div class="map-overview-header">
+              <i class="pi pi-map-marker"></i>
+              <h3>Location</h3>
+            </div>
+            <MapDisplay
+              :latitude="post.latitude"
+              :longitude="post.longitude"
+              :location-name="post.location"
+              height="500px"
+              :zoom="15"
+            />
           </div>
         </div>
       </div>
@@ -328,23 +338,35 @@ onMounted(loadPostData);
 .map-overview {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
-  width: 30rem;
-  height: 65rem;
+  gap: 1rem;
+  width: 25rem;
+  max-height: calc(100vh - 2rem);
   background: var(--primary-background-color);
   border: 0.1rem solid var(--border-color);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  position: sticky;
+  top: 1rem;
 }
 
-.spinner {
-  margin-top: 1rem;
-  width: 4rem;
-  height: 4rem;
-  border: 0.25rem solid #ccc;
-  border-top: 0.25rem solid #1976d2;
-  border-radius: 100%;
-  animation: spin 1.5s linear infinite;
+.map-overview-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.map-overview-header i {
+  font-size: 1.5rem;
+  color: var(--primary-color, #3b82f6);
+}
+
+.map-overview-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary-text-color);
 }
 
 @keyframes spin {
