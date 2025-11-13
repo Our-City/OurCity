@@ -42,7 +42,6 @@ describe("VoteBox - integration", () => {
 
     await wrapper.find(".vote-btn.downvote").trigger("click");
     expect(pushSpy).toHaveBeenCalledWith("/login");
-    // ensure no vote event emitted
     expect(wrapper.emitted("vote")).toBeUndefined();
   });
 
@@ -58,7 +57,6 @@ describe("VoteBox - integration", () => {
     } as unknown as User;
     auth.user = fakeUser;
 
-    // No existing vote -> upvote should emit UPVOTE
     const wrapperNoVote = mount(VoteBox, {
       global: { plugins: [router] },
       props: { votes: 10 },
@@ -67,7 +65,6 @@ describe("VoteBox - integration", () => {
     await wrapperNoVote.find(".vote-btn.upvote").trigger("click");
     expect(wrapperNoVote.emitted("vote")?.[0]).toEqual([VoteType.UPVOTE]);
 
-    // Existing UPVOTE -> clicking upvote again should emit NOVOTE
     const wrapperUp = mount(VoteBox, {
       global: { plugins: [router] },
       props: { votes: 10, userVote: VoteType.UPVOTE },
@@ -76,7 +73,6 @@ describe("VoteBox - integration", () => {
     await wrapperUp.find(".vote-btn.upvote").trigger("click");
     expect(wrapperUp.emitted("vote")?.[0]).toEqual([VoteType.NOVOTE]);
 
-    // Existing DOWNVOTE -> clicking upvote should emit UPVOTE
     const wrapperDown = mount(VoteBox, {
       global: { plugins: [router] },
       props: { votes: 10, userVote: VoteType.DOWNVOTE },
@@ -85,7 +81,6 @@ describe("VoteBox - integration", () => {
     await wrapperDown.find(".vote-btn.upvote").trigger("click");
     expect(wrapperDown.emitted("vote")?.[0]).toEqual([VoteType.UPVOTE]);
 
-    // Existing NOVOTE (explicit) -> clicking downvote should emit DOWNVOTE
     const wrapperNoVote2 = mount(VoteBox, {
       global: { plugins: [router] },
       props: { votes: 4, userVote: VoteType.NOVOTE },

@@ -3,20 +3,6 @@
 ///   a description of what exactly should be tested for this component and giving
 ///   back the needed functions and syntax to implement the tests.
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-// Mock modules used by RegisterView before importing the view
-vi.mock("@/api/userService", () => ({
-  createUser: vi.fn(),
-}));
-vi.mock("@/api/authenticationService", () => ({
-  login: vi.fn(),
-}));
-vi.mock("@/utils/error", () => ({
-  resolveErrorMessage: vi.fn(() => "Registration failed."),
-}));
-vi.mock("primevue/usetoast", () => ({
-  useToast: () => ({ add: vi.fn() }),
-}));
-
 import { mount } from "@vue/test-utils";
 import { User } from "@/models/user";
 import { createRouter, createMemoryHistory } from "vue-router";
@@ -27,7 +13,22 @@ import { createUser } from "@/api/userService";
 import { login } from "@/api/authenticationService";
 import { resolveErrorMessage } from "@/utils/error";
 
-// Reuse a simple Form stub and InputText stub like the login tests
+vi.mock("@/api/userService", () => ({
+  createUser: vi.fn(),
+}));
+
+vi.mock("@/api/authenticationService", () => ({
+  login: vi.fn(),
+}));
+
+vi.mock("@/utils/error", () => ({
+  resolveErrorMessage: vi.fn(() => "Registration failed."),
+}));
+
+vi.mock("primevue/usetoast", () => ({
+  useToast: () => ({ add: vi.fn() }),
+}));
+
 const FormStub = {
   props: ["loading", "variant", "width", "title", "subtitle"],
   template: `
@@ -93,18 +94,15 @@ describe("RegisterView - integration", () => {
 
     const auth = useAuthStore();
 
-    // Fill form fields
     await wrapper.find("#username").setValue("newbie");
     await wrapper.find("#password").setValue("s3cret123");
     await wrapper.find("#confirmPassword").setValue("s3cret123");
 
     const pushSpy = vi.spyOn(router, "push");
 
-    // Submit
     const form = wrapper.find("form");
     await form.trigger("submit");
 
-    // allow async tasks to resolve
     await new Promise((r) => setTimeout(r, 0));
 
     expect(createUser).toHaveBeenCalledWith("newbie", "s3cret123");
@@ -127,18 +125,15 @@ describe("RegisterView - integration", () => {
       },
     });
 
-    // Fill form
     await wrapper.find("#username").setValue("failuser");
     await wrapper.find("#password").setValue("abc123");
     await wrapper.find("#confirmPassword").setValue("abc123");
 
-    // Submit
     const form = wrapper.find("form");
     await form.trigger("submit");
 
     await new Promise((r) => setTimeout(r, 0));
 
-    // store shouldn't have a user
     const auth = useAuthStore();
     expect(auth.user).toBeNull();
 

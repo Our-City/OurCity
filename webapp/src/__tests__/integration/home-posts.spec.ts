@@ -4,7 +4,13 @@
 ///   back the needed functions and syntax to implement the tests.
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { ref } from "vue";
-// Mock the usePostFilters composable before importing the view
+import { mount } from "@vue/test-utils";
+import { createRouter, createMemoryHistory } from "vue-router";
+import { setActivePinia, createPinia } from "pinia";
+import { useAuthStore } from "@/stores/authenticationStore";
+import { User } from "@/models/user";
+import HomeView from "@/views/HomeView.vue";
+
 vi.mock("@/composables/usePostFilters", () => {
   const posts = ref([]);
   const loading = ref(false);
@@ -31,13 +37,6 @@ vi.mock("@/composables/usePostFilters", () => {
   };
 });
 
-import { mount } from "@vue/test-utils";
-import { createRouter, createMemoryHistory } from "vue-router";
-import { setActivePinia, createPinia } from "pinia";
-import { useAuthStore } from "@/stores/authenticationStore";
-import { User } from "@/models/user";
-import HomeView from "@/views/HomeView.vue";
-
 describe("HomeView - integration", () => {
   let router: ReturnType<typeof createRouter>;
 
@@ -55,7 +54,6 @@ describe("HomeView - integration", () => {
   });
 
   it("calls fetchPosts on mount and passes posts/loading/error to PostList", async () => {
-    // Arrange - get the mocked composable state and mutate posts
     const postFilters = (await import("@/composables/usePostFilters")).usePostFilters();
     postFilters.posts.value = [
       { id: "p1", title: "Post One" },
@@ -78,18 +76,16 @@ describe("HomeView - integration", () => {
       },
     });
 
-    // fetchPosts should have been called by onMounted
     const pf = (await import("@/composables/usePostFilters")).usePostFilters();
     expect(pf.fetchPosts).toHaveBeenCalled();
 
-    // Ensure the PostList stub is present
     const stub = wrapper.find('[data-testid="post-list-stub"]');
     expect(stub.exists()).toBe(true);
   });
 
   it("navigates to login when Create Post clicked and user not logged in, otherwise to create-post", async () => {
     const auth = useAuthStore();
-    auth.user = null; // not logged in
+    auth.user = null;
 
     const wrapper = mount(HomeView, {
       global: {
@@ -107,7 +103,6 @@ describe("HomeView - integration", () => {
     await wrapper.find(".create-post-button").trigger("click");
     expect(pushSpy).toHaveBeenCalledWith("/login");
 
-    // Now simulate logged in
     const u = {
       id: "u1",
       username: "me",

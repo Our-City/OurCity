@@ -3,21 +3,6 @@
 ///   a description of what exactly should be tested for this component and giving
 ///   back the needed functions and syntax to implement the tests.
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-
-// Mock API modules
-vi.mock("@/api/postService", () => ({
-  getPostById: vi.fn(),
-}));
-
-// Mock toast to avoid primevue global config access and allow assertions
-const toastAdd = vi.fn();
-vi.mock("primevue/usetoast", () => ({ useToast: () => ({ add: toastAdd }) }));
-
-// Mock userService for ProfileHeader update flows
-vi.mock("@/api/userService", () => ({
-  updateCurrentUser: vi.fn(),
-}));
-
 import { mount } from "@vue/test-utils";
 import { User } from "@/models/user";
 import { createRouter, createMemoryHistory } from "vue-router";
@@ -27,6 +12,17 @@ import { useAuthStore } from "@/stores/authenticationStore";
 import { getPostById } from "@/api/postService";
 import ProfileHeader from "@/components/profile/ProfileHeader.vue";
 import { updateCurrentUser } from "@/api/userService";
+
+vi.mock("@/api/postService", () => ({
+  getPostById: vi.fn(),
+}));
+
+const toastAdd = vi.fn();
+vi.mock("primevue/usetoast", () => ({ useToast: () => ({ add: toastAdd }) }));
+
+vi.mock("@/api/userService", () => ({
+  updateCurrentUser: vi.fn(),
+}));
 
 describe("ProfileView - integration", () => {
   let router: ReturnType<typeof createRouter>;
@@ -51,7 +47,6 @@ describe("ProfileView - integration", () => {
   it("loads posts for the current user and renders them", async () => {
     const auth = useAuthStore();
 
-    // spy and mock fetchCurrentUser to set a user with posts
     vi.spyOn(auth, "fetchCurrentUser").mockImplementation(async () => {
       const u = {
         id: "u1",
@@ -75,7 +70,6 @@ describe("ProfileView - integration", () => {
         stubs: {
           PageHeader: { template: "<div/>" },
           SideBar: { template: "<div/>" },
-          // stub PostList to render a simple list so we can assert items
           PostList: {
             props: ["posts"],
             template: `<div><div v-for="p in posts" :key="p.id" class="profile-post-item">{{ p.title }}</div></div>`,
@@ -88,7 +82,6 @@ describe("ProfileView - integration", () => {
       },
     });
 
-    // allow onMounted to run
     await router.isReady();
     await new Promise((r) => setTimeout(r, 0));
 
@@ -151,7 +144,6 @@ describe("ProfileView - integration", () => {
       auth.user = u;
     });
 
-    // use the real ProfileHeader so the button exists; stub other heavy children
     const wrapper = mount(ProfileView, {
       global: {
         plugins: [router],
@@ -176,7 +168,6 @@ describe("ProfileView - integration", () => {
     expect(pushSpy).toHaveBeenCalledWith("/create-post");
   });
 
-  // Additional ProfileHeader-focused integration tests
   describe("ProfileHeader - integration", () => {
     it("shows username and allows editing, save updates auth store and shows toast", async () => {
       const auth = useAuthStore();
@@ -190,7 +181,6 @@ describe("ProfileView - integration", () => {
       } as unknown as User;
       auth.user = u;
 
-      // mock successful update
       (updateCurrentUser as unknown as vi.Mock).mockResolvedValue({
         id: "u5",
         username: "newname",
@@ -203,23 +193,18 @@ describe("ProfileView - integration", () => {
         },
       });
 
-      // username displayed
       expect(wrapper.find(".profile-username").text()).toContain("oldname");
 
-      // click edit
       await wrapper.find(".edit-username-button").trigger("click");
 
       const input = wrapper.find(".username-input");
       expect(input.exists()).toBe(true);
       await input.setValue("newname");
 
-      // click save
       await wrapper.find(".save-button").trigger("click");
 
-      // wait async
       await new Promise((r) => setTimeout(r, 0));
 
-      // auth store should be updated and toast called
       expect(auth.user?.username).toBe("newname");
       expect(toastAdd).toHaveBeenCalled();
     });
@@ -244,19 +229,16 @@ describe("ProfileView - integration", () => {
       await wrapper.find(".edit-username-button").trigger("click");
       const input = wrapper.find(".username-input");
 
-      // empty username
       await input.setValue("");
       await wrapper.find(".save-button").trigger("click");
       await new Promise((r) => setTimeout(r, 0));
       expect(wrapper.find(".form-error").text()).toContain("Username cannot be empty");
 
-      // too short
       await input.setValue("aa");
       await wrapper.find(".save-button").trigger("click");
       await new Promise((r) => setTimeout(r, 0));
       expect(wrapper.find(".form-error").text()).toContain("between 3 and 20 characters");
 
-      // invalid chars
       await input.setValue("bad name$");
       await wrapper.find(".save-button").trigger("click");
       await new Promise((r) => setTimeout(r, 0));
