@@ -4,7 +4,7 @@
   e.g., loading Tags using API, etc.
   Copilot assisted with error handling.-->
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 
 import PageHeader from "@/components/PageHeader.vue";
@@ -12,6 +12,7 @@ import SideBar from "@/components/SideBar.vue";
 import Form from "@/components/utils/FormCmp.vue";
 import MultiSelect from "@/components/utils/MultiSelect.vue";
 import MapPicker from "@/components/MapPicker.vue";
+import LocationAutocomplete from "@/components/LocationAutocomplete.vue";
 import { useToast } from "primevue/usetoast";
 
 import InputText from "primevue/inputtext";
@@ -227,6 +228,39 @@ const handleFileUpload = (event: Event) => {
 const removeImage = (index: number) => {
   formData.value.images.splice(index, 1);
 };
+
+// Handle location selected from autocomplete
+function handleLocationSelected(location: { name: string; latitude: number; longitude: number }) {
+  // Update the locationData which will automatically update the map via v-model
+  formData.value.locationData = {
+    name: location.name,
+    latitude: location.latitude,
+    longitude: location.longitude,
+  };
+  
+  // Also update the text field for consistency
+  formData.value.location = location.name;
+}
+
+// Handle manual changes to location text field
+function handleLocationTextChange(value: string) {
+  formData.value.location = value;
+  
+  // If user clears the field, also clear the map marker
+  if (!value.trim() && formData.value.locationData) {
+    formData.value.locationData = null;
+  }
+}
+
+watch(
+  () => formData.value.locationData,
+  (newLocationData) => {
+    if (newLocationData?.name && newLocationData.name !== formData.value.location) {
+      formData.value.location = newLocationData.name;
+    }
+  },
+);
+
 </script>
 
 <template>
@@ -276,21 +310,16 @@ const removeImage = (index: number) => {
             <!-- Location Field -->
             <div class="form-field">
               <label class="form-label" for="location">Location</label>
-              <InputText
-                id="location"
-                v-model="formData.location"
-                class="form-input"
+              
+              <LocationAutocomplete
+                :model-value="formData.location"
                 placeholder="e.g., Downtown Winnipeg, University of Manitoba"
-                :class="{ 'p-invalid': showLocationError }"
-                maxlength="150"
-                @blur="
-                  locationTouched = true;
-                  validateForm();
-                "
+                @update:model-value="handleLocationTextChange"
+                @location-selected="handleLocationSelected"
               />
-              <div v-if="showLocationError" class="form-error">{{ errors.location }}</div>
+              
               <div class="form-help">
-                Where is this post about? {{ formData.location.length }}/150 characters (optional)
+                Start typing to search for a location {{ formData.location.length }}/150 characters (optional)
               </div>
             </div>
 

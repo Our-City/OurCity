@@ -1,7 +1,11 @@
 <!-- Google Maps component for selecting a location by clicking on the map
-  Allows users to place a marker and get location details -->
+  Allows users to place a marker and get location details 
+  Generative AI - CoPilot was used to assist in the creation of this file.
+    CoPilot was asked to provide help with CSS styling and for help with syntax.
+    It also assisted with error handling-->
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
+import { loadGoogleMaps } from "@/utils/googleMapsLoader";
 
 interface Props {
   modelValue?: {
@@ -39,29 +43,8 @@ const error = ref<string | null>(null);
 // Default center (Winnipeg)
 const DEFAULT_CENTER = { lat: 49.8951, lng: -97.1384 };
 
-// Check if Google Maps script is already loaded
-function isGoogleMapsLoaded(): boolean {
-  return typeof google !== 'undefined' && typeof google.maps !== 'undefined';
-}
 
-// Wait for Google Maps to be fully loaded
-function waitForGoogleMaps(): Promise<void> {
-  return new Promise((resolve) => {
-    if (isGoogleMapsLoaded()) {
-      resolve();
-      return;
-    }
-    
-    const checkInterval = setInterval(() => {
-      if (isGoogleMapsLoaded()) {
-        clearInterval(checkInterval);
-        resolve();
-      }
-    }, 100);
-  });
-}
-
-// Initialize Google Maps using the new functional API
+// Initialize Google Maps
 async function initMap() {
   try {
     isLoading.value = true;
@@ -71,20 +54,10 @@ async function initMap() {
       throw new Error("Map container not found");
     }
 
-    // Only load the script if it hasn't been loaded yet
-    if (!isGoogleMapsLoaded()) {
-      const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places,geocoding,marker&v=weekly&loading=async`;
-      script.async = true;
-      script.defer = true;
+    // Load Google Maps using shared utility
+    await loadGoogleMaps();
 
-      document.head.appendChild(script);
-      
-      // Wait for Google Maps to be fully loaded
-      await waitForGoogleMaps();
-    }
-
-    // Additional wait to ensure all libraries are loaded
+    // Small delay to ensure all libraries are ready
     await new Promise(resolve => setTimeout(resolve, 100));
 
     // Initialize geocoder
@@ -125,7 +98,6 @@ async function initMap() {
     isLoading.value = false;
   }
 }
-
 // Handle map click - place marker and get location details
 async function handleMapClick(latLng: google.maps.LatLng) {
   const lat = latLng.lat();
@@ -215,13 +187,24 @@ function clearLocation() {
 // Watch for external changes to modelValue
 watch(
   () => props.modelValue,
-  (newValue) => {
-    if (newValue?.latitude && newValue?.longitude && map) {
-      placeMarker({ lat: newValue.latitude, lng: newValue.longitude });
-    } else if (!newValue && marker) {
-      clearLocation();
+  (newValue, oldValue) => {
+    // Only update if the value actually changed
+    if (
+      newValue?.latitude !== oldValue?.latitude ||
+      newValue?.longitude !== oldValue?.longitude
+    ) {
+      if (newValue?.latitude && newValue?.longitude && map) {
+        placeMarker({ lat: newValue.latitude, lng: newValue.longitude });
+        
+        // Optionally, re-center the map on the new location
+        map.setCenter({ lat: newValue.latitude, lng: newValue.longitude });
+        map.setZoom(15); // Zoom in to show the location better
+      } else if (!newValue && marker) {
+        clearLocation();
+      }
     }
   },
+  { deep: true } // Watch nested properties
 );
 
 // Initialize map on mount
