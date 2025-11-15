@@ -77,6 +77,35 @@ const imagePreviewUrls = computed(() => {
   return formData.value.images.map((file) => URL.createObjectURL(file));
 });
 
+// Drag / reorder state and handlers
+const dragIndex = ref<number | null>(null);
+
+const onDragStart = (event: DragEvent, index: number) => {
+  dragIndex.value = index;
+  // required for Firefox to allow dragging
+  event.dataTransfer?.setData("text/plain", String(index));
+};
+
+const onDragOver = (event: DragEvent) => {
+  event.preventDefault();
+};
+
+const onDrop = (event: DragEvent, targetIndex: number) => {
+  event.preventDefault();
+  const from = dragIndex.value ?? parseInt(event.dataTransfer?.getData("text/plain") || "-1", 10);
+  const to = targetIndex;
+  if (from < 0 || isNaN(from) || from === to) {
+    dragIndex.value = null;
+    return;
+  }
+
+  const files = formData.value.images;
+  const [moved] = files.splice(from, 1);
+  files.splice(to, 0, moved);
+  // reset drag index
+  dragIndex.value = null;
+};
+
 // Computed properties for showing errors only after touch
 const showTitleError = computed(() => {
   return titleTouched.value && errors.value.title;
@@ -354,6 +383,11 @@ const removeImage = (index: number) => {
                   v-for="(image, index) in formData.images"
                   :key="index"
                   class="form-file-preview-item"
+                  draggable="true"
+                  @dragstart="(e) => onDragStart(e, index)"
+                  @dragover="onDragOver"
+                  @drop="(e) => onDrop(e, index)"
+                  :aria-grabbed="dragIndex === index"
                 >
                   <img
                     :src="imagePreviewUrls[index]"
@@ -364,8 +398,9 @@ const removeImage = (index: number) => {
                     type="button"
                     class="form-file-preview-remove"
                     @click="removeImage(index)"
+                    title="Remove image"
                   >
-                    ×
+                    X
                   </button>
                 </div>
               </div>
@@ -462,5 +497,50 @@ const removeImage = (index: number) => {
   .create-post-page-body {
     order: 1;
   }
+}
+
+.form-file-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.form-file-preview-item {
+  position: relative;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.25rem;
+  background: var(--primary-background-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 10rem;
+  width: 10rem;
+  overflow: hidden;
+  cursor: grab;
+}
+
+.form-file-preview-item:active {
+  cursor: grabbing;
+}
+
+.form-file-preview-image {
+  max-width: 100%;
+  max-height: 10rem;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.form-file-preview-remove {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.6);
+  color: var(--primary-background-color);
+  border: none;
+  border-radius: 10rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 </style>
