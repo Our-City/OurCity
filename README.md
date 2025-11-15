@@ -8,6 +8,8 @@ OurCity is a hub for the citizens of Winnipeg, Canada to post their suggestions 
 
 This is a student project for COMP 4350 (Software Engineering 2) at the University of Manitoba. This is an educational prototype, and is not officially associated with the City of Winnipeg.
 
+## Planning
+[API Contract](https://docs.google.com/spreadsheets/d/10JAtrF4jHyN3iPUQ_0kMD0UvilGwsvEeYr2FGr_l5jk/edit?usp=sharing)
 
 ## Documentation
 
