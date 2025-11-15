@@ -7,7 +7,6 @@ using OurCity.Api.Common.Dtos.Post;
 using OurCity.Api.Common.Dtos.User;
 using OurCity.Api.Common.Enum;
 using OurCity.Api.Infrastructure.Database;
-using Xunit;
 
 namespace OurCity.Api.Test.IntegrationTests;
 
