@@ -122,7 +122,7 @@ const postImage = computed(() => media.value[0]?.url || null);
   font-weight: 800;
   color: var(--primary-text-color);
   white-space: nowrap;
-  overflow: visible;
+  overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
   min-width: 0;
