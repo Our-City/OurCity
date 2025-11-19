@@ -137,11 +137,12 @@ onMounted(loadPostData);
                 </span>
               </div>
 
-              <h1 class="post-title" data-testid="post-title">{{ post.title }}</h1>
               <div class="post-author" data-testid="post-author">
                 @{{ post.authorName }} ·
                 {{ post.createdAt.toLocaleDateString() }}
               </div>
+
+              <h1 class="post-title" data-testid="post-title">{{ post.title }}</h1>
 
               <div v-if="post.location" class="post-location">
                 {{ post.location }}
@@ -250,7 +251,7 @@ onMounted(loadPostData);
   width: 100%;
   background: var(--primary-background-color);
   border: 0.1rem solid var(--border-color);
-  padding: 4rem 4rem;
+  padding: 5rem 5rem 3rem 5rem;
 }
 
 .post-tags {
@@ -259,16 +260,16 @@ onMounted(loadPostData);
 }
 
 .post-title {
-  font-size: 3rem;
+  font-size: 2.75rem;
 }
 
 .post-author {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   color: var(--tertiary-text-color);
 }
 
 .post-location {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   color: var(--tertiary-text-color);
 }
 
@@ -279,12 +280,13 @@ onMounted(loadPostData);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 2rem;
+  padding: 2rem 2rem 1rem 2rem;
 }
 
 .post-description {
-  font-size: 1.25rem;
-  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  padding-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 .post-footer {

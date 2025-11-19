@@ -127,7 +127,7 @@ function closeImageModal() {
   justify-content: center;
   color: var(--secondary-text-color);
   cursor: pointer;
-  z-index: 2;
+  z-index: 5;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s;

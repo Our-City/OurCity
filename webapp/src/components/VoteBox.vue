@@ -90,7 +90,6 @@ function handleDownvote() {
 .vote-box {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
   border-radius: 3rem;
 }
 
@@ -138,7 +137,7 @@ function handleDownvote() {
 
 .vote-count {
   font-weight: bold;
-  font-size: 1rem;
+  font-size: 0.9rem;
   min-width: 2rem;
   text-align: center;
   color: var(--text-color);
