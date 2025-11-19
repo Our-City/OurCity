@@ -406,6 +406,13 @@ const removeImage = (index: number) => {
 <style scoped>
 .create-post {
   padding: 1rem;
+  height: 100vh;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .create-post-page-layout {
@@ -421,11 +428,18 @@ const removeImage = (index: number) => {
   overflow-y: auto;
   overflow-x: hidden;
   padding: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  position: relative;
 }
 
 .create-post-container {
   max-width: 800px;
-  margin: 0 auto;
+  width: 100%;
+  position: relative;
+  left: -10rem;
+  margin-right: -10rem;
 }
 
 /* Custom styles for PrimeVue input components */
