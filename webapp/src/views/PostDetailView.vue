@@ -207,12 +207,21 @@ onMounted(loadPostData);
 <style scoped>
 .post-detail {
   padding: 1rem;
+  height: 100vh;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  
 }
 
 .post-detail-layout {
   display: flex;
   height: 100vh;
   overflow: hidden;
+  padding-bottom: 5rem;
 }
 
 .post-detail-body {

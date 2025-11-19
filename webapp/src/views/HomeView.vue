@@ -98,11 +98,18 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
 <style scoped>
 .home-page {
   padding: 1rem;
+  height: 100vh;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .home-page-layout {
   display: flex;
-  height: 100vh;
+  height: calc(100vh - 2rem);
   overflow: hidden;
 }
 
@@ -118,19 +125,19 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
   background: var(--neutral-color);
   margin: 1rem 1.5rem 1rem 1rem;
   border-radius: 1rem;
-  padding: 3rem 10rem 3rem 4rem;
+  padding: 1.75rem 10rem 2.5rem 4rem;
 }
 
 .create-post-title {
-  font-size: 4rem;
+  font-size: 3rem;
   color: var(--secondary-text-color);
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .create-post-description {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   color: var(--secondary-text-color);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .create-post-button {
@@ -138,7 +145,7 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
   align-items: center;
   background: var(--primary-background-color);
   color: var(--primary-text-color);
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   border: none;
   border-radius: 0.75rem;
