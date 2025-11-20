@@ -335,18 +335,20 @@ onMounted(loadPostData);
   background: var(--neutral-color-hover);
 }
 
+
 .map-overview {
   display: flex;
   flex-direction: column;
   gap: 1rem;
   width: 25rem;
-  max-height: calc(100vh - 2rem);
+  height: 700px; 
   background: var(--primary-background-color);
   border: 0.1rem solid var(--border-color);
   border-radius: 1rem;
   padding: 1.5rem;
   position: sticky;
   top: 1rem;
+  overflow: hidden; /* Prevent content overflow */
 }
 
 .map-overview-header {
@@ -355,6 +357,7 @@ onMounted(loadPostData);
   gap: 0.75rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
 }
 
 .map-overview-header i {
