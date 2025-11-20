@@ -87,7 +87,7 @@ public class PostService : IPostService
         PostCreateRequestDto postCreateRequestDto
     )
     {
-        var tags = await _tagRepository.GetTagsByIds(postCreateRequestDto.TagIds);
+        var tags = await _tagRepository.GetTagsByIds(postCreateRequestDto.Tags);
 
         var createdPost = await _postRepository.CreatePost(
             postCreateRequestDto.CreateDtoToEntity(userId, tags.ToList())
@@ -114,8 +114,8 @@ public class PostService : IPostService
         }
 
         var tags =
-            postUpdateRequestDto.TagIds != null
-                ? await _tagRepository.GetTagsByIds(postUpdateRequestDto.TagIds)
+            postUpdateRequestDto.Tags != null
+                ? await _tagRepository.GetTagsByIds(postUpdateRequestDto.Tags)
                 : null;
 
         postUpdateRequestDto.UpdateDtoToEntity(post, tags?.ToList());

@@ -25,5 +25,5 @@ public class PostCreateRequestDto
     [StringLength(50, ErrorMessage = "Location cannot exceed 50 characters")]
     public string? Location { get; set; }
 
-    public List<Guid> TagIds { get; set; } = new();
+    public List<Guid> Tags { get; set; } = new();
 }
