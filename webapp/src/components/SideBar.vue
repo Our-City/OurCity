@@ -61,7 +61,7 @@ onMounted(fetchTags);
     </button>
 
     <!-- scrollable tag list -->
-    <div class="tag-list disabled">
+    <div class="tag-list">
       <button
         v-for="tag in tags"
         :key="tag.id"
