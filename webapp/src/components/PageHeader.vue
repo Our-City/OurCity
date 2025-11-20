@@ -103,7 +103,9 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
 
 <style scoped>
 .page-header {
-  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 4rem 6rem rgba(0, 0, 0, 0.075);
+  position: relative;
+  z-index: 10;
 }
 
 .app-title {

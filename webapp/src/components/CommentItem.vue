@@ -43,10 +43,7 @@ async function handleVote(voteType: VoteType) {
   <div class="comment-item">
     <div class="comment-header">
       <span class="comment-author">@{{ comment.authorName }}</span>
-    </div>
-
-    <div class="comment-date">
-      <span class="comment-date">{{ comment.createdAt.toLocaleDateString() }}</span>
+      <span class="comment-date"> · {{ comment.createdAt.toLocaleDateString() }}</span>
     </div>
 
     <div class="comment-body">
@@ -64,21 +61,22 @@ async function handleVote(voteType: VoteType) {
 <style scoped>
 .comment-item {
   padding: 1rem;
-  margin-left: 1rem;
+  margin-left: 2rem;
+  margin-right: 2rem;
 }
 .comment-author {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   color: var(--neutral-color);
-  margin-bottom: 0.5rem;
-}
-.comment-text {
-  font-size: 1rem;
-  color: var(--primary-text-color);
   margin-bottom: 0.5rem;
 }
 .comment-date {
   font-size: 1rem;
   color: var(--tertiary-text-color);
+  margin-bottom: 0.5rem;
+}
+.comment-text {
+  font-size: 1rem;
+  color: var(--primary-text-color);
   margin-bottom: 0.5rem;
 }
 .comment-votes {

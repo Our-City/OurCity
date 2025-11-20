@@ -46,7 +46,7 @@ const sortButtonLabel = computed(() => {
 </script>
 
 <template>
-  <div>
+  <div class="post-list-page">
     <!-- Sort toggle button -->
     <div v-if="showSortControls" class="sort-order-container">
       <button class="sort-order-button" @click="emit('toggleSort')">
@@ -87,8 +87,12 @@ const sortButtonLabel = computed(() => {
 </template>
 
 <style scoped>
+.post-list-page {
+  padding-bottom: 5rem;
+}
+
 .sort-order-container {
-  padding: 1rem;
+  padding: 0.25rem 1rem;
   display: flex;
   justify-content: flex-end;
 }

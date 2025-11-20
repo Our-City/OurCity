@@ -29,7 +29,7 @@ const emit = defineEmits(["close"]);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 3;
+  z-index: 20;
 }
 .close-modal-btn {
   position: absolute;
