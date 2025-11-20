@@ -227,12 +227,12 @@ onMounted(() => {
 }
 
 .location-details i {
-  color: var(--primary-color, #3b82f6);
+  color: var(--primary-color, #dc3545);
 }
 
 .location-name {
   font-size: 0.9rem;
-  color: var(--primary-text-color);
+  color: white;
   font-weight: 500;
 }
 </style>
