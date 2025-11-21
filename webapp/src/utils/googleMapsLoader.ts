@@ -1,4 +1,5 @@
 /**
+ * Generative AI was used to assist in the creation of this file 
  * Google Maps API loader utility
  * Ensures the Google Maps script is loaded only once and shared across components
  */
@@ -7,33 +8,28 @@ let loadPromise: Promise<void> | null = null;
 let isLoaded = false;
 
 export function loadGoogleMaps(): Promise<void> {
-  // If already loaded and Places library is ready, return immediately
   if (isLoaded && typeof google !== 'undefined' && google.maps && google.maps.places) {
     return Promise.resolve();
   }
 
-  // If currently loading, return the existing promise
   if (loadPromise) {
     return loadPromise;
   }
 
   // Start loading
   loadPromise = new Promise((resolve, reject) => {
-    // Check if already loaded (in case another component loaded it)
     if (typeof google !== 'undefined' && google.maps && google.maps.places) {
       isLoaded = true;
       resolve();
       return;
     }
 
-    // Create and append script
     const script = document.createElement('script');
     script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places,geocoding,marker&v=weekly&loading=async`;
     script.async = true;
     script.defer = true;
 
     script.onload = () => {
-      // Poll until Places library is fully available
       const checkPlacesLibrary = () => {
         if (typeof google !== 'undefined' && 
             google.maps && 
@@ -43,7 +39,6 @@ export function loadGoogleMaps(): Promise<void> {
           console.log('Google Maps and Places API fully loaded');
           resolve();
         } else {
-          // Check again after a short delay
           setTimeout(checkPlacesLibrary, 50);
         }
       };
@@ -60,7 +55,7 @@ export function loadGoogleMaps(): Promise<void> {
     };
 
     script.onerror = () => {
-      loadPromise = null; // Reset so it can be retried
+      loadPromise = null; 
       reject(new Error('Failed to load Google Maps script'));
     };
 

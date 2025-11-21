@@ -59,29 +59,24 @@ async function initMap() {
       throw new Error("Map container not found");
     }
 
-    // Load Google Maps using shared utility
     await loadGoogleMaps();
 
-    // Small delay to ensure all libraries are ready
     await new Promise(resolve => setTimeout(resolve, 100));
 
-    // Initialize geocoder
     geocoder = new google.maps.Geocoder();
 
-    // Determine initial center
     const initialCenter =
       props.modelValue?.latitude && props.modelValue?.longitude
         ? { lat: props.modelValue.latitude, lng: props.modelValue.longitude }
         : DEFAULT_CENTER;
 
-    // Create map instance with Map ID (required for Advanced Markers)
     map = new google.maps.Map(mapContainer.value, {
       center: initialCenter,
       zoom: 12,
       mapTypeControl: true,
       streetViewControl: false,
       fullscreenControl: true,
-      mapId: "OURCITY_MAP", // Required for Advanced Markers
+      mapId: "OURCITY_MAP", 
     });
 
     radiusCircle = new google.maps.Circle({
@@ -93,17 +88,15 @@ async function initMap() {
       strokeWeight: 2,
       fillColor: "#4285F4",
       fillOpacity: 0.15,
-      clickable: false, // Don't interfere with map clicks
+      clickable: false, 
     });
 
-    // Add click listener to map
     map.addListener("click", (event: google.maps.MapMouseEvent) => {
       if (event.latLng) {
         handleMapClick(event.latLng);
       }
     });
 
-    // If there's an initial value, place a marker
     if (props.modelValue?.latitude && props.modelValue?.longitude) {
       placeMarker(initialCenter);
     }
@@ -126,19 +119,16 @@ async function handleMapClick(latLng: google.maps.LatLng) {
     const distance = getDistanceFromWinnipeg(lat, lng);
     const errorMsg = `This location is ${distance.toFixed(1)} km from Winnipeg city center. Please select a location within Winnipeg.`;
     emit("location-error", errorMsg);
-    return; // Don't place marker
+    return; 
   }
 
-  // Clear any previous errors (both local and parent)
   emit("location-error", null);
 
-  // Place or move marker
   placeMarker({ lat, lng });
 
   // Reverse geocode to get location name
   const locationName = await reverseGeocode(lat, lng);
 
-  // Emit the selected location
   emit("update:modelValue", {
     latitude: lat,
     longitude: lng,
@@ -175,10 +165,8 @@ function placeMarker(position: { lat: number; lng: number }) {
   if (!map) return;
 
   if (marker) {
-    // Update existing marker position
     marker.position = position;
   } else {
-    // Create new Advanced Marker
     marker = new google.maps.marker.AdvancedMarkerElement({
       map,
       position,
@@ -186,21 +174,18 @@ function placeMarker(position: { lat: number; lng: number }) {
       title: "Selected Location",
     });
 
-    // Add drag listener to marker
     marker.addListener("dragend", () => {
       const newPosition = marker?.position;
       if (newPosition && typeof newPosition === 'object' && 'lat' in newPosition && 'lng' in newPosition) {
         const lat = typeof newPosition.lat === 'function' ? newPosition.lat() : newPosition.lat;
         const lng = typeof newPosition.lng === 'function' ? newPosition.lng() : newPosition.lng;
         
-        // Create a proper LatLng object
         const latLng = new google.maps.LatLng(lat as number, lng as number);
         handleMapClick(latLng);
       }
     });
   }
 
-  // Center map on marker
   map.panTo(position);
 }
 
@@ -216,7 +201,6 @@ async function reverseGeocode(lat: number, lng: number): Promise<string> {
     });
 
     if (response.results && response.results.length > 0) {
-      // Get the most specific address available
       const result = response.results[0];
       return result.formatted_address;
     }
@@ -231,7 +215,7 @@ async function reverseGeocode(lat: number, lng: number): Promise<string> {
 // Clear the selected location
 function clearLocation() {
   if (marker) {
-    marker.map = null; // Remove marker from map
+    marker.map = null;
     marker = null;
   }
   emit("update:modelValue", null);
@@ -241,7 +225,6 @@ function clearLocation() {
 watch(
   () => props.modelValue,
   (newValue, oldValue) => {
-    // Only update if the value actually changed
     if (
       newValue?.latitude !== oldValue?.latitude ||
       newValue?.longitude !== oldValue?.longitude
@@ -249,15 +232,14 @@ watch(
       if (newValue?.latitude && newValue?.longitude && map) {
         placeMarker({ lat: newValue.latitude, lng: newValue.longitude });
         
-        // Optionally, re-center the map on the new location
         map.setCenter({ lat: newValue.latitude, lng: newValue.longitude });
-        map.setZoom(15); // Zoom in to show the location better
+        map.setZoom(15);
       } else if (!newValue && marker) {
         clearLocation();
       }
     }
   },
-  { deep: true } // Watch nested properties
+  { deep: true } 
 );
 
 // Initialize map on mount

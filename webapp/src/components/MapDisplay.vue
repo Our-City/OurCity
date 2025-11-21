@@ -42,21 +42,17 @@ async function initMap() {
       throw new Error("Map container not found");
     }
 
-    // Load Google Maps using shared utility
     await loadGoogleMaps();
 
     // Small delay to ensure all libraries are ready
     await new Promise((resolve) => setTimeout(resolve, 100));
 
-    // Check if we have a valid location
     hasLocation.value = !!(props.latitude && props.longitude);
 
-    // Determine map center
     const center = hasLocation.value
       ? { lat: props.latitude!, lng: props.longitude! }
       : DEFAULT_CENTER;
 
-    // Create map instance
     map = new google.maps.Map(mapContainer.value, {
       center,
       zoom: hasLocation.value ? props.zoom : 12,
@@ -64,10 +60,9 @@ async function initMap() {
       streetViewControl: false,
       fullscreenControl: true,
       mapId: "OURCITY_MAP_DISPLAY",
-      // Disable interactions for read-only display
       disableDefaultUI: false,
-      draggable: true, // Allow panning to explore
-      scrollwheel: true, // Allow zoom
+      draggable: true,
+      scrollwheel: true,
       disableDoubleClickZoom: false,
     });
 
@@ -88,7 +83,6 @@ async function initMap() {
 function placeMarker(position: { lat: number; lng: number }) {
   if (!map) return;
 
-  // Create Advanced Marker
   marker = new google.maps.marker.AdvancedMarkerElement({
     map,
     position,
@@ -104,7 +98,6 @@ watch(
       hasLocation.value = true;
       const position = { lat: newLat as number, lng: newLng as number };
 
-      // Update or create marker
       if (marker) {
         marker.position = position;
       } else {
@@ -116,7 +109,6 @@ watch(
       map.setZoom(props.zoom);
     } else {
       hasLocation.value = false;
-      // Remove marker if it exists
       if (marker) {
         marker.map = null;
         marker = null;

@@ -1,4 +1,5 @@
 /**
+ * Generative AI was used to assist in the creation of this file
  * Location validation utilities for Winnipeg city boundaries
  */
 
@@ -12,7 +13,7 @@ const WINNIPEG_CENTER = {
 const WINNIPEG_RADIUS_KM = 25;
 
 /**
- * Calculate distance between two coordinates using Haversine formula
+ * Calculates distance between two coordinates using Haversine formula
  * Returns distance in kilometers
  */
 export function calculateDistance(
@@ -79,7 +80,7 @@ export function validateWinnipegLocation(
   longitude?: number,
 ): string | null {
   if (!latitude || !longitude) {
-    return null; // Optional field, no validation needed
+    return null; 
   }
 
   if (!isWithinWinnipeg(latitude, longitude)) {

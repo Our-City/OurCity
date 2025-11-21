@@ -1,3 +1,7 @@
+<!-- Generative AI - CoPilot was used to assist in the creation of this file.
+  CoPilot was asked to provide help with CSS styling and for help with syntax.
+  It also assisted with error handling.-->
+
 <script setup lang="ts">
 import { ref, onMounted, watch, nextTick } from "vue";
 import { loadGoogleMaps } from "@/utils/googleMapsLoader";
@@ -27,7 +31,6 @@ const emit = defineEmits<{
   "location-error": [error: string | null];
 }>();
 
-// Use a plain HTML input ref instead of PrimeVue component
 const inputRef = ref<HTMLInputElement | null>(null);
 const searchValue = ref(props.modelValue);
 let autocomplete: google.maps.places.Autocomplete | null = null;
@@ -37,12 +40,10 @@ async function initAutocomplete() {
   try {
     console.log("LocationAutocomplete: Starting initialization...");
     
-    // Load Google Maps using shared utility (will wait for Places library)
     await loadGoogleMaps();
     
     console.log("LocationAutocomplete: Google Maps loaded");
 
-    // Wait for next tick to ensure DOM is ready
     await nextTick();
 
     if (!inputRef.value) {
@@ -52,14 +53,12 @@ async function initAutocomplete() {
 
     console.log("LocationAutocomplete: Input element found:", inputRef.value);
 
-    // Double-check that Places library is available
     if (!google.maps.places || !google.maps.places.Autocomplete) {
       throw new Error("Google Maps Places library not loaded");
     }
 
     console.log("LocationAutocomplete: Creating Autocomplete instance...");
 
-    // Create autocomplete instance
     autocomplete = new google.maps.places.Autocomplete(inputRef.value, {
       types: ["geocode", "establishment"],
       componentRestrictions: { country: "ca" },
@@ -68,7 +67,6 @@ async function initAutocomplete() {
 
     console.log("LocationAutocomplete: Autocomplete created successfully:", autocomplete);
 
-    // Listen for place selection
     autocomplete.addListener("place_changed", handlePlaceSelect);
     
     console.log("LocationAutocomplete: Place change listener added");
@@ -109,18 +107,14 @@ function handlePlaceSelect() {
     return;
   }
 
-  // Clear error (both local and parent)
   emit("location-error", null);
 
   console.log("LocationAutocomplete: Emitting location:", { locationName, lat, lng });
 
-  // Update the search value
   searchValue.value = locationName;
 
-  // Emit the location name to parent
   emit("update:modelValue", locationName);
 
-  // Emit the full location details (name, lat, lng)
   emit("location-selected", {
     name: locationName,
     latitude: lat,
@@ -160,7 +154,6 @@ watch(
 
 onMounted(async () => {
   console.log("LocationAutocomplete: Component mounted");
-  // Wait a bit to ensure MapPicker has started loading Google Maps
   await new Promise(resolve => setTimeout(resolve, 500));
   await initAutocomplete();
 });
@@ -207,13 +200,12 @@ onMounted(async () => {
   cursor: not-allowed;
 }
 
-/* Override Google's autocomplete dropdown styles to match your theme */
 :global(.pac-container) {
   border-radius: 0.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   margin-top: 0.25rem;
   font-family: inherit;
-  z-index: 9999; /* Ensure it appears above other elements */
+  z-index: 9999; 
 }
 
 :global(.pac-item) {
