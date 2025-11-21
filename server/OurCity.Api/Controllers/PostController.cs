@@ -1,8 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos.Pagination;
 using OurCity.Api.Common.Dtos.Post;
-using OurCity.Api.Extensions;
 using OurCity.Api.Services;
 
 namespace OurCity.Api.Controllers;
@@ -21,6 +21,7 @@ public class PostController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     [EndpointSummary("Create a new post")]
     [EndpointDescription("Creates a new post with the provided data")]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -29,17 +30,12 @@ public class PostController : ControllerBase
         [FromBody] PostCreateRequestDto postCreateRequestDto
     )
     {
-        var userId = User.GetUserId();
+        var res = await _postService.CreatePost(postCreateRequestDto);
 
-        if (userId == null)
+        if (!res.IsSuccess)
         {
-            return Problem(
-                statusCode: StatusCodes.Status401Unauthorized,
-                detail: ErrorMessages.UserNotAuthenticated
-            );
+            return Problem(statusCode: StatusCodes.Status403Forbidden, detail: res.Error);
         }
-
-        var res = await _postService.CreatePost(userId.Value, postCreateRequestDto);
 
         return CreatedAtAction(nameof(GetPosts), new { id = res.Data?.Id }, res.Data);
     }
@@ -52,8 +48,7 @@ public class PostController : ControllerBase
     [ProducesResponseType(typeof(PaginatedResponseDto<PostResponseDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetPosts([FromQuery] PostGetAllRequestDto postGetAllRequest)
     {
-        var userId = User.GetUserId();
-        var res = await _postService.GetPosts(userId, postGetAllRequest);
+        var res = await _postService.GetPosts(postGetAllRequest);
 
         return Ok(res.Data);
     }
@@ -66,8 +61,7 @@ public class PostController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetPostById([FromRoute] Guid postId)
     {
-        var userId = User.GetUserId();
-        var res = await _postService.GetPostById(userId, postId);
+        var res = await _postService.GetPostById(postId);
 
         if (!res.IsSuccess)
         {
@@ -78,6 +72,7 @@ public class PostController : ControllerBase
     }
 
     [HttpPut]
+    [Authorize]
     [Route("{postId}")]
     [EndpointSummary("Update an existing post")]
     [EndpointDescription("Updates an existing post with the provided data")]
@@ -90,17 +85,7 @@ public class PostController : ControllerBase
         [FromBody] PostUpdateRequestDto postUpdateRequestDto
     )
     {
-        var userId = User.GetUserId();
-
-        if (userId == null)
-        {
-            return Problem(
-                statusCode: StatusCodes.Status401Unauthorized,
-                detail: ErrorMessages.UserNotAuthenticated
-            );
-        }
-
-        var res = await _postService.UpdatePost(userId.Value, postId, postUpdateRequestDto);
+        var res = await _postService.UpdatePost(postId, postUpdateRequestDto);
 
         if (!res.IsSuccess)
         {
@@ -116,6 +101,7 @@ public class PostController : ControllerBase
     }
 
     [HttpPut]
+    [Authorize]
     [Route("{postId}/votes")]
     [EndpointSummary("Vote on a post")]
     [EndpointDescription("A user votes on a post, either upvote or downvote")]
@@ -126,27 +112,23 @@ public class PostController : ControllerBase
         [FromBody] PostVoteRequestDto postVoteRequestDto
     )
     {
-        var userId = User.GetUserId();
-
-        if (userId == null)
-        {
-            return Problem(
-                statusCode: StatusCodes.Status401Unauthorized,
-                detail: ErrorMessages.UserNotAuthenticated
-            );
-        }
-
-        var res = await _postService.VotePost(userId.Value, postId, postVoteRequestDto);
+        var res = await _postService.VotePost(postId, postVoteRequestDto);
 
         if (!res.IsSuccess)
         {
-            return Problem(statusCode: StatusCodes.Status404NotFound, detail: res.Error);
+            return Problem(
+                statusCode: (res.Error != null && res.Error.Equals(ErrorMessages.PostNotFound))
+                    ? StatusCodes.Status404NotFound
+                    : StatusCodes.Status403Forbidden,
+                detail: res.Error
+            );
         }
 
         return Ok(res.Data);
     }
 
     [HttpDelete]
+    [Authorize]
     [Route("{postId}")]
     [EndpointSummary("Delete a post")]
     [EndpointDescription("Deletes a post by its ID")]
@@ -154,17 +136,7 @@ public class PostController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeletePost([FromRoute] Guid postId)
     {
-        var userId = User.GetUserId();
-
-        if (userId == null)
-        {
-            return Problem(
-                statusCode: StatusCodes.Status401Unauthorized,
-                detail: ErrorMessages.UserNotAuthenticated
-            );
-        }
-
-        var res = await _postService.DeletePost(userId.Value, postId);
+        var res = await _postService.DeletePost(postId);
 
         if (!res.IsSuccess)
         {

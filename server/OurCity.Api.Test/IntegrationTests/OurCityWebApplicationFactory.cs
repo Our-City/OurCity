@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using OurCity.Api.Extensions;
 using OurCity.Api.Infrastructure.Database;
 using Testcontainers.PostgreSql;
 
@@ -72,6 +73,8 @@ public class OurCityWebApplicationFactory : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseTestEnvironment();
+
         builder.ConfigureServices(services =>
         {
             var descriptor = services.SingleOrDefault(d =>
