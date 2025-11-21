@@ -38,11 +38,7 @@ let autocomplete: google.maps.places.Autocomplete | null = null;
 // Initialize Google Places Autocomplete
 async function initAutocomplete() {
   try {
-    console.log("LocationAutocomplete: Starting initialization...");
-
     await loadGoogleMaps();
-
-    console.log("LocationAutocomplete: Google Maps loaded");
 
     await nextTick();
 
@@ -51,13 +47,9 @@ async function initAutocomplete() {
       return;
     }
 
-    console.log("LocationAutocomplete: Input element found:", inputRef.value);
-
     if (!google.maps.places || !google.maps.places.Autocomplete) {
       throw new Error("Google Maps Places library not loaded");
     }
-
-    console.log("LocationAutocomplete: Creating Autocomplete instance...");
 
     autocomplete = new google.maps.places.Autocomplete(inputRef.value, {
       types: ["geocode", "establishment"],
@@ -65,11 +57,7 @@ async function initAutocomplete() {
       fields: ["formatted_address", "geometry", "name"],
     });
 
-    console.log("LocationAutocomplete: Autocomplete created successfully:", autocomplete);
-
     autocomplete.addListener("place_changed", handlePlaceSelect);
-
-    console.log("LocationAutocomplete: Place change listener added");
   } catch (error) {
     console.error("LocationAutocomplete: Error initializing autocomplete:", error);
   }
@@ -77,15 +65,12 @@ async function initAutocomplete() {
 
 // Handle place selection from autocomplete
 function handlePlaceSelect() {
-  console.log("LocationAutocomplete: Place changed event triggered");
-
   if (!autocomplete) {
     console.error("LocationAutocomplete: Autocomplete not initialized");
     return;
   }
 
   const place = autocomplete.getPlace();
-  console.log("LocationAutocomplete: Selected place:", place);
 
   if (!place.geometry || !place.geometry.location) {
     console.error("LocationAutocomplete: No geometry found for selected place");
@@ -109,8 +94,6 @@ function handlePlaceSelect() {
 
   emit("location-error", null);
 
-  console.log("LocationAutocomplete: Emitting location:", { locationName, lat, lng });
-
   searchValue.value = locationName;
 
   emit("update:modelValue", locationName);
@@ -122,23 +105,11 @@ function handlePlaceSelect() {
   });
 }
 
-watch(
-  () => props.modelValue,
-  (newValue) => {
-    if (newValue !== searchValue.value) {
-      searchValue.value = newValue;
-
-      console.log("LocationAutocomplete: External value changed to:", newValue);
-    }
-  },
-);
-
 // Handle manual input changes
 function handleInput(event: Event) {
   const target = event.target as HTMLInputElement;
   searchValue.value = target.value;
   emit("update:modelValue", target.value);
-  console.log("LocationAutocomplete: Input changed to:", target.value);
 }
 
 // Watch for external changes to modelValue
@@ -147,13 +118,11 @@ watch(
   (newValue) => {
     if (newValue !== searchValue.value) {
       searchValue.value = newValue;
-      console.log("LocationAutocomplete: External value changed to:", newValue);
     }
   },
 );
 
 onMounted(async () => {
-  console.log("LocationAutocomplete: Component mounted");
   await new Promise((resolve) => setTimeout(resolve, 500));
   await initAutocomplete();
 });

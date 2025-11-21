@@ -7,6 +7,7 @@
 import { ref, onMounted, watch } from "vue";
 import { loadGoogleMaps } from "@/utils/googleMapsLoader";
 import { isWithinWinnipeg, getDistanceFromWinnipeg } from "@/utils/locationValidator";
+let radiusCircle: google.maps.Circle | null = null;
 
 interface Props {
   modelValue?: {
@@ -75,6 +76,7 @@ async function initMap() {
       streetViewControl: false,
       fullscreenControl: true,
       mapId: "OURCITY_MAP",
+      gestureHandling: "greedy",
     });
 
     radiusCircle = new google.maps.Circle({
@@ -216,24 +218,6 @@ function clearLocation() {
   }
   emit("update:modelValue", null);
 }
-
-// Watch for external changes to modelValue
-watch(
-  () => props.modelValue,
-  (newValue, oldValue) => {
-    if (newValue?.latitude !== oldValue?.latitude || newValue?.longitude !== oldValue?.longitude) {
-      if (newValue?.latitude && newValue?.longitude && map) {
-        placeMarker({ lat: newValue.latitude, lng: newValue.longitude });
-
-        map.setCenter({ lat: newValue.latitude, lng: newValue.longitude });
-        map.setZoom(15);
-      } else if (!newValue && marker) {
-        clearLocation();
-      }
-    }
-  },
-  { deep: true },
-);
 
 // Initialize map on mount
 onMounted(() => {
