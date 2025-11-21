@@ -49,8 +49,7 @@ onMounted(fetchTags);
 
     <div class="sidebar-divider"></div>
 
-    <!-- Optional: add (WIP) if you want -->
-    <h4 class="filter-title">Filter by tag (WIP)</h4>
+    <h4 class="filter-title">Filter by tag</h4>
 
     <button
       class="tag-button all-tags"
