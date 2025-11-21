@@ -46,7 +46,7 @@ public class CommentController : ControllerBase
             );
         }
 
-        var res = await _commentService.CreateComment(userId.Value, postId, commentRequestDto);
+        var res = await _commentService.CreateComment(postId, commentRequestDto);
 
         if (!res.IsSuccess)
         {
@@ -70,9 +70,7 @@ public class CommentController : ControllerBase
         [FromQuery] int limit = 25
     )
     {
-        var userId = User.GetUserId();
-
-        var getResult = await _commentService.GetCommentsForPost(userId, postId, cursor, limit);
+        var getResult = await _commentService.GetCommentsForPost(postId, cursor, limit);
 
         if (!getResult.IsSuccess)
             return Problem(statusCode: StatusCodes.Status404NotFound, detail: getResult.Error);
@@ -94,17 +92,7 @@ public class CommentController : ControllerBase
         [FromBody] CommentRequestDto commentRequestDto
     )
     {
-        var userId = User.GetUserId();
-
-        if (userId == null)
-        {
-            return Problem(
-                statusCode: StatusCodes.Status401Unauthorized,
-                detail: "User not authenticated"
-            );
-        }
-
-        var res = await _commentService.UpdateComment(userId.Value, commentId, commentRequestDto);
+        var res = await _commentService.UpdateComment(commentId, commentRequestDto);
 
         if (!res.IsSuccess)
         {
@@ -132,17 +120,7 @@ public class CommentController : ControllerBase
         [FromBody] CommentVoteRequestDto commentVoteRequestDto
     )
     {
-        var userId = User.GetUserId();
-
-        if (userId == null)
-        {
-            return Problem(
-                statusCode: StatusCodes.Status401Unauthorized,
-                detail: "User not authenticated"
-            );
-        }
-
-        var res = await _commentService.VoteComment(userId.Value, commentId, commentVoteRequestDto);
+        var res = await _commentService.VoteComment(commentId, commentVoteRequestDto);
 
         if (!res.IsSuccess)
         {
@@ -162,17 +140,7 @@ public class CommentController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> DeleteComment([FromRoute] Guid commentId)
     {
-        var userId = User.GetUserId();
-
-        if (userId == null)
-        {
-            return Problem(
-                statusCode: StatusCodes.Status401Unauthorized,
-                detail: "User not authenticated"
-            );
-        }
-
-        var res = await _commentService.DeleteComment(userId.Value, commentId);
+        var res = await _commentService.DeleteComment(commentId);
 
         if (!res.IsSuccess)
         {

@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 
-namespace OurCity.Api.Services.Authorization.CanCreatePosts;
+namespace OurCity.Api.Services.Authorization.CanParticipateInForum;
 
-public class CanCreatePostsHandler : AuthorizationHandler<CanCreatePostsRequirement>
+public class CanParticipateInForumHandler : AuthorizationHandler<CanParticipateInForumRequirement>
 {
     protected override Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
-        CanCreatePostsRequirement requirement
+        CanParticipateInForumRequirement requirement
     )
     {
         var isUserAuthenticated = context.User.Identity?.IsAuthenticated ?? false;

@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -8,8 +7,9 @@ using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Middlewares;
 using OurCity.Api.Services;
 using OurCity.Api.Services.Authorization;
-using OurCity.Api.Services.Authorization.CanCreatePosts;
+using OurCity.Api.Services.Authorization.CanMutateThisComment;
 using OurCity.Api.Services.Authorization.CanMutateThisPost;
+using OurCity.Api.Services.Authorization.CanParticipateInForum;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -100,8 +100,10 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 //Authorization
-builder.Services.AddSingleton<IAuthorizationHandler, CanCreatePostsHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, CanParticipateInForumHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, CanMutateThisPostHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, CanMutateThisCommentHandler>();
+builder.Services.AddScoped<IRequestingUser, RequestingUser>();
 builder.Services.AddAuthorization(options =>
 {
     options.AddOurCityPolicies();
@@ -109,6 +111,7 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
+//Configure exception handling for the API
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -116,6 +119,15 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler();
+}
+
+//Seed ESSENTIAL data
+if (!app.Environment.IsEnvironment("Testing"))
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        await AppDbContextSeeder.SeedAsync(scope.ServiceProvider);
+    }
 }
 
 app.UseHttpsRedirection();

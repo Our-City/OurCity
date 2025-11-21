@@ -14,23 +14,25 @@ namespace OurCity.Api.Services.Authorization;
 public interface IPolicyService
 {
     Task<bool> CheckPolicy(ClaimsPrincipal user, Policy policy);
-    Task<bool> CheckResourcePolicy(ClaimsPrincipal user, Policy policy, object resource);
+    Task<bool> CheckResourcePolicy(ClaimsPrincipal user, Policy policy, Guid resourceId);
 }
 
 public class PolicyService : IPolicyService
 {
     private readonly IAuthorizationService _authorizationService;
     private readonly IPostRepository _postRepository;
+    private readonly ICommentRepository _commentRepository;
 
-    public PolicyService(IAuthorizationService authorizationService, IPostRepository postRepository)
+    public PolicyService(IAuthorizationService authorizationService, IPostRepository postRepository, ICommentRepository commentRepository)
     {
         _authorizationService = authorizationService;
         _postRepository = postRepository;
+        _commentRepository = commentRepository;
     }
 
     public async Task<bool> CheckPolicy(ClaimsPrincipal user, Policy policy)
     {
-        var authResult = await _authorizationService.AuthorizeAsync(user, Policy.CanCreatePosts);
+        var authResult = await _authorizationService.AuthorizeAsync(user, policy);
 
         var isAllowed = authResult.Succeeded;
 
@@ -40,18 +42,21 @@ public class PolicyService : IPolicyService
     public async Task<bool> CheckResourcePolicy(
         ClaimsPrincipal user,
         Policy policy,
-        object resource
+        Guid resourceId
     )
     {
         bool isAllowed = false;
 
         if (policy == Policy.CanMutateThisPost)
-            isAllowed = await CheckCanMutateThisPost(user, policy, (Guid)resource);
+            isAllowed = await CheckCanMutateThisPost(user, resourceId);
+
+        if (policy == Policy.CanMutateThisComment)
+            isAllowed = await CheckCanMutateThisComment(user, resourceId);
 
         return isAllowed;
     }
 
-    public async Task<bool> CheckCanMutateThisPost(ClaimsPrincipal user, Policy policy, Guid postId)
+    private async Task<bool> CheckCanMutateThisPost(ClaimsPrincipal user, Guid postId)
     {
         var post = await _postRepository.GetSlimPostbyId(postId);
 
@@ -62,6 +67,23 @@ public class PolicyService : IPolicyService
             user,
             post,
             Policy.CanMutateThisPost
+        );
+        var isAllowed = authResult.Succeeded;
+
+        return isAllowed;
+    }
+
+    private async Task<bool> CheckCanMutateThisComment(ClaimsPrincipal user, Guid commentId)
+    {
+        var comment = await _commentRepository.GetCommentById(commentId);
+
+        if (comment == null)
+            return false;
+
+        var authResult = await _authorizationService.AuthorizeAsync(
+            user,
+            comment,
+            Policy.CanMutateThisComment
         );
         var isAllowed = authResult.Succeeded;
 

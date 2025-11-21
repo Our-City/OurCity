@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using OurCity.Api.Services.Authorization.CanCreatePosts;
+using OurCity.Api.Services.Authorization.CanMutateThisComment;
 using OurCity.Api.Services.Authorization.CanMutateThisPost;
+using OurCity.Api.Services.Authorization.CanParticipateInForum;
 
 namespace OurCity.Api.Services.Authorization;
 
@@ -12,8 +13,9 @@ namespace OurCity.Api.Services.Authorization;
 /// </credits>
 public class Policy
 {
-    public static readonly Policy CanCreatePosts = new("CanCreatePosts");
+    public static readonly Policy CanParticipateInForum = new("CanParticipateInForum");
     public static readonly Policy CanMutateThisPost = new("CanMutateThisPost");
+    public static readonly Policy CanMutateThisComment = new("CanMutateThisComment");
 
     private string Value { get; }
 
@@ -27,13 +29,18 @@ public static class PolicyRegistry
     public static AuthorizationOptions AddOurCityPolicies(this AuthorizationOptions options)
     {
         options.AddPolicy(
-            Policy.CanCreatePosts,
-            policy => policy.Requirements.Add(new CanCreatePostsRequirement())
+            Policy.CanParticipateInForum,
+            policy => policy.Requirements.Add(new CanParticipateInForumRequirement())
         );
 
         options.AddPolicy(
             Policy.CanMutateThisPost,
             policy => policy.Requirements.Add(new CanMutateThisPostRequirement())
+        );
+        
+        options.AddPolicy(
+            Policy.CanMutateThisComment,
+            policy => policy.Requirements.Add(new CanMutateThisCommentRequirement())
         );
 
         return options;

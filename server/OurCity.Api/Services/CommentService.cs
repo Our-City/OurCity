@@ -1,13 +1,14 @@
 /// Generative AI - CoPilot was used to assist in the creation of this file.
 /// CoPilot assisted by generating boilerplate code for standard mapping functions
 /// based on common patterns in C# for mapping between entities and DTOs
+
 using OurCity.Api.Common;
-using OurCity.Api.Common.Dtos;
 using OurCity.Api.Common.Dtos.Comments;
 using OurCity.Api.Common.Dtos.Pagination;
 using OurCity.Api.Common.Enum;
 using OurCity.Api.Infrastructure;
 using OurCity.Api.Infrastructure.Database;
+using OurCity.Api.Services.Authorization;
 using OurCity.Api.Services.Mappings;
 
 namespace OurCity.Api.Services;
@@ -15,48 +16,46 @@ namespace OurCity.Api.Services;
 public interface ICommentService
 {
     Task<Result<PaginatedResponseDto<CommentResponseDto>>> GetCommentsForPost(
-        Guid? userId,
         Guid postId,
         Guid? cursor,
         int limit
     );
     Task<Result<CommentResponseDto>> CreateComment(
-        Guid userId,
         Guid postId,
         CommentRequestDto commentCreateRequestDto
     );
     Task<Result<CommentResponseDto>> UpdateComment(
-        Guid userId,
         Guid commentId,
         CommentRequestDto commentUpdateRequestDto
     );
     Task<Result<CommentResponseDto>> VoteComment(
-        Guid userId,
         Guid commentId,
         CommentVoteRequestDto commentVoteRequestDto
     );
-    Task<Result<CommentResponseDto>> DeleteComment(Guid userId, Guid commentId);
+    Task<Result<CommentResponseDto>> DeleteComment(Guid commentId);
 }
 
 public class CommentService : ICommentService
 {
+    private readonly IRequestingUser _requestingUser;
     private readonly ICommentRepository _commentRepository;
     private readonly ICommentVoteRepository _commentVoteRepository;
     private readonly IPostRepository _postRepository;
 
     public CommentService(
+        IRequestingUser requestingUser,
         ICommentRepository commentRepository,
         ICommentVoteRepository commentVoteRepository,
         IPostRepository postRepository
     )
     {
+        _requestingUser = requestingUser;
         _commentRepository = commentRepository;
         _commentVoteRepository = commentVoteRepository;
         _postRepository = postRepository;
     }
 
     public async Task<Result<PaginatedResponseDto<CommentResponseDto>>> GetCommentsForPost(
-        Guid? userId,
         Guid postId,
         Guid? cursor,
         int limit
@@ -77,7 +76,7 @@ public class CommentService : ICommentService
 
         var response = new PaginatedResponseDto<CommentResponseDto>
         {
-            Items = pageItems.ToDtos(userId),
+            Items = pageItems.ToDtos(_requestingUser.UserId),
             NextCursor = hasNextPage ? pageItems.LastOrDefault()?.Id : null,
         };
 
@@ -85,57 +84,69 @@ public class CommentService : ICommentService
     }
 
     public async Task<Result<CommentResponseDto>> CreateComment(
-        Guid userId,
         Guid postId,
         CommentRequestDto commentRequestDto
     )
     {
+        //Check that user can create posts/comments
+        if (!_requestingUser.UserId.HasValue || !await _requestingUser.HasPolicy(Policy.CanParticipateInForum))
+        {
+            return Result<CommentResponseDto>.Failure(ErrorMessages.Unauthorized);
+        }
+
+        //Check that post exists
         var post = await _postRepository.GetSlimPostbyId(postId);
         if (post is null)
         {
             return Result<CommentResponseDto>.Failure(ErrorMessages.PostNotFound);
         }
 
+        //Create comment
         var createdComment = await _commentRepository.CreateComment(
-            commentRequestDto.CreateRequestToEntity(userId, postId)
+            commentRequestDto.CreateRequestToEntity(_requestingUser.UserId.Value, postId)
         );
 
-        return Result<CommentResponseDto>.Success(createdComment.ToDto(userId));
+        return Result<CommentResponseDto>.Success(createdComment.ToDto(_requestingUser.UserId.Value));
     }
 
     public async Task<Result<CommentResponseDto>> UpdateComment(
-        Guid userId,
         Guid commentId,
         CommentRequestDto commentRequestDto
     )
     {
+        //Check that the comment exists
         var comment = await _commentRepository.GetCommentById(commentId);
-
         if (comment == null)
         {
             return Result<CommentResponseDto>.Failure(ErrorMessages.CommentNotFound);
         }
-
-        if (userId != comment.AuthorId)
+        
+        //Check that user can modify this comment
+        if (!_requestingUser.UserId.HasValue || !await _requestingUser.HasPolicy(Policy.CanMutateThisComment, comment.Id))
         {
             return Result<CommentResponseDto>.Failure(ErrorMessages.CommentUnauthorized);
         }
 
-        comment.Content = commentRequestDto.Content ?? comment.Content;
+        comment.Content = commentRequestDto.Content;
         comment.UpdatedAt = DateTime.UtcNow;
         await _commentRepository.SaveChangesAsync();
 
-        return Result<CommentResponseDto>.Success(comment.ToDto(userId));
+        return Result<CommentResponseDto>.Success(comment.ToDto(_requestingUser.UserId.Value));
     }
 
     public async Task<Result<CommentResponseDto>> VoteComment(
-        Guid userId,
         Guid commentId,
         CommentVoteRequestDto commentVoteRequestDto
     )
     {
-        var comment = await _commentRepository.GetCommentById(commentId);
+        //Check that user can vote
+        if (!_requestingUser.UserId.HasValue || !await _requestingUser.HasPolicy(Policy.CanParticipateInForum))
+        {
+            return Result<CommentResponseDto>.Failure(ErrorMessages.Unauthorized);
+        }
 
+        //Check that the comment even exists
+        var comment = await _commentRepository.GetCommentById(commentId);
         if (comment == null)
         {
             return Result<CommentResponseDto>.Failure(ErrorMessages.CommentNotFound);
@@ -143,7 +154,7 @@ public class CommentService : ICommentService
 
         var existingVote = await _commentVoteRepository.GetVoteByCommentAndUserId(
             commentId,
-            userId
+            _requestingUser.UserId.Value
         );
         var requestedVoteType = commentVoteRequestDto.VoteType;
 
@@ -158,7 +169,7 @@ public class CommentService : ICommentService
                 {
                     Id = Guid.NewGuid(),
                     CommentId = commentId,
-                    VoterId = userId,
+                    VoterId = _requestingUser.UserId.Value,
                     VoteType = requestedVoteType,
                 }
             );
@@ -171,28 +182,29 @@ public class CommentService : ICommentService
         comment.UpdatedAt = DateTime.UtcNow;
         await _commentRepository.SaveChangesAsync();
 
-        return Result<CommentResponseDto>.Success(comment.ToDto(userId));
+        return Result<CommentResponseDto>.Success(comment.ToDto(_requestingUser.UserId.Value));
     }
 
-    public async Task<Result<CommentResponseDto>> DeleteComment(Guid userId, Guid commentId)
+    public async Task<Result<CommentResponseDto>> DeleteComment(Guid commentId)
     {
+        //Check that the comment even exists
         var comment = await _commentRepository.GetCommentById(commentId);
-
         if (comment == null)
         {
             return Result<CommentResponseDto>.Failure(ErrorMessages.CommentNotFound);
         }
 
-        if (userId != comment.AuthorId)
+        //Check that user can delete this comment
+        if (!_requestingUser.UserId.HasValue || !await _requestingUser.HasPolicy(Policy.CanMutateThisComment, comment.Id))
         {
-            return Result<CommentResponseDto>.Failure(ErrorMessages.CommentUnauthorized);
+            return Result<CommentResponseDto>.Failure(ErrorMessages.Unauthorized);
         }
 
-        // soft deletion in db  (mark Comment as deleted)
+        // soft deletion in db (mark Comment as deleted)
         comment.IsDeleted = true;
         comment.UpdatedAt = DateTime.UtcNow;
         await _commentRepository.SaveChangesAsync();
 
-        return Result<CommentResponseDto>.Success(comment.ToDto(userId));
+        return Result<CommentResponseDto>.Success(comment.ToDto(_requestingUser.UserId.Value));
     }
 }

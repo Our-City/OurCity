@@ -23,13 +23,13 @@ public class AuthorizationController : ControllerBase
     }
 
     [HttpGet]
-    [Route("can-create-posts")]
-    [EndpointSummary("CanCreatePosts")]
-    [EndpointDescription("Check if the current user is authorized to create posts")]
+    [Route("can-participate-in-forum")]
+    [EndpointSummary("CanParticipateInForum")]
+    [EndpointDescription("Check if the current user is authorized to participate in the forum (create posts/comments, vote, etc)")]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
-    public async Task<IActionResult> CanCreatePosts()
+    public async Task<IActionResult> CanParticipateInForum()
     {
-        var isAllowed = await _policyService.CheckPolicy(HttpContext.User, Policy.CanCreatePosts);
+        var isAllowed = await _policyService.CheckPolicy(HttpContext.User, Policy.CanParticipateInForum);
 
         return Ok(isAllowed);
     }
