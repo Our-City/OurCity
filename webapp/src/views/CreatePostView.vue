@@ -60,6 +60,13 @@ const availableTags = ref<Tag[]>([]);
 const isLoadingTags = ref(false);
 const tagError = ref<string | null>(null);
 
+const locationValidationError = ref<string | null>(null);
+
+// Handle location errors from either component
+function handleLocationError(error: string | null) {
+  locationValidationError.value = error;
+}
+
 async function loadTags() {
   try {
     isLoadingTags.value = true;
@@ -231,14 +238,15 @@ const removeImage = (index: number) => {
 
 // Handle location selected from autocomplete
 function handleLocationSelected(location: { name: string; latitude: number; longitude: number }) {
-  // Update the locationData which will automatically update the map via v-model
+  // Clear error on successful selection
+  locationValidationError.value = null;
+  
   formData.value.locationData = {
     name: location.name,
     latitude: location.latitude,
     longitude: location.longitude,
   };
   
-  // Also update the text field for consistency
   formData.value.location = location.name;
 }
 
@@ -246,9 +254,10 @@ function handleLocationSelected(location: { name: string; latitude: number; long
 function handleLocationTextChange(value: string) {
   formData.value.location = value;
   
-  // If user clears the field, also clear the map marker
   if (!value.trim() && formData.value.locationData) {
     formData.value.locationData = null;
+    // Clear error when field is cleared
+    locationValidationError.value = null;
   }
 }
 
@@ -257,10 +266,14 @@ watch(
   (newLocationData) => {
     if (newLocationData?.name && newLocationData.name !== formData.value.location) {
       formData.value.location = newLocationData.name;
+      // Clear error when valid location is set from map
+      locationValidationError.value = null;
+    } else if (!newLocationData) {
+      // Clear error when location data is cleared
+      locationValidationError.value = null;
     }
   },
 );
-
 </script>
 
 <template>
@@ -307,6 +320,17 @@ watch(
               <div class="form-help">{{ formData.title.length }}/50 characters</div>
             </div>
 
+            <!-- Location Validation Error Banner - Enhanced -->
+            <div v-if="locationValidationError" class="location-error-banner">
+              <div class="error-icon-container">
+                <i class="pi pi-exclamation-triangle"></i>
+              </div>
+              <div class="error-content">
+                <h4 class="error-title">Location Outside Winnipeg</h4>
+                <p class="error-message">{{ locationValidationError }}</p>
+              </div>
+            </div>
+
             <!-- Location Field -->
             <div class="form-field">
               <label class="form-label" for="location">Location</label>
@@ -316,6 +340,7 @@ watch(
                 placeholder="e.g., Downtown Winnipeg, University of Manitoba"
                 @update:model-value="handleLocationTextChange"
                 @location-selected="handleLocationSelected"
+                @location-error="handleLocationError"
               />
               
               <div class="form-help">
@@ -325,7 +350,11 @@ watch(
 
             <div class="form-field">
               <label class="form-label">Select Location on Map (Optional)</label>
-              <MapPicker v-model="formData.locationData" height="400px" />
+              <MapPicker 
+                v-model="formData.locationData" 
+                height="400px"
+                @location-error="handleLocationError"
+              />
               <div class="form-help">
                 Click on the map to select a location for your post
               </div>
@@ -373,6 +402,7 @@ watch(
                 Choose tags that best describe your post (max 5, optional)
               </div>
             </div>
+
             <!-- Image Upload Field -->
             <div class="form-field">
               <label class="form-label" for="images">Images</label>
@@ -509,4 +539,75 @@ watch(
     order: 1;
   }
 }
+
+.location-error-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #fff9e6 0%, #fffbf0 100%);
+  border: 2px solid #ffc107;
+  border-left: 5px solid #ff9800;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-icon-container {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ff9800;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(255, 152, 0, 0.3);
+}
+
+.error-icon-container i {
+  font-size: 1.25rem;
+  color: white;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.error-content {
+  flex: 1;
+}
+
+.error-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e65100;
+}
+
+.error-message {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #856404;
+}
+
 </style>

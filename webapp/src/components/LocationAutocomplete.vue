@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, nextTick } from "vue";
 import { loadGoogleMaps } from "@/utils/googleMapsLoader";
+import { isWithinWinnipeg, getDistanceFromWinnipeg } from "@/utils/locationValidator";
 
 interface Props {
   modelValue?: string;
@@ -23,6 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   "update:modelValue": [value: string];
   "location-selected": [location: LocationResult];
+  "location-error": [error: string | null];
 }>();
 
 // Use a plain HTML input ref instead of PrimeVue component
@@ -96,6 +98,20 @@ function handlePlaceSelect() {
   const lat = place.geometry.location.lat();
   const lng = place.geometry.location.lng();
 
+  // Validate location is within Winnipeg
+  if (!isWithinWinnipeg(lat, lng)) {
+    const distance = getDistanceFromWinnipeg(lat, lng);
+    const errorMsg = `"${locationName}" is ${distance.toFixed(1)} km from Winnipeg. Please select a location within Winnipeg.`;
+    emit("location-error", errorMsg);
+    
+    // Clear the input
+    searchValue.value = "";
+    return;
+  }
+
+  // Clear error (both local and parent)
+  emit("location-error", null);
+
   console.log("LocationAutocomplete: Emitting location:", { locationName, lat, lng });
 
   // Update the search value
@@ -111,6 +127,17 @@ function handlePlaceSelect() {
     longitude: lng,
   });
 }
+
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (newValue !== searchValue.value) {
+      searchValue.value = newValue;
+      
+      console.log("LocationAutocomplete: External value changed to:", newValue);
+    }
+  },
+);
 
 // Handle manual input changes
 function handleInput(event: Event) {
@@ -148,6 +175,7 @@ onMounted(async () => {
       :placeholder="props.placeholder"
       :disabled="props.disabled"
       class="location-input p-inputtext"
+      :class="{ 'p-invalid': locationError }" 
       @input="handleInput"
     />
   </div>

@@ -6,6 +6,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
 import { loadGoogleMaps } from "@/utils/googleMapsLoader";
+import { isWithinWinnipeg, getDistanceFromWinnipeg } from "@/utils/locationValidator";
 
 interface Props {
   modelValue?: {
@@ -29,6 +30,7 @@ const emit = defineEmits<{
       name: string;
     } | null,
   ];
+  "location-error": [error: string | null]; 
 }>();
 
 // Refs for map and marker
@@ -36,12 +38,15 @@ const mapContainer = ref<HTMLDivElement | null>(null);
 let map: google.maps.Map | null = null;
 let marker: google.maps.marker.AdvancedMarkerElement | null = null;
 let geocoder: google.maps.Geocoder | null = null;
+let radiusCircle: google.maps.Circle | null = null;
 
 const isLoading = ref(true);
 const error = ref<string | null>(null);
 
 // Default center (Winnipeg)
 const DEFAULT_CENTER = { lat: 49.8951, lng: -97.1384 };
+const WINNIPEG_RADIUS_KM = 25;
+const WINNIPEG_RADIUS_METERS = WINNIPEG_RADIUS_KM * 1000;
 
 
 // Initialize Google Maps
@@ -79,6 +84,18 @@ async function initMap() {
       mapId: "OURCITY_MAP", // Required for Advanced Markers
     });
 
+    radiusCircle = new google.maps.Circle({
+      map: map,
+      center: DEFAULT_CENTER,
+      radius: WINNIPEG_RADIUS_METERS, // 25,000 meters (25 km)
+      strokeColor: "#4285F4", // Google Blue
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: "#4285F4",
+      fillOpacity: 0.15,
+      clickable: false, // Don't interfere with map clicks
+    });
+
     // Add click listener to map
     map.addListener("click", (event: google.maps.MapMouseEvent) => {
       if (event.latLng) {
@@ -98,10 +115,22 @@ async function initMap() {
     isLoading.value = false;
   }
 }
+
 // Handle map click - place marker and get location details
 async function handleMapClick(latLng: google.maps.LatLng) {
   const lat = latLng.lat();
   const lng = latLng.lng();
+
+  // Validate location is within Winnipeg
+  if (!isWithinWinnipeg(lat, lng)) {
+    const distance = getDistanceFromWinnipeg(lat, lng);
+    const errorMsg = `This location is ${distance.toFixed(1)} km from Winnipeg city center. Please select a location within Winnipeg.`;
+    emit("location-error", errorMsg);
+    return; // Don't place marker
+  }
+
+  // Clear any previous errors (both local and parent)
+  emit("location-error", null);
 
   // Place or move marker
   placeMarker({ lat, lng });
@@ -116,6 +145,30 @@ async function handleMapClick(latLng: google.maps.LatLng) {
     name: locationName,
   });
 }
+
+
+// Watch for external location updates (from autocomplete)
+watch(
+  () => props.modelValue,
+  (newValue, oldValue) => {
+    if (
+      newValue?.latitude !== oldValue?.latitude ||
+      newValue?.longitude !== oldValue?.longitude
+    ) {
+      if (newValue?.latitude && newValue?.longitude && map) {
+
+        
+        placeMarker({ lat: newValue.latitude, lng: newValue.longitude });
+        map.setCenter({ lat: newValue.latitude, lng: newValue.longitude });
+        map.setZoom(15);
+      } else if (!newValue && marker) {
+        clearLocation();
+      }
+    }
+  },
+  { deep: true }
+);
+
 
 // Place or update marker on map using AdvancedMarkerElement
 function placeMarker(position: { lat: number; lng: number }) {
