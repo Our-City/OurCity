@@ -131,12 +131,6 @@ onMounted(loadPostData);
         <div v-else-if="post" class="post-detail-content-layout">
           <div class="post-content">
             <div class="post-card">
-              <div class="post-tags">
-                <span v-for="tag in post.tags" :key="tag.id" class="tag-pill">
-                  {{ tag.name }}
-                </span>
-              </div>
-
               <div class="post-author" data-testid="post-author">
                 @{{ post.authorName }} ·
                 {{ post.createdAt.toLocaleDateString() }}
@@ -146,6 +140,12 @@ onMounted(loadPostData);
 
               <div v-if="post.location" class="post-location">
                 {{ post.location }}
+              </div>
+
+              <div class="post-tags">
+                <span v-for="tag in post.tags" :key="tag.id" class="tag-pill">
+                  {{ tag.name }}
+                </span>
               </div>
 
               <div v-if="images.length" class="post-images">
@@ -250,12 +250,26 @@ onMounted(loadPostData);
   width: 100%;
   background: var(--primary-background-color);
   border: 0.1rem solid var(--border-color);
-  padding: 5rem 5rem 3rem 5rem;
+  padding: 2rem 5rem 3rem 5rem;
 }
 
 .post-tags {
-  font-size: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.tag-pill {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  background: var(--secondary-background-color);
   color: var(--tertiary-text-color);
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid var(--border-color);
 }
 
 .post-title {

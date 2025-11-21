@@ -289,13 +289,13 @@ public class PostServiceTests
             Title = "Test Post",
             Description = "Test Description",
             Location = "Test Location",
-            TagIds = new List<Guid>(),
+            Tags = new List<Guid>(),
         };
 
         var tags = new List<Tag>();
         var createdPost = CreateTestFatPost(Guid.NewGuid(), _testUserId, createDto.Title);
 
-        _mockTagRepository.Setup(r => r.GetTagsByIds(createDto.TagIds)).ReturnsAsync(tags);
+        _mockTagRepository.Setup(r => r.GetTagsByIds(createDto.Tags)).ReturnsAsync(tags);
 
         _mockPostRepository.Setup(r => r.CreatePost(It.IsAny<Post>())).ReturnsAsync(createdPost);
 
@@ -308,7 +308,7 @@ public class PostServiceTests
         Assert.Equal(createDto.Title, result.Data.Title);
         Assert.Equal(createDto.Description, result.Data.Description);
 
-        _mockTagRepository.Verify(r => r.GetTagsByIds(createDto.TagIds), Times.Once);
+        _mockTagRepository.Verify(r => r.GetTagsByIds(createDto.Tags), Times.Once);
         _mockPostRepository.Verify(r => r.CreatePost(It.IsAny<Post>()), Times.Once);
     }
 
@@ -326,12 +326,12 @@ public class PostServiceTests
         {
             Title = "Post with Tags",
             Description = "Description",
-            TagIds = new List<Guid> { tagId },
+            Tags = new List<Guid> { tagId },
         };
 
         Post? capturedPost = null;
 
-        _mockTagRepository.Setup(r => r.GetTagsByIds(createDto.TagIds)).ReturnsAsync(tags);
+        _mockTagRepository.Setup(r => r.GetTagsByIds(createDto.Tags)).ReturnsAsync(tags);
 
         _mockPostRepository
             .Setup(r => r.CreatePost(It.IsAny<Post>()))
@@ -487,7 +487,7 @@ public class PostServiceTests
             new Tag { Id = oldTagId, Name = "OldTag" },
         };
 
-        var updateDto = new PostUpdateRequestDto { TagIds = new List<Guid> { newTagId } };
+        var updateDto = new PostUpdateRequestDto { Tags = new List<Guid> { newTagId } };
 
         var newTags = new List<Tag>
         {
@@ -496,7 +496,7 @@ public class PostServiceTests
 
         _mockPostRepository.Setup(r => r.GetFatPostById(_testPostId)).ReturnsAsync(post);
 
-        _mockTagRepository.Setup(r => r.GetTagsByIds(updateDto.TagIds)).ReturnsAsync(newTags);
+        _mockTagRepository.Setup(r => r.GetTagsByIds(updateDto.Tags)).ReturnsAsync(newTags);
 
         _mockPostRepository.Setup(r => r.SaveChangesAsync()).Returns(Task.CompletedTask);
 
@@ -510,7 +510,7 @@ public class PostServiceTests
         Assert.Equal(newTags[0].Id, result.Data.Tags[0].Id);
         Assert.Equal(newTags[0].Name, result.Data.Tags[0].Name);
 
-        _mockTagRepository.Verify(r => r.GetTagsByIds(updateDto.TagIds), Times.Once);
+        _mockTagRepository.Verify(r => r.GetTagsByIds(updateDto.Tags), Times.Once);
     }
 
     #endregion

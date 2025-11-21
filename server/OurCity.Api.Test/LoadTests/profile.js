@@ -136,7 +136,7 @@ function getMeAuth() {
 }
 
 function createPost() {
-    const payload = JSON.stringify({ title: "Test Title", description: "Test Description", tagIds: [] });
+    const payload = JSON.stringify({ title: "Test Title", description: "Test Description", tags: [] });
     const params = {
         headers: {
             'Content-Type': 'application/json',
