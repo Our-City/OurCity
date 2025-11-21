@@ -335,13 +335,12 @@ onMounted(loadPostData);
   background: var(--neutral-color-hover);
 }
 
-
 .map-overview {
   display: flex;
   flex-direction: column;
   gap: 1rem;
   width: 25rem;
-  height: 700px; 
+  height: 700px;
   background: var(--primary-background-color);
   border: 0.1rem solid var(--border-color);
   border-radius: 1rem;

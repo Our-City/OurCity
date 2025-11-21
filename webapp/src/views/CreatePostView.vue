@@ -236,20 +236,20 @@ const removeImage = (index: number) => {
 function handleLocationSelected(location: { name: string; latitude: number; longitude: number }) {
   // Clear error on successful selection
   locationValidationError.value = null;
-  
+
   formData.value.locationData = {
     name: location.name,
     latitude: location.latitude,
     longitude: location.longitude,
   };
-  
+
   formData.value.location = location.name;
 }
 
 // Handle manual changes to location text field
 function handleLocationTextChange(value: string) {
   formData.value.location = value;
-  
+
   if (!value.trim() && formData.value.locationData) {
     formData.value.locationData = null;
     // Clear error when field is cleared
@@ -330,7 +330,7 @@ watch(
             <!-- Location Field -->
             <div class="form-field">
               <label class="form-label" for="location">Location</label>
-              
+
               <LocationAutocomplete
                 :model-value="formData.location"
                 placeholder="e.g., Downtown Winnipeg, University of Manitoba"
@@ -338,22 +338,21 @@ watch(
                 @location-selected="handleLocationSelected"
                 @location-error="handleLocationError"
               />
-              
+
               <div class="form-help">
-                Start typing to search for a location {{ formData.location.length }}/150 characters (optional)
+                Start typing to search for a location {{ formData.location.length }}/150 characters
+                (optional)
               </div>
             </div>
 
             <div class="form-field">
               <label class="form-label">Select Location on Map (Optional)</label>
-              <MapPicker 
-                v-model="formData.locationData" 
+              <MapPicker
+                v-model="formData.locationData"
                 height="400px"
                 @location-error="handleLocationError"
               />
-              <div class="form-help">
-                Click on the map to select a location for your post
-              </div>
+              <div class="form-help">Click on the map to select a location for your post</div>
             </div>
 
             <!-- Description Field -->
@@ -580,7 +579,8 @@ watch(
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {
@@ -605,5 +605,4 @@ watch(
   line-height: 1.5;
   color: #856404;
 }
-
 </style>

@@ -30,7 +30,7 @@ const emit = defineEmits<{
       name: string;
     } | null,
   ];
-  "location-error": [error: string | null]; 
+  "location-error": [error: string | null];
 }>();
 
 // Refs for map and marker
@@ -47,7 +47,6 @@ const DEFAULT_CENTER = { lat: 49.8951, lng: -97.1384 };
 const WINNIPEG_RADIUS_KM = 25;
 const WINNIPEG_RADIUS_METERS = WINNIPEG_RADIUS_KM * 1000;
 
-
 // Initialize Google Maps
 async function initMap() {
   try {
@@ -60,7 +59,7 @@ async function initMap() {
 
     await loadGoogleMaps();
 
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     geocoder = new google.maps.Geocoder();
 
@@ -75,7 +74,7 @@ async function initMap() {
       mapTypeControl: true,
       streetViewControl: false,
       fullscreenControl: true,
-      mapId: "OURCITY_MAP", 
+      mapId: "OURCITY_MAP",
     });
 
     radiusCircle = new google.maps.Circle({
@@ -87,7 +86,7 @@ async function initMap() {
       strokeWeight: 2,
       fillColor: "#4285F4",
       fillOpacity: 0.15,
-      clickable: false, 
+      clickable: false,
     });
 
     map.addListener("click", (event: google.maps.MapMouseEvent) => {
@@ -118,7 +117,7 @@ async function handleMapClick(latLng: google.maps.LatLng) {
     const distance = getDistanceFromWinnipeg(lat, lng);
     const errorMsg = `This location is ${distance.toFixed(1)} km from Winnipeg city center. Please select a location within Winnipeg.`;
     emit("location-error", errorMsg);
-    return; 
+    return;
   }
 
   emit("location-error", null);
@@ -135,18 +134,12 @@ async function handleMapClick(latLng: google.maps.LatLng) {
   });
 }
 
-
 // Watch for external location updates (from autocomplete)
 watch(
   () => props.modelValue,
   (newValue, oldValue) => {
-    if (
-      newValue?.latitude !== oldValue?.latitude ||
-      newValue?.longitude !== oldValue?.longitude
-    ) {
+    if (newValue?.latitude !== oldValue?.latitude || newValue?.longitude !== oldValue?.longitude) {
       if (newValue?.latitude && newValue?.longitude && map) {
-
-        
         placeMarker({ lat: newValue.latitude, lng: newValue.longitude });
         map.setCenter({ lat: newValue.latitude, lng: newValue.longitude });
         map.setZoom(15);
@@ -155,9 +148,8 @@ watch(
       }
     }
   },
-  { deep: true }
+  { deep: true },
 );
-
 
 // Place or update marker on map using AdvancedMarkerElement
 function placeMarker(position: { lat: number; lng: number }) {
@@ -175,10 +167,15 @@ function placeMarker(position: { lat: number; lng: number }) {
 
     marker.addListener("dragend", () => {
       const newPosition = marker?.position;
-      if (newPosition && typeof newPosition === 'object' && 'lat' in newPosition && 'lng' in newPosition) {
-        const lat = typeof newPosition.lat === 'function' ? newPosition.lat() : newPosition.lat;
-        const lng = typeof newPosition.lng === 'function' ? newPosition.lng() : newPosition.lng;
-        
+      if (
+        newPosition &&
+        typeof newPosition === "object" &&
+        "lat" in newPosition &&
+        "lng" in newPosition
+      ) {
+        const lat = typeof newPosition.lat === "function" ? newPosition.lat() : newPosition.lat;
+        const lng = typeof newPosition.lng === "function" ? newPosition.lng() : newPosition.lng;
+
         const latLng = new google.maps.LatLng(lat as number, lng as number);
         handleMapClick(latLng);
       }
@@ -224,13 +221,10 @@ function clearLocation() {
 watch(
   () => props.modelValue,
   (newValue, oldValue) => {
-    if (
-      newValue?.latitude !== oldValue?.latitude ||
-      newValue?.longitude !== oldValue?.longitude
-    ) {
+    if (newValue?.latitude !== oldValue?.latitude || newValue?.longitude !== oldValue?.longitude) {
       if (newValue?.latitude && newValue?.longitude && map) {
         placeMarker({ lat: newValue.latitude, lng: newValue.longitude });
-        
+
         map.setCenter({ lat: newValue.latitude, lng: newValue.longitude });
         map.setZoom(15);
       } else if (!newValue && marker) {
@@ -238,7 +232,7 @@ watch(
       }
     }
   },
-  { deep: true } 
+  { deep: true },
 );
 
 // Initialize map on mount

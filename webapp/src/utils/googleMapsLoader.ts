@@ -1,5 +1,5 @@
 /**
- * Generative AI was used to assist in the creation of this file 
+ * Generative AI was used to assist in the creation of this file
  * Google Maps API loader utility
  * Ensures the Google Maps script is loaded only once and shared across components
  */
@@ -8,7 +8,7 @@ let loadPromise: Promise<void> | null = null;
 let isLoaded = false;
 
 export function loadGoogleMaps(): Promise<void> {
-  if (isLoaded && typeof google !== 'undefined' && google.maps && google.maps.places) {
+  if (isLoaded && typeof google !== "undefined" && google.maps && google.maps.places) {
     return Promise.resolve();
   }
 
@@ -18,25 +18,27 @@ export function loadGoogleMaps(): Promise<void> {
 
   // Start loading
   loadPromise = new Promise((resolve, reject) => {
-    if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+    if (typeof google !== "undefined" && google.maps && google.maps.places) {
       isLoaded = true;
       resolve();
       return;
     }
 
-    const script = document.createElement('script');
+    const script = document.createElement("script");
     script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places,geocoding,marker&v=weekly&loading=async`;
     script.async = true;
     script.defer = true;
 
     script.onload = () => {
       const checkPlacesLibrary = () => {
-        if (typeof google !== 'undefined' && 
-            google.maps && 
-            google.maps.places && 
-            google.maps.places.Autocomplete) {
+        if (
+          typeof google !== "undefined" &&
+          google.maps &&
+          google.maps.places &&
+          google.maps.places.Autocomplete
+        ) {
           isLoaded = true;
-          console.log('Google Maps and Places API fully loaded');
+          console.log("Google Maps and Places API fully loaded");
           resolve();
         } else {
           setTimeout(checkPlacesLibrary, 50);
@@ -49,14 +51,14 @@ export function loadGoogleMaps(): Promise<void> {
       setTimeout(() => {
         if (!isLoaded) {
           loadPromise = null;
-          reject(new Error('Timeout waiting for Google Maps Places library'));
+          reject(new Error("Timeout waiting for Google Maps Places library"));
         }
       }, 10000);
     };
 
     script.onerror = () => {
-      loadPromise = null; 
-      reject(new Error('Failed to load Google Maps script'));
+      loadPromise = null;
+      reject(new Error("Failed to load Google Maps script"));
     };
 
     document.head.appendChild(script);
@@ -66,8 +68,10 @@ export function loadGoogleMaps(): Promise<void> {
 }
 
 export function isGoogleMapsLoaded(): boolean {
-  return isLoaded && 
-         typeof google !== 'undefined' && 
-         typeof google.maps !== 'undefined' &&
-         typeof google.maps.places !== 'undefined';
+  return (
+    isLoaded &&
+    typeof google !== "undefined" &&
+    typeof google.maps !== "undefined" &&
+    typeof google.maps.places !== "undefined"
+  );
 }

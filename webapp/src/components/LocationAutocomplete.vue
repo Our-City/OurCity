@@ -39,9 +39,9 @@ let autocomplete: google.maps.places.Autocomplete | null = null;
 async function initAutocomplete() {
   try {
     console.log("LocationAutocomplete: Starting initialization...");
-    
+
     await loadGoogleMaps();
-    
+
     console.log("LocationAutocomplete: Google Maps loaded");
 
     await nextTick();
@@ -68,7 +68,7 @@ async function initAutocomplete() {
     console.log("LocationAutocomplete: Autocomplete created successfully:", autocomplete);
 
     autocomplete.addListener("place_changed", handlePlaceSelect);
-    
+
     console.log("LocationAutocomplete: Place change listener added");
   } catch (error) {
     console.error("LocationAutocomplete: Error initializing autocomplete:", error);
@@ -78,7 +78,7 @@ async function initAutocomplete() {
 // Handle place selection from autocomplete
 function handlePlaceSelect() {
   console.log("LocationAutocomplete: Place changed event triggered");
-  
+
   if (!autocomplete) {
     console.error("LocationAutocomplete: Autocomplete not initialized");
     return;
@@ -101,7 +101,7 @@ function handlePlaceSelect() {
     const distance = getDistanceFromWinnipeg(lat, lng);
     const errorMsg = `"${locationName}" is ${distance.toFixed(1)} km from Winnipeg. Please select a location within Winnipeg.`;
     emit("location-error", errorMsg);
-    
+
     // Clear the input
     searchValue.value = "";
     return;
@@ -127,7 +127,7 @@ watch(
   (newValue) => {
     if (newValue !== searchValue.value) {
       searchValue.value = newValue;
-      
+
       console.log("LocationAutocomplete: External value changed to:", newValue);
     }
   },
@@ -154,7 +154,7 @@ watch(
 
 onMounted(async () => {
   console.log("LocationAutocomplete: Component mounted");
-  await new Promise(resolve => setTimeout(resolve, 500));
+  await new Promise((resolve) => setTimeout(resolve, 500));
   await initAutocomplete();
 });
 </script>
@@ -168,7 +168,7 @@ onMounted(async () => {
       :placeholder="props.placeholder"
       :disabled="props.disabled"
       class="location-input p-inputtext"
-      :class="{ 'p-invalid': locationError }" 
+      :class="{ 'p-invalid': locationError }"
       @input="handleInput"
     />
   </div>
@@ -205,7 +205,7 @@ onMounted(async () => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   margin-top: 0.25rem;
   font-family: inherit;
-  z-index: 9999; 
+  z-index: 9999;
 }
 
 :global(.pac-item) {
