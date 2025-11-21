@@ -7,6 +7,8 @@
 import { ref, onMounted, watch } from "vue";
 import { loadGoogleMaps } from "@/utils/googleMapsLoader";
 import { isWithinWinnipeg, getDistanceFromWinnipeg } from "@/utils/locationValidator";
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 let radiusCircle: google.maps.Circle | null = null;
 
 interface Props {
