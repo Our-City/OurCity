@@ -96,10 +96,6 @@ const showTitleError = computed(() => {
   return titleTouched.value && errors.value.title;
 });
 
-const showLocationError = computed(() => {
-  return locationTouched.value && errors.value.location;
-});
-
 const showDescriptionError = computed(() => {
   return descriptionTouched.value && errors.value.description;
 });

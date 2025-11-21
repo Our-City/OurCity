@@ -38,7 +38,6 @@ const mapContainer = ref<HTMLDivElement | null>(null);
 let map: google.maps.Map | null = null;
 let marker: google.maps.marker.AdvancedMarkerElement | null = null;
 let geocoder: google.maps.Geocoder | null = null;
-let radiusCircle: google.maps.Circle | null = null;
 
 const isLoading = ref(true);
 const error = ref<string | null>(null);
