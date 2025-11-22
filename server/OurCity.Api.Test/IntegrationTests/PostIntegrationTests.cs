@@ -7,7 +7,6 @@ using OurCity.Api.Common.Dtos.Post;
 using OurCity.Api.Common.Dtos.User;
 using OurCity.Api.Common.Enum;
 using OurCity.Api.Infrastructure.Database;
-using Xunit;
 
 namespace OurCity.Api.Test.IntegrationTests;
 
@@ -342,7 +341,7 @@ public class PostIntegrationTests : IClassFixture<OurCityWebApplicationFactory>,
             Title = "New Post",
             Description = "New Description for test",
             Location = "Test Location",
-            TagIds = new List<Guid> { _testTagId },
+            Tags = new List<Guid> { _testTagId },
         };
 
         var loginRequest = new UserCreateRequestDto

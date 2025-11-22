@@ -6,7 +6,7 @@ namespace OurCity.Api.Infrastructure;
 public interface ITagRepository
 {
     Task<IEnumerable<Tag>> GetAllTags();
-    Task<IEnumerable<Tag>> GetTagsByIds(List<Guid> tagIds);
+    Task<IEnumerable<Tag>> GetTagsByIds(List<Guid> tags);
 }
 
 public class TagRepository : ITagRepository
@@ -23,8 +23,8 @@ public class TagRepository : ITagRepository
         return await _appDbContext.Tags.ToListAsync();
     }
 
-    public async Task<IEnumerable<Tag>> GetTagsByIds(List<Guid> tagIds)
+    public async Task<IEnumerable<Tag>> GetTagsByIds(List<Guid> tags)
     {
-        return await _appDbContext.Tags.Where(t => tagIds.Contains(t.Id)).ToListAsync();
+        return await _appDbContext.Tags.Where(t => tags.Contains(t.Id)).ToListAsync();
     }
 }

@@ -132,20 +132,21 @@ onMounted(loadPostData);
         <div v-else-if="post" class="post-detail-content-layout">
           <div class="post-content">
             <div class="post-card">
-              <div class="post-tags">
-                <span v-for="tag in post.tags" :key="tag.id" class="tag-pill">
-                  {{ tag.name }}
-                </span>
-              </div>
-
-              <h1 class="post-title" data-testid="post-title">{{ post.title }}</h1>
               <div class="post-author" data-testid="post-author">
                 @{{ post.authorName }} ·
                 {{ post.createdAt.toLocaleDateString() }}
               </div>
 
+              <h1 class="post-title" data-testid="post-title">{{ post.title }}</h1>
+
               <div v-if="post.location" class="post-location">
                 {{ post.location }}
+              </div>
+
+              <div class="post-tags">
+                <span v-for="tag in post.tags" :key="tag.id" class="tag-pill">
+                  {{ tag.name }}
+                </span>
               </div>
 
               <div v-if="images.length" class="post-images">
@@ -217,12 +218,20 @@ onMounted(loadPostData);
 <style scoped>
 .post-detail {
   padding: 1rem;
+  height: 100vh;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .post-detail-layout {
   display: flex;
   height: 100vh;
   overflow: hidden;
+  padding-bottom: 5rem;
 }
 
 .post-detail-body {
@@ -251,25 +260,39 @@ onMounted(loadPostData);
   width: 100%;
   background: var(--primary-background-color);
   border: 0.1rem solid var(--border-color);
-  padding: 4rem 4rem;
+  padding: 2rem 5rem 3rem 5rem;
 }
 
 .post-tags {
-  font-size: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.tag-pill {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  background: var(--secondary-background-color);
   color: var(--tertiary-text-color);
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid var(--border-color);
 }
 
 .post-title {
-  font-size: 3rem;
+  font-size: 2.75rem;
 }
 
 .post-author {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   color: var(--tertiary-text-color);
 }
 
 .post-location {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   color: var(--tertiary-text-color);
 }
 
@@ -280,12 +303,13 @@ onMounted(loadPostData);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 2rem;
+  padding: 2rem 2rem 1rem 2rem;
 }
 
 .post-description {
-  font-size: 1.25rem;
-  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  padding-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 .post-footer {

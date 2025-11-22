@@ -22,9 +22,13 @@ const emit = defineEmits<{ (e: "updated", updated: Comment): void }>();
 
 <style scoped>
 .comments-list {
-  margin-top: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.comments-list > :not(:last-child) {
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
 }
 </style>

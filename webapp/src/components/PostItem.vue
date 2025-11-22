@@ -52,7 +52,7 @@ const postImage = computed(() => media.value[0]?.url || null);
       <div class="post-author-date">
         @{{ authorUsername }}
         <span v-if="post.createdAt" class="post-date">
-          {{ new Date(post.createdAt).toLocaleDateString() }}
+          · {{ new Date(post.createdAt).toLocaleDateString() }}
         </span>
       </div>
 
@@ -122,7 +122,7 @@ const postImage = computed(() => media.value[0]?.url || null);
   font-weight: 800;
   color: var(--primary-text-color);
   white-space: nowrap;
-  overflow: visible;
+  overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
   min-width: 0;

@@ -133,7 +133,7 @@ const validateForm = () => {
   if (!formData.value.password) {
     errors.value.password = "Password is required";
   } else if (formData.value.password.length < 6) {
-    errors.value.password = "Password must be at least 6 characters";
+    errors.value.password = "Password must be at least 6 characters\n";
   }
 
   // Confirm Password validation
@@ -171,7 +171,7 @@ const handleCancel = () => {
       >
         <!-- Error display -->
         <div v-if="errors.submit" class="form-section form-section--before">
-          <div class="form-error">{{ errors.submit }}</div>
+          <div class="form-error" v-html="errors.submit"></div>
         </div>
 
         <!-- Username Field -->
