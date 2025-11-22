@@ -14,6 +14,8 @@ export interface Post {
   description: string;
   authorName?: string;
   location?: string;
+  latitude?: number;
+  longitude?: number;
   upvoteCount: number;
   downvoteCount: number;
   voteCount: number; // total votes (upvotes - downvotes)

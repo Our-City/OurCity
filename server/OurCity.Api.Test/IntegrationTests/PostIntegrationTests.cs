@@ -341,7 +341,7 @@ public class PostIntegrationTests : IClassFixture<OurCityWebApplicationFactory>,
             Title = "New Post",
             Description = "New Description for test",
             Location = "Test Location",
-            Tags = new List<Guid> { _testTagId },
+            TagIds = new List<Guid> { _testTagId },
         };
 
         var loginRequest = new UserCreateRequestDto

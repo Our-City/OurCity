@@ -21,7 +21,7 @@ public class PostUpdateRequestDto
     [RegularExpression(@"^\s*\S[\s\S]*$", ErrorMessage = "Description cannot be only whitespace")]
     public string? Description { get; set; }
 
-    [StringLength(50, ErrorMessage = "Location cannot exceed 50 characters")]
+    [StringLength(150, ErrorMessage = "Location cannot exceed 150 characters")]
     public string? Location { get; set; }
 
     public List<Guid>? Tags { get; set; }
