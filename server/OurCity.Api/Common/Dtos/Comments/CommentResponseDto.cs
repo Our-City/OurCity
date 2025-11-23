@@ -12,6 +12,7 @@ public class CommentResponseDto
     public required int UpvoteCount { get; set; }
     public required int DownvoteCount { get; set; }
     public required VoteType VoteStatus { get; set; }
+    public required bool CanMutate { get; set; }
     public bool IsDeleted { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }

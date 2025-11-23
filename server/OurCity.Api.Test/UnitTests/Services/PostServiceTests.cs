@@ -12,6 +12,7 @@ using OurCity.Api.Common.Enum;
 using OurCity.Api.Infrastructure;
 using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Services;
+using OurCity.Api.Services.Authorization;
 
 namespace OurCity.Api.Test.UnitTests.Services;
 
@@ -19,6 +20,8 @@ namespace OurCity.Api.Test.UnitTests.Services;
 [Trait("Domain", "Post")]
 public class PostServiceTests
 {
+    private readonly Mock<ICurrentUser> _mockCurrentUser;
+    private readonly Mock<IPolicyService> _mockPolicyService;
     private readonly Mock<IPostRepository> _mockPostRepository;
     private readonly Mock<ITagRepository> _mockTagRepository;
     private readonly Mock<IPostVoteRepository> _mockPostVoteRepository;
@@ -29,11 +32,15 @@ public class PostServiceTests
 
     public PostServiceTests()
     {
+        _mockCurrentUser = new Mock<ICurrentUser>();
+        _mockPolicyService = new Mock<IPolicyService>();
         _mockPostRepository = new Mock<IPostRepository>();
         _mockTagRepository = new Mock<ITagRepository>();
         _mockPostVoteRepository = new Mock<IPostVoteRepository>();
 
         _service = new PostService(
+            _mockCurrentUser.Object,
+            _mockPolicyService.Object,
             _mockPostRepository.Object,
             _mockTagRepository.Object,
             _mockPostVoteRepository.Object
@@ -55,9 +62,10 @@ public class PostServiceTests
         _mockPostRepository
             .Setup(r => r.GetAllPosts(postGetAllRequestDto))
             .ReturnsAsync(new List<Post>());
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
 
         // Act
-        var result = await _service.GetPosts(_testUserId, postGetAllRequestDto);
+        var result = await _service.GetPosts(postGetAllRequestDto);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -85,9 +93,10 @@ public class PostServiceTests
         };
 
         _mockPostRepository.Setup(r => r.GetAllPosts(postGetAllRequestDto)).ReturnsAsync(posts);
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
 
         // Act
-        var result = await _service.GetPosts(_testUserId, postGetAllRequestDto);
+        var result = await _service.GetPosts(postGetAllRequestDto);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -113,9 +122,10 @@ public class PostServiceTests
         };
 
         _mockPostRepository.Setup(r => r.GetAllPosts(postGetAllRequestDto)).ReturnsAsync(posts);
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
 
         // Act
-        var result = await _service.GetPosts(_testUserId, postGetAllRequestDto);
+        var result = await _service.GetPosts(postGetAllRequestDto);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -139,9 +149,10 @@ public class PostServiceTests
         };
 
         _mockPostRepository.Setup(r => r.GetAllPosts(postGetAllRequestDto)).ReturnsAsync(posts);
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
 
         // Act
-        var result = await _service.GetPosts(_testUserId, postGetAllRequestDto);
+        var result = await _service.GetPosts(postGetAllRequestDto);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -164,9 +175,10 @@ public class PostServiceTests
         };
 
         _mockPostRepository.Setup(r => r.GetAllPosts(postGetAllRequestDto)).ReturnsAsync(posts);
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
 
         // Act
-        var result = await _service.GetPosts(_testUserId, postGetAllRequestDto);
+        var result = await _service.GetPosts(postGetAllRequestDto);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -188,9 +200,10 @@ public class PostServiceTests
         };
 
         _mockPostRepository.Setup(r => r.GetAllPosts(postGetAllRequestDto)).ReturnsAsync(posts);
+        _mockCurrentUser.Setup(u => u.UserId).Returns((Guid?)null);
 
         // Act
-        var result = await _service.GetPosts(null, postGetAllRequestDto);
+        var result = await _service.GetPosts(postGetAllRequestDto);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -210,9 +223,10 @@ public class PostServiceTests
         var post = CreateTestFatPost(_testPostId, _testUserId, "Test Post");
 
         _mockPostRepository.Setup(r => r.GetFatPostById(_testPostId)).ReturnsAsync(post);
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
 
         // Act
-        var result = await _service.GetPostById(_testUserId, _testPostId);
+        var result = await _service.GetPostById(_testPostId);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -228,9 +242,10 @@ public class PostServiceTests
     {
         // Arrange
         _mockPostRepository.Setup(r => r.GetFatPostById(_testPostId)).ReturnsAsync((Post?)null);
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
 
         // Act
-        var result = await _service.GetPostById(_testUserId, _testPostId);
+        var result = await _service.GetPostById(_testPostId);
 
         // Assert
         Assert.False(result.IsSuccess);
@@ -249,9 +264,10 @@ public class PostServiceTests
         );
 
         _mockPostRepository.Setup(r => r.GetFatPostById(_testPostId)).ReturnsAsync(post);
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
 
         // Act
-        var result = await _service.GetPostById(_testUserId, _testPostId);
+        var result = await _service.GetPostById(_testPostId);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -266,9 +282,10 @@ public class PostServiceTests
         var post = CreateTestFatPost(_testPostId, Guid.NewGuid(), "Test Post");
 
         _mockPostRepository.Setup(r => r.GetFatPostById(_testPostId)).ReturnsAsync(post);
+        _mockCurrentUser.Setup(u => u.UserId).Returns((Guid?)null);
 
         // Act
-        var result = await _service.GetPostById(null, _testPostId);
+        var result = await _service.GetPostById(_testPostId);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -299,8 +316,12 @@ public class PostServiceTests
 
         _mockPostRepository.Setup(r => r.CreatePost(It.IsAny<Post>())).ReturnsAsync(createdPost);
 
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
+
+        _mockPolicyService.Setup(u => u.CanParticipateInForum()).ReturnsAsync(true);
+
         // Act
-        var result = await _service.CreatePost(_testUserId, createDto);
+        var result = await _service.CreatePost(createDto);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -338,8 +359,12 @@ public class PostServiceTests
             .Callback<Post>(p => capturedPost = p)
             .ReturnsAsync((Post p) => p);
 
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
+
+        _mockPolicyService.Setup(u => u.CanParticipateInForum()).ReturnsAsync(true);
+
         // Act
-        var result = await _service.CreatePost(_testUserId, createDto);
+        var result = await _service.CreatePost(createDto);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -368,8 +393,12 @@ public class PostServiceTests
             .Callback<Post>(p => capturedPost = p)
             .ReturnsAsync((Post p) => p);
 
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
+
+        _mockPolicyService.Setup(u => u.CanParticipateInForum()).ReturnsAsync(true);
+
         // Act
-        var result = await _service.CreatePost(_testUserId, createDto);
+        var result = await _service.CreatePost(createDto);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -399,8 +428,12 @@ public class PostServiceTests
 
         _mockPostRepository.Setup(r => r.SaveChangesAsync()).Returns(Task.CompletedTask);
 
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
+
+        _mockPolicyService.Setup(u => u.CanMutateThisPost(post)).ReturnsAsync(true);
+
         // Act
-        var result = await _service.UpdatePost(_testUserId, _testPostId, updateDto);
+        var result = await _service.UpdatePost(_testPostId, updateDto);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -419,8 +452,10 @@ public class PostServiceTests
 
         _mockPostRepository.Setup(r => r.GetFatPostById(_testPostId)).ReturnsAsync((Post?)null);
 
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
+
         // Act
-        var result = await _service.UpdatePost(_testUserId, _testPostId, updateDto);
+        var result = await _service.UpdatePost(_testPostId, updateDto);
 
         // Assert
         Assert.False(result.IsSuccess);
@@ -439,8 +474,10 @@ public class PostServiceTests
 
         _mockPostRepository.Setup(r => r.GetFatPostById(_testPostId)).ReturnsAsync(post);
 
+        _mockCurrentUser.Setup(u => u.UserId).Returns(differentUserId);
+
         // Act
-        var result = await _service.UpdatePost(differentUserId, _testPostId, updateDto);
+        var result = await _service.UpdatePost(_testPostId, updateDto);
 
         // Assert
         Assert.False(result.IsSuccess);
@@ -463,8 +500,12 @@ public class PostServiceTests
 
         _mockPostRepository.Setup(r => r.SaveChangesAsync()).Returns(Task.CompletedTask);
 
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
+
+        _mockPolicyService.Setup(u => u.CanMutateThisPost(post)).ReturnsAsync(true);
+
         // Act
-        var result = await _service.UpdatePost(_testUserId, _testPostId, updateDto);
+        var result = await _service.UpdatePost(_testPostId, updateDto);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -500,8 +541,12 @@ public class PostServiceTests
 
         _mockPostRepository.Setup(r => r.SaveChangesAsync()).Returns(Task.CompletedTask);
 
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
+
+        _mockPolicyService.Setup(u => u.CanMutateThisPost(post)).ReturnsAsync(true);
+
         // Act
-        var result = await _service.UpdatePost(_testUserId, _testPostId, updateDto);
+        var result = await _service.UpdatePost(_testPostId, updateDto);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -534,8 +579,12 @@ public class PostServiceTests
 
         _mockPostRepository.Setup(r => r.SaveChangesAsync()).Returns(Task.CompletedTask);
 
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
+
+        _mockPolicyService.Setup(u => u.CanParticipateInForum()).ReturnsAsync(true);
+
         // Act
-        var result = await _service.VotePost(_testUserId, _testPostId, voteDto);
+        var result = await _service.VotePost(_testPostId, voteDto);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -580,8 +629,11 @@ public class PostServiceTests
 
         _mockPostRepository.Setup(r => r.SaveChangesAsync()).Returns(Task.CompletedTask);
 
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
+        _mockPolicyService.Setup(u => u.CanParticipateInForum()).ReturnsAsync(true);
+
         // Act
-        var result = await _service.VotePost(_testUserId, _testPostId, voteDto);
+        var result = await _service.VotePost(_testPostId, voteDto);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -614,8 +666,12 @@ public class PostServiceTests
 
         _mockPostRepository.Setup(r => r.SaveChangesAsync()).Returns(Task.CompletedTask);
 
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
+
+        _mockPolicyService.Setup(u => u.CanParticipateInForum()).ReturnsAsync(true);
+
         // Act
-        var result = await _service.VotePost(_testUserId, _testPostId, voteDto);
+        var result = await _service.VotePost(_testPostId, voteDto);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -634,8 +690,10 @@ public class PostServiceTests
 
         _mockPostRepository.Setup(r => r.GetSlimPostbyId(_testPostId)).ReturnsAsync((Post?)null);
 
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
+
         // Act
-        var result = await _service.VotePost(_testUserId, _testPostId, voteDto);
+        var result = await _service.VotePost(_testPostId, voteDto);
 
         // Assert
         Assert.False(result.IsSuccess);
@@ -663,9 +721,13 @@ public class PostServiceTests
 
         _mockPostRepository.Setup(r => r.SaveChangesAsync()).Returns(Task.CompletedTask);
 
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
+
+        _mockPolicyService.Setup(u => u.CanParticipateInForum()).ReturnsAsync(true);
+
         // Act
         await Task.Delay(10); // Ensure time difference
-        var result = await _service.VotePost(_testUserId, _testPostId, voteDto);
+        var result = await _service.VotePost(_testPostId, voteDto);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -686,8 +748,12 @@ public class PostServiceTests
 
         _mockPostRepository.Setup(r => r.SaveChangesAsync()).Returns(Task.CompletedTask);
 
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
+
+        _mockPolicyService.Setup(u => u.CanMutateThisPost(post)).ReturnsAsync(true);
+
         // Act
-        var result = await _service.DeletePost(_testUserId, _testPostId);
+        var result = await _service.DeletePost(_testPostId);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -704,8 +770,10 @@ public class PostServiceTests
         // Arrange
         _mockPostRepository.Setup(r => r.GetSlimPostbyId(_testPostId)).ReturnsAsync((Post?)null);
 
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
+
         // Act
-        var result = await _service.DeletePost(_testUserId, _testPostId);
+        var result = await _service.DeletePost(_testPostId);
 
         // Assert
         Assert.False(result.IsSuccess);
@@ -723,8 +791,10 @@ public class PostServiceTests
 
         _mockPostRepository.Setup(r => r.GetSlimPostbyId(_testPostId)).ReturnsAsync(post);
 
+        _mockCurrentUser.Setup(u => u.UserId).Returns(differentUserId);
+
         // Act
-        var result = await _service.DeletePost(differentUserId, _testPostId);
+        var result = await _service.DeletePost(_testPostId);
 
         // Assert
         Assert.False(result.IsSuccess);
@@ -745,9 +815,13 @@ public class PostServiceTests
 
         _mockPostRepository.Setup(r => r.SaveChangesAsync()).Returns(Task.CompletedTask);
 
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
+
+        _mockPolicyService.Setup(u => u.CanMutateThisPost(post)).ReturnsAsync(true);
+
         // Act
         await Task.Delay(10); // Ensure time difference
-        var result = await _service.DeletePost(_testUserId, _testPostId);
+        var result = await _service.DeletePost(_testPostId);
 
         // Assert
         Assert.True(result.IsSuccess);
