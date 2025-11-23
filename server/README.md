@@ -9,9 +9,6 @@
   - To run the dev environment, you will need .env.development (even if empty) or docker compose will error
   - To run the prod environment, you will need .env.production (even if empty) or docker compose will error
 
-## Notable quirks
-- If you see ClaimsPrincipal in the repo, it essentially means a User
-
 ## Common Errors
 - SQL Errors like "Relation does not exist"
   - You may need to run migrations when initially running the app to populate your database. It is NOT automatically done.

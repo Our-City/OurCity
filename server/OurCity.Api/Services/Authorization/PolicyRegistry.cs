@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using OurCity.Api.Services.Authorization.CanMutateThisComment;
-using OurCity.Api.Services.Authorization.CanMutateThisPost;
-using OurCity.Api.Services.Authorization.CanParticipateInForum;
+using OurCity.Api.Services.Authorization.Policies;
 
 namespace OurCity.Api.Services.Authorization;
 

@@ -36,21 +36,16 @@ public class CommentController : ControllerBase
         [FromBody] CommentRequestDto commentRequestDto
     )
     {
-        var userId = User.GetUserId();
-
-        if (userId == null)
-        {
-            return Problem(
-                statusCode: StatusCodes.Status401Unauthorized,
-                detail: "User not authenticated"
-            );
-        }
-
         var res = await _commentService.CreateComment(postId, commentRequestDto);
 
         if (!res.IsSuccess)
         {
-            return Problem(statusCode: StatusCodes.Status404NotFound, detail: res.Error);
+            return Problem(
+                statusCode: (res.Error != null && res.Error.Equals(ErrorMessages.PostNotFound))
+                    ? StatusCodes.Status404NotFound
+                    : StatusCodes.Status403Forbidden,
+                detail: res.Error
+            );
         }
 
         return Ok(res.Data);
@@ -124,7 +119,12 @@ public class CommentController : ControllerBase
 
         if (!res.IsSuccess)
         {
-            return Problem(statusCode: StatusCodes.Status404NotFound, detail: res.Error);
+            return Problem(
+                statusCode: (res.Error != null && res.Error.Equals(ErrorMessages.CommentNotFound))
+                    ? StatusCodes.Status404NotFound
+                    : StatusCodes.Status403Forbidden,
+                detail: res.Error
+            );
         }
 
         return Ok(res.Data);

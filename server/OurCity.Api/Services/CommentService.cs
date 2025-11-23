@@ -37,19 +37,22 @@ public interface ICommentService
 
 public class CommentService : ICommentService
 {
-    private readonly IRequestingUser _requestingUser;
+    private readonly ICurrentUser _requestingUser;
+    private readonly IPolicyService _policyService;
     private readonly ICommentRepository _commentRepository;
     private readonly ICommentVoteRepository _commentVoteRepository;
     private readonly IPostRepository _postRepository;
 
     public CommentService(
-        IRequestingUser requestingUser,
+        ICurrentUser requestingUser,
+        IPolicyService policyService,
         ICommentRepository commentRepository,
         ICommentVoteRepository commentVoteRepository,
         IPostRepository postRepository
     )
     {
         _requestingUser = requestingUser;
+        _policyService = policyService;
         _commentRepository = commentRepository;
         _commentVoteRepository = commentVoteRepository;
         _postRepository = postRepository;
@@ -76,7 +79,7 @@ public class CommentService : ICommentService
 
         var response = new PaginatedResponseDto<CommentResponseDto>
         {
-            Items = pageItems.ToDtos(_requestingUser.UserId),
+            Items = await Task.WhenAll(pageItems.Select(async c => c.ToDto(_requestingUser.UserId, await _policyService.CanMutateThisComment(c)))),
             NextCursor = hasNextPage ? pageItems.LastOrDefault()?.Id : null,
         };
 
@@ -89,7 +92,7 @@ public class CommentService : ICommentService
     )
     {
         //Check that user can create posts/comments
-        if (!_requestingUser.UserId.HasValue || !await _requestingUser.HasPolicy(Policy.CanParticipateInForum))
+        if (!_requestingUser.UserId.HasValue || !await _policyService.CanParticipateInForum())
         {
             return Result<CommentResponseDto>.Failure(ErrorMessages.Unauthorized);
         }
@@ -106,7 +109,7 @@ public class CommentService : ICommentService
             commentRequestDto.CreateRequestToEntity(_requestingUser.UserId.Value, postId)
         );
 
-        return Result<CommentResponseDto>.Success(createdComment.ToDto(_requestingUser.UserId.Value));
+        return Result<CommentResponseDto>.Success(createdComment.ToDto(_requestingUser.UserId, true));
     }
 
     public async Task<Result<CommentResponseDto>> UpdateComment(
@@ -122,7 +125,8 @@ public class CommentService : ICommentService
         }
         
         //Check that user can modify this comment
-        if (!_requestingUser.UserId.HasValue || !await _requestingUser.HasPolicy(Policy.CanMutateThisComment, comment.Id))
+        var canMutateComment = await _policyService.CanMutateThisComment(comment);
+        if (!canMutateComment)
         {
             return Result<CommentResponseDto>.Failure(ErrorMessages.CommentUnauthorized);
         }
@@ -131,7 +135,7 @@ public class CommentService : ICommentService
         comment.UpdatedAt = DateTime.UtcNow;
         await _commentRepository.SaveChangesAsync();
 
-        return Result<CommentResponseDto>.Success(comment.ToDto(_requestingUser.UserId.Value));
+        return Result<CommentResponseDto>.Success(comment.ToDto(_requestingUser.UserId, canMutateComment));
     }
 
     public async Task<Result<CommentResponseDto>> VoteComment(
@@ -140,7 +144,7 @@ public class CommentService : ICommentService
     )
     {
         //Check that user can vote
-        if (!_requestingUser.UserId.HasValue || !await _requestingUser.HasPolicy(Policy.CanParticipateInForum))
+        if (!_requestingUser.UserId.HasValue || !await _policyService.CanParticipateInForum())
         {
             return Result<CommentResponseDto>.Failure(ErrorMessages.Unauthorized);
         }
@@ -182,7 +186,10 @@ public class CommentService : ICommentService
         comment.UpdatedAt = DateTime.UtcNow;
         await _commentRepository.SaveChangesAsync();
 
-        return Result<CommentResponseDto>.Success(comment.ToDto(_requestingUser.UserId.Value));
+        //Check for permisisons for Dto response
+        var canMutateComment = await _policyService.CanMutateThisComment(comment);
+
+        return Result<CommentResponseDto>.Success(comment.ToDto(_requestingUser.UserId, canMutateComment));
     }
 
     public async Task<Result<CommentResponseDto>> DeleteComment(Guid commentId)
@@ -195,7 +202,8 @@ public class CommentService : ICommentService
         }
 
         //Check that user can delete this comment
-        if (!_requestingUser.UserId.HasValue || !await _requestingUser.HasPolicy(Policy.CanMutateThisComment, comment.Id))
+        var canMutateComment = await _policyService.CanMutateThisComment(comment);
+        if (!canMutateComment)
         {
             return Result<CommentResponseDto>.Failure(ErrorMessages.Unauthorized);
         }
@@ -205,6 +213,6 @@ public class CommentService : ICommentService
         comment.UpdatedAt = DateTime.UtcNow;
         await _commentRepository.SaveChangesAsync();
 
-        return Result<CommentResponseDto>.Success(comment.ToDto(_requestingUser.UserId.Value));
+        return Result<CommentResponseDto>.Success(comment.ToDto(_requestingUser.UserId, canMutateComment));
     }
 }

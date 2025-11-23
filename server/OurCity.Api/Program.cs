@@ -7,9 +7,7 @@ using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Middlewares;
 using OurCity.Api.Services;
 using OurCity.Api.Services.Authorization;
-using OurCity.Api.Services.Authorization.CanMutateThisComment;
-using OurCity.Api.Services.Authorization.CanMutateThisPost;
-using OurCity.Api.Services.Authorization.CanParticipateInForum;
+using OurCity.Api.Services.Authorization.Policies;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -100,10 +98,10 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 //Authorization
-builder.Services.AddSingleton<IAuthorizationHandler, CanParticipateInForumHandler>();
-builder.Services.AddSingleton<IAuthorizationHandler, CanMutateThisPostHandler>();
-builder.Services.AddSingleton<IAuthorizationHandler, CanMutateThisCommentHandler>();
-builder.Services.AddScoped<IRequestingUser, RequestingUser>();
+builder.Services.AddScoped<IAuthorizationHandler, CanParticipateInForumHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, CanMutateThisPostHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, CanMutateThisCommentHandler>();
+builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 builder.Services.AddAuthorization(options =>
 {
     options.AddOurCityPolicies();
