@@ -1,7 +1,6 @@
 /// Generative AI - CoPilot was used to assist in the creation of this file.
 /// CoPilot assisted by generating boilerplate code for standard mapping functions
 /// based on common patterns in C# for mapping between entities and DTOs
-
 using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos.Comments;
 using OurCity.Api.Common.Dtos.Pagination;
@@ -79,7 +78,11 @@ public class CommentService : ICommentService
 
         var response = new PaginatedResponseDto<CommentResponseDto>
         {
-            Items = await Task.WhenAll(pageItems.Select(async c => c.ToDto(_requestingUser.UserId, await _policyService.CanMutateThisComment(c)))),
+            Items = await Task.WhenAll(
+                pageItems.Select(async c =>
+                    c.ToDto(_requestingUser.UserId, await _policyService.CanMutateThisComment(c))
+                )
+            ),
             NextCursor = hasNextPage ? pageItems.LastOrDefault()?.Id : null,
         };
 
@@ -109,7 +112,9 @@ public class CommentService : ICommentService
             commentRequestDto.CreateRequestToEntity(_requestingUser.UserId.Value, postId)
         );
 
-        return Result<CommentResponseDto>.Success(createdComment.ToDto(_requestingUser.UserId, true));
+        return Result<CommentResponseDto>.Success(
+            createdComment.ToDto(_requestingUser.UserId, true)
+        );
     }
 
     public async Task<Result<CommentResponseDto>> UpdateComment(
@@ -123,7 +128,7 @@ public class CommentService : ICommentService
         {
             return Result<CommentResponseDto>.Failure(ErrorMessages.CommentNotFound);
         }
-        
+
         //Check that user can modify this comment
         var canMutateComment = await _policyService.CanMutateThisComment(comment);
         if (!canMutateComment)
@@ -135,7 +140,9 @@ public class CommentService : ICommentService
         comment.UpdatedAt = DateTime.UtcNow;
         await _commentRepository.SaveChangesAsync();
 
-        return Result<CommentResponseDto>.Success(comment.ToDto(_requestingUser.UserId, canMutateComment));
+        return Result<CommentResponseDto>.Success(
+            comment.ToDto(_requestingUser.UserId, canMutateComment)
+        );
     }
 
     public async Task<Result<CommentResponseDto>> VoteComment(
@@ -189,7 +196,9 @@ public class CommentService : ICommentService
         //Check for permisisons for Dto response
         var canMutateComment = await _policyService.CanMutateThisComment(comment);
 
-        return Result<CommentResponseDto>.Success(comment.ToDto(_requestingUser.UserId, canMutateComment));
+        return Result<CommentResponseDto>.Success(
+            comment.ToDto(_requestingUser.UserId, canMutateComment)
+        );
     }
 
     public async Task<Result<CommentResponseDto>> DeleteComment(Guid commentId)
@@ -213,6 +222,8 @@ public class CommentService : ICommentService
         comment.UpdatedAt = DateTime.UtcNow;
         await _commentRepository.SaveChangesAsync();
 
-        return Result<CommentResponseDto>.Success(comment.ToDto(_requestingUser.UserId, canMutateComment));
+        return Result<CommentResponseDto>.Success(
+            comment.ToDto(_requestingUser.UserId, canMutateComment)
+        );
     }
 }

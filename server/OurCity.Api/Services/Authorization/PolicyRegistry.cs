@@ -35,7 +35,7 @@ public static class PolicyRegistry
             Policy.CanMutateThisPost,
             policy => policy.Requirements.Add(new CanMutateThisPostRequirement())
         );
-        
+
         options.AddPolicy(
             Policy.CanMutateThisComment,
             policy => policy.Requirements.Add(new CanMutateThisCommentRequirement())

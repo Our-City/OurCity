@@ -16,14 +16,8 @@ public interface IPostService
     );
     Task<Result<PostResponseDto>> GetPostById(Guid postId);
     Task<Result<PostResponseDto>> CreatePost(PostCreateRequestDto postRequestDto);
-    Task<Result<PostResponseDto>> UpdatePost(
-        Guid postId,
-        PostUpdateRequestDto postRequestDto
-    );
-    Task<Result<PostResponseDto>> VotePost(
-        Guid postId,
-        PostVoteRequestDto postVoteRequestDto
-    );
+    Task<Result<PostResponseDto>> UpdatePost(Guid postId, PostUpdateRequestDto postRequestDto);
+    Task<Result<PostResponseDto>> VotePost(Guid postId, PostVoteRequestDto postVoteRequestDto);
     Task<Result<PostResponseDto>> DeletePost(Guid postId);
 }
 
@@ -66,7 +60,11 @@ public class PostService : IPostService
 
         var response = new PaginatedResponseDto<PostResponseDto>
         {
-            Items = await Task.WhenAll(pageItems.Select(async p => p.ToDto(_requestingUser.UserId, await _policyService.CanMutateThisPost(p)))),
+            Items = await Task.WhenAll(
+                pageItems.Select(async p =>
+                    p.ToDto(_requestingUser.UserId, await _policyService.CanMutateThisPost(p))
+                )
+            ),
             NextCursor = hasNextPage ? pageItems.LastOrDefault()?.Id : null,
         };
 
@@ -82,19 +80,19 @@ public class PostService : IPostService
             return Result<PostResponseDto>.Failure(ErrorMessages.PostNotFound);
         }
 
-        return Result<PostResponseDto>.Success(post.ToDto(_requestingUser.UserId, await _policyService.CanMutateThisPost(post)));
+        return Result<PostResponseDto>.Success(
+            post.ToDto(_requestingUser.UserId, await _policyService.CanMutateThisPost(post))
+        );
     }
 
-    public async Task<Result<PostResponseDto>> CreatePost(
-        PostCreateRequestDto postCreateRequestDto
-    )
+    public async Task<Result<PostResponseDto>> CreatePost(PostCreateRequestDto postCreateRequestDto)
     {
         //Check that user can create posts
         if (!_requestingUser.UserId.HasValue || !await _policyService.CanParticipateInForum())
         {
             return Result<PostResponseDto>.Failure(ErrorMessages.Unauthorized);
         }
-        
+
         var tags = await _tagRepository.GetTagsByIds(postCreateRequestDto.TagIds);
 
         var createdPost = await _postRepository.CreatePost(
@@ -131,7 +129,9 @@ public class PostService : IPostService
         postUpdateRequestDto.UpdateDtoToEntity(post, tags?.ToList());
         await _postRepository.SaveChangesAsync();
 
-        return Result<PostResponseDto>.Success(post.ToDto(_requestingUser.UserId, canMutateThisPost));
+        return Result<PostResponseDto>.Success(
+            post.ToDto(_requestingUser.UserId, canMutateThisPost)
+        );
     }
 
     public async Task<Result<PostResponseDto>> VotePost(
@@ -145,14 +145,17 @@ public class PostService : IPostService
         {
             return Result<PostResponseDto>.Failure(ErrorMessages.PostNotFound);
         }
-        
+
         //Check that user can vote
         if (!_requestingUser.UserId.HasValue || !await _policyService.CanParticipateInForum())
         {
             return Result<PostResponseDto>.Failure(ErrorMessages.Unauthorized);
         }
 
-        var existingVote = await _postVoteRepository.GetVoteByPostAndUserId(postId, _requestingUser.UserId.Value);
+        var existingVote = await _postVoteRepository.GetVoteByPostAndUserId(
+            postId,
+            _requestingUser.UserId.Value
+        );
         var requestedVoteType = postVoteRequestDto.VoteType;
 
         if (existingVote != null && requestedVoteType == VoteType.NoVote)
@@ -183,7 +186,7 @@ public class PostService : IPostService
 
         //Check for permissions to put in Dto
         var canMutatePost = await _policyService.CanMutateThisPost(post);
-        
+
         return Result<PostResponseDto>.Success(post.ToDto(_requestingUser.UserId, canMutatePost));
     }
 

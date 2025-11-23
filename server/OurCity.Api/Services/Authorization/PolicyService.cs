@@ -29,19 +29,30 @@ public class PolicyService : IPolicyService
 
     public async Task<bool> CanParticipateInForum()
     {
-        var authResult =  await _authorizationService.AuthorizeAsync(_user.Principal, Policy.CanParticipateInForum);
+        var authResult = await _authorizationService.AuthorizeAsync(
+            _user.Principal,
+            Policy.CanParticipateInForum
+        );
         return authResult.Succeeded;
     }
 
     public async Task<bool> CanMutateThisPost(Post post)
     {
-        var authResult = await _authorizationService.AuthorizeAsync(_user.Principal, post, Policy.CanMutateThisPost);
+        var authResult = await _authorizationService.AuthorizeAsync(
+            _user.Principal,
+            post,
+            Policy.CanMutateThisPost
+        );
         return authResult.Succeeded;
     }
 
     public async Task<bool> CanMutateThisComment(Comment comment)
     {
-        var authResult = await _authorizationService.AuthorizeAsync(_user.Principal, comment, Policy.CanMutateThisComment);
+        var authResult = await _authorizationService.AuthorizeAsync(
+            _user.Principal,
+            comment,
+            Policy.CanMutateThisComment
+        );
         return authResult.Succeeded;
     }
 }

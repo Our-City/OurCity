@@ -5,7 +5,8 @@ namespace OurCity.Api.Services.Authorization.Policies;
 
 public class CanMutateThisCommentRequirement : IAuthorizationRequirement { }
 
-public class CanMutateThisCommentHandler : AuthorizationHandler<CanMutateThisCommentRequirement, Comment>
+public class CanMutateThisCommentHandler
+    : AuthorizationHandler<CanMutateThisCommentRequirement, Comment>
 {
     private readonly ICurrentUser _user;
 

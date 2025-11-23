@@ -544,7 +544,7 @@ public class PostServiceTests
         _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
 
         _mockPolicyService.Setup(u => u.CanMutateThisPost(post)).ReturnsAsync(true);
-        
+
         // Act
         var result = await _service.UpdatePost(_testPostId, updateDto);
 
@@ -582,7 +582,7 @@ public class PostServiceTests
         _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
 
         _mockPolicyService.Setup(u => u.CanParticipateInForum()).ReturnsAsync(true);
-        
+
         // Act
         var result = await _service.VotePost(_testPostId, voteDto);
 
@@ -669,7 +669,7 @@ public class PostServiceTests
         _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
 
         _mockPolicyService.Setup(u => u.CanParticipateInForum()).ReturnsAsync(true);
-        
+
         // Act
         var result = await _service.VotePost(_testPostId, voteDto);
 
@@ -691,7 +691,7 @@ public class PostServiceTests
         _mockPostRepository.Setup(r => r.GetSlimPostbyId(_testPostId)).ReturnsAsync((Post?)null);
 
         _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
-        
+
         // Act
         var result = await _service.VotePost(_testPostId, voteDto);
 
@@ -724,7 +724,7 @@ public class PostServiceTests
         _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
 
         _mockPolicyService.Setup(u => u.CanParticipateInForum()).ReturnsAsync(true);
-        
+
         // Act
         await Task.Delay(10); // Ensure time difference
         var result = await _service.VotePost(_testPostId, voteDto);
@@ -751,7 +751,7 @@ public class PostServiceTests
         _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
 
         _mockPolicyService.Setup(u => u.CanMutateThisPost(post)).ReturnsAsync(true);
-        
+
         // Act
         var result = await _service.DeletePost(_testPostId);
 
@@ -771,7 +771,7 @@ public class PostServiceTests
         _mockPostRepository.Setup(r => r.GetSlimPostbyId(_testPostId)).ReturnsAsync((Post?)null);
 
         _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
-        
+
         // Act
         var result = await _service.DeletePost(_testPostId);
 
@@ -818,7 +818,7 @@ public class PostServiceTests
         _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
 
         _mockPolicyService.Setup(u => u.CanMutateThisPost(post)).ReturnsAsync(true);
-        
+
         // Act
         await Task.Delay(10); // Ensure time difference
         var result = await _service.DeletePost(_testPostId);

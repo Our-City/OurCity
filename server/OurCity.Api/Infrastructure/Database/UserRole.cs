@@ -6,5 +6,7 @@ public class UserRole : IdentityRole<Guid>
 {
     //Constructors required for EFCore
     public UserRole() { }
-    public UserRole(string username) : base(username) { }
+
+    public UserRole(string username)
+        : base(username) { }
 }

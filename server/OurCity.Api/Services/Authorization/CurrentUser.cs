@@ -16,13 +16,12 @@ public class CurrentUser : ICurrentUser
 
     public CurrentUser(IHttpContextAccessor accessor)
     {
-        _user = accessor.HttpContext?.User 
-                     ?? new ClaimsPrincipal(new ClaimsIdentity());
+        _user = accessor.HttpContext?.User ?? new ClaimsPrincipal(new ClaimsIdentity());
     }
 
     public ClaimsPrincipal Principal => _user;
 
     public Guid? UserId => _user.GetUserId();
-    
+
     public bool IsAuthenticated => _user.Identity?.IsAuthenticated ?? false;
 }
