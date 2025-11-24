@@ -213,7 +213,7 @@ function addMarkers() {
   if (postsWithLocation.length > 0) {
     map.fitBounds(bounds);
 
-    const listener = google.maps.event.addListenerOnce(map, "idle", () => {
+    google.maps.event.addListenerOnce(map, "idle", () => {
       if (map && map.getZoom()! > 15) {
         map.setZoom(15);
       }
