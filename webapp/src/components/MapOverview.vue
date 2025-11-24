@@ -1,4 +1,4 @@
-<!-- <!-- Generative AI was used to assist in the creation of this file.
+<!-- Generative AI was used to assist in the creation of this file.
   CoPilot was asked to provide help with CSS styling and for help with syntax, and error handling.
   Map component for displaying all posts on a map with interactive markers -->
 <script setup lang="ts">
