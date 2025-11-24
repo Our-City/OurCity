@@ -25,7 +25,8 @@ export function loadGoogleMaps(): Promise<void> {
     }
 
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places,geocoding,marker&v=weekly&loading=async`;
+    // Add 'visualization' to the libraries parameter
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places,geocoding,marker,visualization&v=weekly&loading=async`;
     script.async = true;
     script.defer = true;
 
@@ -35,10 +36,12 @@ export function loadGoogleMaps(): Promise<void> {
           typeof google !== "undefined" &&
           google.maps &&
           google.maps.places &&
-          google.maps.places.Autocomplete
+          google.maps.places.Autocomplete &&
+          google.maps.visualization && // Check visualization library is loaded
+          google.maps.visualization.HeatmapLayer
         ) {
           isLoaded = true;
-          console.log("Google Maps and Places API fully loaded");
+          console.log("Google Maps, Places API, and Visualization library fully loaded");
           resolve();
         } else {
           setTimeout(checkPlacesLibrary, 50);
@@ -51,7 +54,7 @@ export function loadGoogleMaps(): Promise<void> {
       setTimeout(() => {
         if (!isLoaded) {
           loadPromise = null;
-          reject(new Error("Timeout waiting for Google Maps Places library"));
+          reject(new Error("Timeout waiting for Google Maps libraries"));
         }
       }, 10000);
     };
@@ -72,6 +75,7 @@ export function isGoogleMapsLoaded(): boolean {
     isLoaded &&
     typeof google !== "undefined" &&
     typeof google.maps !== "undefined" &&
-    typeof google.maps.places !== "undefined"
+    typeof google.maps.places !== "undefined" &&
+    typeof google.maps.visualization !== "undefined"
   );
 }

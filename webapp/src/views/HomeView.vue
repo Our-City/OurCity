@@ -246,5 +246,4 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
   opacity: 0.5;
   cursor: not-allowed;
 }
-
 </style>

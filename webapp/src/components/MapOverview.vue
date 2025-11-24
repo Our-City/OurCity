@@ -1,10 +1,13 @@
-<!-- filepath: webapp/src/components/MapOverview.vue -->
-<!-- Map component for displaying all posts on a map with interactive markers -->
+<!-- <!-- Generative AI was used to assist in the creation of this file.
+  CoPilot was asked to provide help with CSS styling and for help with syntax, and error handling.
+  Map component for displaying all posts on a map with interactive markers -->
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import { loadGoogleMaps } from "@/utils/googleMapsLoader";
+import { getMediaByPostId } from "@/api/mediaService";
 import type { Post } from "@/models/post";
+import type { Media } from "@/models/media";
 
 interface Props {
   posts: Post[];
@@ -18,16 +21,41 @@ const props = withDefaults(defineProps<Props>(), {
 const router = useRouter();
 const mapContainer = ref<HTMLDivElement | null>(null);
 let map: google.maps.Map | null = null;
+let heatmap: google.maps.visualization.HeatmapLayer | null = null; // Add heatmap layer
 const markers = ref<Map<string, google.maps.marker.AdvancedMarkerElement>>(new Map());
 const infoWindows = ref<Map<string, google.maps.InfoWindow>>(new Map());
+const postMedia = ref<Map<string, Media[]>>(new Map());
 
 const isLoading = ref(true);
 const error = ref<string | null>(null);
+const showHeatmap = ref(false); // Toggle state for heatmap
+const showMarkers = ref(true); // Toggle state for markers
 
-// Default center (Winnipeg)
 const DEFAULT_CENTER = { lat: 49.8951, lng: -97.1384 };
 
-// Initialize Google Maps
+// Fetch media for all posts with locations
+async function fetchPostsMedia(posts: Post[]) {
+  const postsWithLocation = posts.filter(
+    (post) => post.latitude && post.longitude && !post.isDeleted,
+  );
+
+  const mediaPromises = postsWithLocation.map(async (post) => {
+    try {
+      const media = await getMediaByPostId(post.id);
+      return { postId: post.id, media };
+    } catch (err) {
+      console.error(`Failed to fetch media for post ${post.id}:`, err);
+      return { postId: post.id, media: [] };
+    }
+  });
+
+  const results = await Promise.all(mediaPromises);
+
+  results.forEach(({ postId, media }) => {
+    postMedia.value.set(postId, media);
+  });
+}
+
 async function initMap() {
   try {
     isLoading.value = true;
@@ -49,8 +77,10 @@ async function initMap() {
       mapId: "OURCITY_MAP_OVERVIEW",
     });
 
-    // Add markers for posts with locations
+    // Fetch media and add markers
+    await fetchPostsMedia(props.posts);
     addMarkers();
+    initHeatmap(); // Initialize heatmap
 
     isLoading.value = false;
   } catch (err) {
@@ -60,11 +90,89 @@ async function initMap() {
   }
 }
 
-// Add markers for all posts with location data
+// Initialize heatmap layer
+function initHeatmap() {
+  if (!map) return;
+
+  const postsWithLocation = props.posts.filter(
+    (post) => post.latitude && post.longitude && !post.isDeleted,
+  );
+
+  if (postsWithLocation.length === 0) {
+    return;
+  }
+
+  // Create weighted data points (more posts at same location = higher weight)
+  const locationCounts = new Map<string, { location: google.maps.LatLng; count: number }>();
+
+  postsWithLocation.forEach((post) => {
+    const key = `${post.latitude},${post.longitude}`;
+    const existing = locationCounts.get(key);
+
+    if (existing) {
+      existing.count++;
+    } else {
+      locationCounts.set(key, {
+        location: new google.maps.LatLng(post.latitude!, post.longitude!),
+        count: 1,
+      });
+    }
+  });
+
+  // Convert to weighted heatmap data
+  const heatmapData: google.maps.visualization.WeightedLocation[] = Array.from(
+    locationCounts.values(),
+  ).map((item) => ({
+    location: item.location,
+    weight: item.count, // Higher count = hotter spot
+  }));
+
+  // Create heatmap layer
+  heatmap = new google.maps.visualization.HeatmapLayer({
+    data: heatmapData,
+    map: showHeatmap.value ? map : null, // Only show if toggle is on
+    radius: 30, // Size of each heat point
+    opacity: 0.6, // Transparency
+    gradient: [
+      "rgba(0, 255, 255, 0)",
+      "rgba(0, 255, 255, 1)",
+      "rgba(0, 191, 255, 1)",
+      "rgba(0, 127, 255, 1)",
+      "rgba(0, 63, 255, 1)",
+      "rgba(0, 0, 255, 1)",
+      "rgba(0, 0, 223, 1)",
+      "rgba(0, 0, 191, 1)",
+      "rgba(0, 0, 159, 1)",
+      "rgba(0, 0, 127, 1)",
+      "rgba(63, 0, 91, 1)",
+      "rgba(127, 0, 63, 1)",
+      "rgba(191, 0, 31, 1)",
+      "rgba(255, 0, 0, 1)",
+    ],
+  });
+}
+
+// Toggle heatmap visibility
+function toggleHeatmap() {
+  showHeatmap.value = !showHeatmap.value;
+
+  if (heatmap) {
+    heatmap.setMap(showHeatmap.value ? map : null);
+  }
+}
+
+// Toggle markers visibility
+function toggleMarkers() {
+  showMarkers.value = !showMarkers.value;
+
+  markers.value.forEach((marker) => {
+    marker.map = showMarkers.value ? map : null;
+  });
+}
+
 function addMarkers() {
   if (!map) return;
 
-  // Clear existing markers
   clearMarkers();
 
   const postsWithLocation = props.posts.filter(
@@ -75,30 +183,25 @@ function addMarkers() {
     return;
   }
 
-  // Create bounds to fit all markers
   const bounds = new google.maps.LatLngBounds();
 
   postsWithLocation.forEach((post) => {
     const position = { lat: post.latitude!, lng: post.longitude! };
 
-    // Create marker
     const marker = new google.maps.marker.AdvancedMarkerElement({
-      map,
+      map: showMarkers.value ? map : null,
       position,
       title: post.title,
     });
 
-    // Create info window content
-    const infoWindowContent = createInfoWindowContent(post);
+    const media = postMedia.value.get(post.id) || [];
+    const infoWindowContent = createInfoWindowContent(post, media);
     const infoWindow = new google.maps.InfoWindow({
       content: infoWindowContent,
     });
 
-    // Add click listener to marker
     marker.addListener("click", () => {
-      // Close all other info windows
       infoWindows.value.forEach((iw) => iw.close());
-      // Open this info window
       infoWindow.open(map, marker);
     });
 
@@ -107,11 +210,9 @@ function addMarkers() {
     bounds.extend(position);
   });
 
-  // Fit map to show all markers
   if (postsWithLocation.length > 0) {
     map.fitBounds(bounds);
-    
-    // Ensure zoom doesn't get too close if there's only one marker
+
     const listener = google.maps.event.addListenerOnce(map, "idle", () => {
       if (map && map.getZoom()! > 15) {
         map.setZoom(15);
@@ -120,15 +221,42 @@ function addMarkers() {
   }
 }
 
-// Create info window HTML content
-function createInfoWindowContent(post: Post): HTMLDivElement {
+function createInfoWindowContent(post: Post, media: Media[]): HTMLDivElement {
   const content = document.createElement("div");
   content.className = "map-info-window";
   content.style.cssText = `
-    max-width: 250px;
+    max-width: 280px;
     padding: 12px;
     cursor: pointer;
   `;
+
+  if (media.length > 0) {
+    const imageContainer = document.createElement("div");
+    imageContainer.style.cssText = `
+      width: 100%;
+      height: 140px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #f3f4f6;
+    `;
+
+    const image = document.createElement("img");
+    image.src = media[0].url;
+    image.alt = post.title;
+    image.style.cssText = `
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    `;
+
+    image.onerror = () => {
+      imageContainer.style.display = "none";
+    };
+
+    imageContainer.appendChild(image);
+    content.appendChild(imageContainer);
+  }
 
   const title = document.createElement("h3");
   title.textContent = post.title;
@@ -137,17 +265,17 @@ function createInfoWindowContent(post: Post): HTMLDivElement {
     font-size: 16px;
     font-weight: 600;
     color: #1f2937;
+    line-height: 1.3;
   `;
 
   const description = document.createElement("p");
   description.textContent =
-    post.description.length > 100
-      ? post.description.substring(0, 100) + "..."
-      : post.description;
+    post.description.length > 80 ? post.description.substring(0, 80) + "..." : post.description;
   description.style.cssText = `
     margin: 0 0 8px 0;
-    font-size: 14px;
+    font-size: 13px;
     color: #6b7280;
+    line-height: 1.4;
   `;
 
   const location = document.createElement("p");
@@ -156,33 +284,41 @@ function createInfoWindowContent(post: Post): HTMLDivElement {
     margin: 0 0 8px 0;
     font-size: 12px;
     color: #9ca3af;
+    display: flex;
+    align-items: center;
+    gap: 4px;
   `;
 
   const stats = document.createElement("div");
   stats.style.cssText = `
     display: flex;
     gap: 12px;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     font-size: 12px;
     color: #6b7280;
   `;
   stats.innerHTML = `
-    <span><i class="pi pi-arrow-up"></i> ${post.voteCount}</span>
-    <span><i class="pi pi-comments"></i> ${post.commentCount}</span>
+    <span style="display: flex; align-items: center; gap: 4px;">
+      <i class="pi pi-arrow-up"></i> ${post.voteCount}
+    </span>
+    <span style="display: flex; align-items: center; gap: 4px;">
+      <i class="pi pi-comments"></i> ${post.commentCount}
+    </span>
   `;
 
   const button = document.createElement("button");
   button.textContent = "View Post";
   button.style.cssText = `
     width: 100%;
-    padding: 8px;
+    padding: 8px 12px;
     background: #3b82f6;
     color: white;
     border: none;
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     cursor: pointer;
+    transition: background 0.2s;
   `;
   button.onmouseover = () => {
     button.style.background = "#2563eb";
@@ -204,7 +340,6 @@ function createInfoWindowContent(post: Post): HTMLDivElement {
   return content;
 }
 
-// Clear all markers from map
 function clearMarkers() {
   markers.value.forEach((marker) => {
     marker.map = null;
@@ -215,12 +350,18 @@ function clearMarkers() {
   infoWindows.value.clear();
 }
 
-// Watch for changes in posts
 watch(
   () => props.posts,
-  () => {
+  async (newPosts) => {
     if (map) {
+      await fetchPostsMedia(newPosts);
       addMarkers();
+
+      // Recreate heatmap with new data
+      if (heatmap) {
+        heatmap.setMap(null);
+      }
+      initHeatmap();
     }
   },
   { deep: true },
@@ -248,6 +389,28 @@ onMounted(initMap);
       :style="{ height: props.height }"
     ></div>
 
+    <!-- Toggle Controls - positioned below map -->
+    <div v-if="!isLoading && !error" class="map-controls">
+      <button
+        class="control-button"
+        :class="{ active: showMarkers }"
+        @click="toggleMarkers"
+        title="Toggle Markers"
+      >
+        <i class="pi pi-map-marker"></i>
+        Markers
+      </button>
+      <button
+        class="control-button"
+        :class="{ active: showHeatmap }"
+        @click="toggleHeatmap"
+        title="Toggle Heatmap"
+      >
+        <i class="pi pi-chart-bar"></i>
+        Heatmap
+      </button>
+    </div>
+
     <div v-if="!isLoading && !error && props.posts.length === 0" class="empty-state">
       <i class="pi pi-map"></i>
       <p>No posts with locations to display</p>
@@ -259,13 +422,58 @@ onMounted(initMap);
 .map-overview-container {
   width: 100%;
   height: 100%;
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.map-controls {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  background: white;
+  padding: 8px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+.control-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.control-button:hover {
+  background: #f9fafb;
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.control-button.active {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+}
+
+.control-button i {
+  font-size: 14px;
 }
 
 .map-container {
   width: 100%;
   border-radius: 8px;
   overflow: hidden;
+  flex: 1;
 }
 
 .loading-state,
