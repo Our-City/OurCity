@@ -179,7 +179,7 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
   border-radius: 1rem;
   flex: 1;
   max-width: 100%;
-  min-width: 0;
+  min-width: 60%;
   overflow: visible;
 }
 
@@ -187,8 +187,8 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  width: 25rem;
-  height: 65rem;
+  width: 40rem;
+  height: 50rem;
   background: var(--primary-background-color);
   border: 0.1rem solid var(--border-color);
   border-radius: 1rem;

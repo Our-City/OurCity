@@ -260,7 +260,7 @@ onMounted(loadPostData);
   width: 100%;
   background: var(--primary-background-color);
   border: 0.1rem solid var(--border-color);
-  padding: 2rem 5rem 3rem 5rem;
+  padding: 4rem 5rem 3rem 5rem;
 }
 
 .post-tags {
@@ -363,8 +363,8 @@ onMounted(loadPostData);
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  width: 25rem;
-  height: 700px;
+  width: 40rem;
+  height: 42rem;
   background: var(--primary-background-color);
   border: 0.1rem solid var(--border-color);
   border-radius: 1rem;
@@ -393,11 +393,5 @@ onMounted(loadPostData);
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--primary-text-color);
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 </style>
