@@ -6,6 +6,9 @@ import { onMounted, computed } from "vue";
 import PageHeader from "@/components/PageHeader.vue";
 import SideBar from "@/components/SideBar.vue";
 import { useAuthStore } from "@/stores/authenticationStore";
+import { CContainer, CCard, CCardBody, CCardHeader, CRow, CCol } from "@coreui/vue";
+import PostActivity from "@/components/admin/PostActivity.vue";
+import TagBreakdown from "@/components/admin/Charts/TagBreakdown.vue";
 
 const auth = useAuthStore();
 
@@ -29,6 +32,15 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
 
       <div class="admin-page-body">
         <div class="admin-page-content-layout">
+          <h2>Admin Dashboard</h2>
+          <br/>
+          <CContainer fluid>
+            <CRow>
+              <CCol>
+                <PostActivity/>
+              </CCol>
+            </CRow>
+          </CContainer>
         </div>
       </div>
     </div>
@@ -62,7 +74,6 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
 }
 
 .admin-page-content-layout {
-  display: flex;
   gap: 1rem;
   margin: 1rem 1.5rem 1rem 1rem;
   min-width: 0;
@@ -83,5 +94,22 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
   to {
     transform: rotate(360deg);
   }
+}
+
+/* General card styling for all admin dashboard cards */
+:deep(.card) {
+  margin-bottom: 1rem;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+}
+
+:deep(.card-body) {
+  padding: 1.5rem;
+}
+
+:deep(.card-header) {
+  padding: 1rem 1.5rem;
+  font-weight: 600;
 }
 </style>
