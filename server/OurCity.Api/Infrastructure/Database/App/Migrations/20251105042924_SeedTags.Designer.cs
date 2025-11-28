@@ -9,11 +9,11 @@ using OurCity.Api.Infrastructure.Database;
 
 #nullable disable
 
-namespace OurCity.Api.Infrastructure.Database.Migrations
+namespace OurCity.Api.Infrastructure.Database.App.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251111014226_AddLocationToPost")]
-    partial class AddLocationToPost
+    [Migration("20251105042924_SeedTags")]
+    partial class SeedTags
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -231,14 +231,8 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<double?>("Latitude")
-                        .HasColumnType("double precision");
-
                     b.Property<string>("Location")
                         .HasColumnType("text");
-
-                    b.Property<double?>("Longitude")
-                        .HasColumnType("double precision");
 
                     b.Property<string>("Title")
                         .IsRequired()

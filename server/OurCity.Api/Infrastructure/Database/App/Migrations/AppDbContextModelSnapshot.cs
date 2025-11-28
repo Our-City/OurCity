@@ -2,21 +2,18 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using OurCity.Api.Infrastructure.Database;
+using OurCity.Api.Infrastructure.Database.App;
 
 #nullable disable
 
-namespace OurCity.Api.Infrastructure.Database.Migrations
+namespace OurCity.Api.Infrastructure.Database.App.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251101062248_AddMediaTable")]
-    partial class AddMediaTable
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -128,7 +125,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Comment", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.Comment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -162,7 +159,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.CommentVote", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.CommentVote", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -186,7 +183,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.ToTable("CommentVotes");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Media", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.Media", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -212,7 +209,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.ToTable("Media");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Post", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.Post", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -231,8 +228,14 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("double precision");
+
                     b.Property<string>("Location")
                         .HasColumnType("text");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("double precision");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -251,7 +254,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.ToTable("Posts");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.PostVote", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.PostVote", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -278,7 +281,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.ToTable("PostVotes");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tag", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.Tag", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -291,9 +294,101 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Tags");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("3b84d6d5-4d4e-4e09-8a90-6c2d257ae14c"),
+                            Name = "Construction"
+                        },
+                        new
+                        {
+                            Id = new Guid("6b8e5470-5a3e-48a7-a3e3-142e7e8b2e02"),
+                            Name = "Transportation"
+                        },
+                        new
+                        {
+                            Id = new Guid("5f8b0e26-33a1-4e9f-a3c5-7e78f32f804a"),
+                            Name = "Entertainment"
+                        },
+                        new
+                        {
+                            Id = new Guid("91f75b8d-bf32-46af-a6a9-8f89417cbbd0"),
+                            Name = "Shopping"
+                        },
+                        new
+                        {
+                            Id = new Guid("c4db2614-0d47-4c16-89da-fd8c97a216f4"),
+                            Name = "Food & Dining"
+                        },
+                        new
+                        {
+                            Id = new Guid("8c7b9a39-b4a9-40a3-85ce-034d97a2a6c2"),
+                            Name = "Parks & Recreation"
+                        },
+                        new
+                        {
+                            Id = new Guid("f1f8e911-61db-45a2-b9df-7dc6de4c9a0d"),
+                            Name = "Safety"
+                        },
+                        new
+                        {
+                            Id = new Guid("1f59e1d4-37b7-4ad2-9f6f-431a5e8cf8b7"),
+                            Name = "Community Events"
+                        },
+                        new
+                        {
+                            Id = new Guid("41a6f4ac-8a91-4209-b40e-8b14b9a01873"),
+                            Name = "Infrastructure"
+                        },
+                        new
+                        {
+                            Id = new Guid("4f6329f1-3201-4a94-b41c-cf74ed91f777"),
+                            Name = "Business"
+                        },
+                        new
+                        {
+                            Id = new Guid("08e4cb83-1d93-4e0c-bc4c-30c2aee497b8"),
+                            Name = "Education"
+                        },
+                        new
+                        {
+                            Id = new Guid("f6d81e88-8332-4ee7-96b9-8517f7d7a2d9"),
+                            Name = "Healthcare"
+                        },
+                        new
+                        {
+                            Id = new Guid("7dd62a06-5a7c-44ff-a2f1-299a507d21aa"),
+                            Name = "Environment"
+                        },
+                        new
+                        {
+                            Id = new Guid("e122c911-8cbe-45e0-9d91-9353ed685c61"),
+                            Name = "Sports"
+                        },
+                        new
+                        {
+                            Id = new Guid("c6d13b79-0a6a-4db3-a219-1c6240b9ef82"),
+                            Name = "Culture"
+                        },
+                        new
+                        {
+                            Id = new Guid("0a7f2a8d-504c-4b17-8448-7a274a1bba44"),
+                            Name = "Tourism"
+                        },
+                        new
+                        {
+                            Id = new Guid("3a46f0b5-238f-4e41-bbb4-254bdb14f92e"),
+                            Name = "Housing"
+                        },
+                        new
+                        {
+                            Id = new Guid("9e4f0c3f-02e4-4c88-bf89-9cc7cf7b63c3"),
+                            Name = "Events"
+                        });
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.User", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -373,7 +468,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.UserRole", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.UserRole", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -417,7 +512,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.UserRole", null)
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.UserRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -426,7 +521,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.User", null)
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -435,7 +530,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.User", null)
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -444,13 +539,13 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.UserRole", null)
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.UserRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("OurCity.Api.Infrastructure.Database.User", null)
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -459,22 +554,22 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.User", null)
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Comment", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.Comment", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.User", "Author")
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.User", "Author")
                         .WithMany("Comments")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("OurCity.Api.Infrastructure.Database.Post", "Post")
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.Post", "Post")
                         .WithMany("Comments")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -485,15 +580,15 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Navigation("Post");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.CommentVote", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.CommentVote", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.Comment", "Comment")
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.Comment", "Comment")
                         .WithMany("Votes")
                         .HasForeignKey("CommentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("OurCity.Api.Infrastructure.Database.User", "Voter")
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.User", "Voter")
                         .WithMany()
                         .HasForeignKey("VoterId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -504,9 +599,9 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Navigation("Voter");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Media", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.Media", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.Post", "Post")
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.Post", "Post")
                         .WithMany("Media")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -515,9 +610,9 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Navigation("Post");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Post", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.Post", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.User", "Author")
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.User", "Author")
                         .WithMany("Posts")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -526,15 +621,15 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Navigation("Author");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.PostVote", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.PostVote", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.Post", "Post")
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.Post", "Post")
                         .WithMany("Votes")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("OurCity.Api.Infrastructure.Database.User", "Voter")
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.User", "Voter")
                         .WithMany("PostVotes")
                         .HasForeignKey("VoterId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -547,25 +642,25 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("PostTag", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.Post", null)
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.Post", null)
                         .WithMany()
                         .HasForeignKey("PostsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("OurCity.Api.Infrastructure.Database.Tag", null)
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.Tag", null)
                         .WithMany()
                         .HasForeignKey("TagsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Comment", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.Comment", b =>
                 {
                     b.Navigation("Votes");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Post", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.Post", b =>
                 {
                     b.Navigation("Comments");
 
@@ -574,7 +669,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Navigation("Votes");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.User", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.User", b =>
                 {
                     b.Navigation("Comments");
 

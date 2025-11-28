@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using OurCity.Api.Infrastructure.Database;
+using OurCity.Api.Infrastructure.Database.App;
+using OurCity.Api.Infrastructure.Database.Host;
 using Testcontainers.PostgreSql;
 
 namespace OurCity.Api.Test.IntegrationTests;
@@ -32,22 +33,27 @@ public class OurCityWebApplicationFactory : WebApplicationFactory<Program>
     public readonly Guid StubCommentId = Guid.NewGuid();
     public readonly string StubCommentContent = "Test Content";
 
-    private readonly PostgreSqlContainer _postgres;
+    private readonly PostgreSqlContainer _hostPostgres;
+    private readonly PostgreSqlContainer _tenantPostgres;
 
     public OurCityWebApplicationFactory()
     {
-        _postgres = new PostgreSqlBuilder().WithImage("postgres:16.10").WithCleanUp(true).Build();
+        _hostPostgres = new PostgreSqlBuilder().WithImage("postgres:16.10").WithCleanUp(true).Build();
+        _tenantPostgres = new PostgreSqlBuilder().WithImage("postgres:16.10").WithCleanUp(true).Build();
     }
 
     public async Task StartDbAsync()
     {
-        await _postgres.StartAsync();
+        await _hostPostgres.StartAsync();
+        await _tenantPostgres.StartAsync();
     }
 
     public async Task StopDbAsync()
     {
-        await _postgres.StopAsync();
-        await _postgres.DisposeAsync();
+        await _hostPostgres.StopAsync();
+        await _hostPostgres.DisposeAsync();
+        await _tenantPostgres.StopAsync();
+        await _tenantPostgres.DisposeAsync();
     }
 
     public async Task SeedTestDataAsync(Func<AppDbContext, UserManager<User>, Task> seedAction)
@@ -74,20 +80,44 @@ public class OurCityWebApplicationFactory : WebApplicationFactory<Program>
     {
         builder.ConfigureServices(services =>
         {
-            var descriptor = services.SingleOrDefault(d =>
+            //Remove HostDbContext and AppDbContext registrations from Program.cs
+            var hostDbService = services.SingleOrDefault(d =>
+                d.ServiceType == typeof(DbContextOptions<HostDbContext>)
+            );
+            if (hostDbService != null)
+                services.Remove(hostDbService);
+
+            var appDbService = services.SingleOrDefault(d =>
                 d.ServiceType == typeof(DbContextOptions<AppDbContext>)
             );
-            if (descriptor != null)
-                services.Remove(descriptor);
+            if (appDbService != null)
+                services.Remove(appDbService);
 
-            services.AddDbContextPool<AppDbContext>(options =>
-                options.UseNpgsql(_postgres.GetConnectionString())
+            //Add new HostDbContext and AppDbContext registrations
+            services.AddDbContextPool<HostDbContext>(options =>
+                options.UseNpgsql(_hostPostgres.GetConnectionString())
             );
+            services.AddDbContext<AppDbContext>();
 
+            //Run migrations for new HostDbContext and AppDbContext
             var sp = services.BuildServiceProvider();
             using var scope = sp.CreateScope();
-            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            db.Database.Migrate();
+
+            var hostDb = scope.ServiceProvider.GetRequiredService<HostDbContext>();
+            var tenantDb = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+            hostDb.Database.Migrate();
+
+            var tenant = new Tenant
+            {
+                DbName = "TestTenant",
+                DbUser = "TestTenantDbUser",
+                DbPassword = "TestTenantDbPassword",
+                DbServer = "localhost"
+            };
+            hostDb.Tenants.Add();
+            
+            tenantDb.Database.Migrate();
 
             //stub user
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();

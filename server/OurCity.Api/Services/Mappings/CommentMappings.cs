@@ -3,7 +3,7 @@
 /// based on common patterns in C# for mapping between entities and DTOs
 using OurCity.Api.Common.Dtos.Comments;
 using OurCity.Api.Common.Enum;
-using OurCity.Api.Infrastructure.Database;
+using OurCity.Api.Infrastructure.Database.App;
 
 namespace OurCity.Api.Services.Mappings;
 

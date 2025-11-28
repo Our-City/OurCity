@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace OurCity.Api.Infrastructure.Database;
+namespace OurCity.Api.Infrastructure.Database.App;
 
 public class AppDbContext : IdentityDbContext<User, UserRole, Guid>
 {
+    private readonly ITenantProvider _tenantProvider;
+    private readonly ITenantConnectionStringFactory _connectionStringFactory;
+
     public DbSet<Post> Posts { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Media> Media { get; set; }
@@ -12,8 +15,26 @@ public class AppDbContext : IdentityDbContext<User, UserRole, Guid>
     public DbSet<CommentVote> CommentVotes { get; set; }
     public DbSet<Tag> Tags { get; set; }
 
-    public AppDbContext(DbContextOptions<AppDbContext> options)
-        : base(options) { }
+    public AppDbContext(
+        DbContextOptions<AppDbContext> options,
+        ITenantProvider tenantProvider,
+        ITenantConnectionStringFactory connectionStringFactory
+    )
+        : base(options)
+    {
+        _tenantProvider = tenantProvider;
+        _connectionStringFactory = connectionStringFactory;
+    }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+
+        var connectionString = _connectionStringFactory.GetConnectionString(
+            _tenantProvider.TenantName
+        );
+        optionsBuilder.UseNpgsql(connectionString);
+    }
 
     //OnModelCreating
     // -> Can get more granular about what the tables will look like
