@@ -87,7 +87,7 @@ public class PostService : IPostService
         PostCreateRequestDto postCreateRequestDto
     )
     {
-        var tags = await _tagRepository.GetTagsByIds(postCreateRequestDto.TagIds);
+        var tags = await _tagRepository.GetTagsByIds(postCreateRequestDto.Tags);
 
         var createdPost = await _postRepository.CreatePost(
             postCreateRequestDto.CreateDtoToEntity(userId, tags.ToList())
