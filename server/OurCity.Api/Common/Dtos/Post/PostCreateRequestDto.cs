@@ -29,5 +29,5 @@ public class PostCreateRequestDto
 
     public double? Longitude { get; set; }
 
-    public List<Guid> TagIds { get; set; } = new();
+    public List<Guid> Tags { get; set; } = new();
 }
