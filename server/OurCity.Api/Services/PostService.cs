@@ -92,7 +92,7 @@ public class PostService : IPostService
         {
             return Result<PostResponseDto>.Failure(ErrorMessages.Unauthorized);
         }
-        
+
         var tags = await _tagRepository.GetTagsByIds(postCreateRequestDto.Tags);
 
         var createdPost = await _postRepository.CreatePost(
