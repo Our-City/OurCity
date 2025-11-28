@@ -9,12 +9,7 @@ namespace OurCity.Api.Services.Mappings;
 
 public static class PostMappings
 {
-    public static IEnumerable<PostResponseDto> ToDtos(this IEnumerable<Post> posts, Guid? userId)
-    {
-        return posts.Select(post => post.ToDto(userId));
-    }
-
-    public static PostResponseDto ToDto(this Post post, Guid? userId)
+    public static PostResponseDto ToDto(this Post post, Guid? userId, bool canMutate)
     {
         return new PostResponseDto
         {
@@ -35,6 +30,7 @@ public static class PostMappings
                 ? post.Votes.FirstOrDefault(vote => vote.VoterId.Equals(userId))?.VoteType
                 ?? VoteType.NoVote
                 : VoteType.NoVote,
+            CanMutate = canMutate,
             IsDeleted = post.IsDeleted,
             CreatedAt = post.CreatedAt,
             UpdatedAt = post.UpdatedAt,
