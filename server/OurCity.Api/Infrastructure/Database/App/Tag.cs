@@ -1,4 +1,4 @@
-namespace OurCity.Api.Infrastructure.Database;
+namespace OurCity.Api.Infrastructure.Database.App;
 
 public class Tag
 {

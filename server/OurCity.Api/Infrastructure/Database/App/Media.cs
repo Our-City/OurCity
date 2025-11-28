@@ -1,6 +1,4 @@
-using System;
-
-namespace OurCity.Api.Infrastructure.Database;
+namespace OurCity.Api.Infrastructure.Database.App;
 
 public class Media
 {

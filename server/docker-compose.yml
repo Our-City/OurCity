@@ -44,7 +44,7 @@ services:
         condition: service_healthy
     environment:
       #TODO: I dont like this
-      CONNECTION_STRING: "Host=ourcity.postgres.dev;Port=5432;Username=postgres;Password=postgres;Database=ourcity"
+      HOST_CONNECTION_STRING: "Host=ourcity.postgres.dev;Username=postgres;Password=postgres;Database=Host"
     restart: no
 
 volumes:

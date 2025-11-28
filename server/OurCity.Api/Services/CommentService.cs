@@ -2,12 +2,11 @@
 /// CoPilot assisted by generating boilerplate code for standard mapping functions
 /// based on common patterns in C# for mapping between entities and DTOs
 using OurCity.Api.Common;
-using OurCity.Api.Common.Dtos;
 using OurCity.Api.Common.Dtos.Comments;
 using OurCity.Api.Common.Dtos.Pagination;
 using OurCity.Api.Common.Enum;
 using OurCity.Api.Infrastructure;
-using OurCity.Api.Infrastructure.Database;
+using OurCity.Api.Infrastructure.Database.App;
 using OurCity.Api.Services.Mappings;
 
 namespace OurCity.Api.Services;
