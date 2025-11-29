@@ -14,11 +14,23 @@ public interface IPostService
     Task<Result<PaginatedResponseDto<PostResponseDto>>> GetPosts(
         PostGetAllRequestDto postGetAllRequestDto
     );
-    Task<Result<PostResponseDto>> GetPostById(Guid postId);
-    Task<Result<PostResponseDto>> CreatePost(PostCreateRequestDto postRequestDto);
-    Task<Result<PostResponseDto>> UpdatePost(Guid postId, PostUpdateRequestDto postRequestDto);
-    Task<Result<PostResponseDto>> VotePost(Guid postId, PostVoteRequestDto postVoteRequestDto);
-    Task<Result<PostResponseDto>> DeletePost(Guid postId);
+    Task<Result<PostResponseDto>> GetPostById(Guid? userId, Guid postId);
+    Task<Result<PostResponseDto>> CreatePost(Guid userId, PostCreateRequestDto postRequestDto);
+    Task<Result<PostResponseDto>> UpdatePost(
+        Guid userId,
+        Guid postId,
+        PostUpdateRequestDto postRequestDto
+    );
+    Task<Result<PostResponseDto>> VotePost(
+        Guid userId,
+        Guid postId,
+        PostVoteRequestDto postVoteRequestDto
+    );
+    Task<Result<PostResponseDto>> BookmarkPost(
+        Guid userId,
+        Guid postId
+    );
+    Task<Result<PostResponseDto>> DeletePost(Guid userId, Guid postId);
 }
 
 public class PostService : IPostService
@@ -28,13 +40,15 @@ public class PostService : IPostService
     private readonly IPostRepository _postRepository;
     private readonly ITagRepository _tagRepository;
     private readonly IPostVoteRepository _postVoteRepository;
+    private readonly IPostBookmarkRepository _postBookmarkRepository;
 
     public PostService(
         ICurrentUser requestingUser,
         IPolicyService policyService,
         IPostRepository postRepository,
         ITagRepository tagRepository,
-        IPostVoteRepository postVoteRepository
+        IPostVoteRepository postVoteRepository,
+        IPostBookmarkRepository postBookmarkRepository
     )
     {
         _requestingUser = requestingUser;
@@ -42,6 +56,7 @@ public class PostService : IPostService
         _postRepository = postRepository;
         _tagRepository = tagRepository;
         _postVoteRepository = postVoteRepository;
+        _postBookmarkRepository = postBookmarkRepository;
     }
 
     public async Task<Result<PaginatedResponseDto<PostResponseDto>>> GetPosts(
@@ -190,7 +205,41 @@ public class PostService : IPostService
         return Result<PostResponseDto>.Success(post.ToDto(_requestingUser.UserId, canMutatePost));
     }
 
-    public async Task<Result<PostResponseDto>> DeletePost(Guid postId)
+    public async Task<Result<PostResponseDto>> BookmarkPost(
+        Guid userId,
+        Guid postId
+    )
+    {
+        var post = await _postRepository.GetSlimPostbyId(postId);
+
+        if (post == null)
+        {
+            return Result<PostResponseDto>.Failure(ErrorMessages.PostNotFound);
+        }
+
+        var existingBookmark = await _postBookmarkRepository.GetBookmarkByUserAndPostId(userId, postId);
+
+        if (existingBookmark != null)
+        {
+            await _postBookmarkRepository.Remove(existingBookmark);
+        }
+        else
+        {
+            await _postBookmarkRepository.Add(new PostBookmark
+                {
+                    PostId = postId,
+                    UserId = userId,
+                    BookmarkedAt = DateTime.UtcNow,
+                }
+            );
+        }
+        
+        await _postBookmarkRepository.SaveChangesAsync();
+
+        return Result<PostResponseDto>.Success(post.ToDto(userId));
+    }
+
+    public async Task<Result<PostResponseDto>> DeletePost(Guid userId, Guid postId)
     {
         //Check that post exists
         var post = await _postRepository.GetSlimPostbyId(postId);

@@ -46,6 +46,7 @@ builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<IPostVoteRepository, PostVoteRepository>();
 builder.Services.AddScoped<ICommentVoteRepository, CommentVoteRepository>();
 builder.Services.AddScoped<IMediaRepository, MediaRepository>();
+builder.Services.AddScoped<IPostBookmarkRepository, PostBookmarkRepository>();
 
 //Service
 builder.Services.AddScoped<IPostService, PostService>();
