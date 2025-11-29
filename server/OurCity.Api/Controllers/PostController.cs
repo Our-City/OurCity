@@ -71,6 +71,30 @@ public class PostController : ControllerBase
         return Ok(res.Data);
     }
 
+    [HttpGet]
+    [Route("bookmarks")]
+    [EndpointSummary("Get bookmarked posts")]
+    [EndpointDescription("Retrieves all posts bookmarked by the authenticated user")]
+    [ProducesResponseType(typeof(IEnumerable<PostResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetBookmarkedPosts(
+        [FromQuery] Guid? cursor,
+        [FromQuery] int limit = 25
+    )
+    {
+        var userId = User.GetUserId();
+        if (userId == null)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status401Unauthorized,
+                detail: ErrorMessages.UserNotAuthenticated
+            );
+        }
+
+        var res = await _postService.GetBookmarkedPosts(userId.Value, cursor, limit);
+        return Ok(res.Data);
+    }
+
     [HttpPut]
     [Authorize]
     [Route("{postId}")]

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos.Pagination;
 using OurCity.Api.Common.Dtos.Post;
@@ -15,6 +16,11 @@ public interface IPostService
         PostGetAllRequestDto postGetAllRequestDto
     );
     Task<Result<PostResponseDto>> GetPostById(Guid? userId, Guid postId);
+    Task<Result<PaginatedResponseDto<PostResponseDto>>> GetBookmarkedPosts(
+        Guid userId,
+        Guid? cursor,
+        int limit
+    );
     Task<Result<PostResponseDto>> CreatePost(Guid userId, PostCreateRequestDto postRequestDto);
     Task<Result<PostResponseDto>> UpdatePost(
         Guid userId,
@@ -100,7 +106,32 @@ public class PostService : IPostService
         );
     }
 
-    public async Task<Result<PostResponseDto>> CreatePost(PostCreateRequestDto postCreateRequestDto)
+    public async Task<Result<PaginatedResponseDto<PostResponseDto>>> GetBookmarkedPosts(
+        Guid userId,
+        Guid? cursor,
+        int limit
+    )
+    {
+        var bookmarks = await _postBookmarkRepository.GetBookmarksByUser(userId, cursor, limit + 1);
+        var hasNextPage = bookmarks.Count() > limit;
+        var pageItems = bookmarks.Take(limit);
+        var posts = pageItems
+            .Select(b => b.Post?.ToDto(userId))
+            .ToList();
+
+        var response = new PaginatedResponseDto<PostResponseDto>
+        {
+            Items = posts as IEnumerable<PostResponseDto>,
+            NextCursor = hasNextPage ? pageItems.LastOrDefault()?.Id : null,
+        };
+
+        return Result<PaginatedResponseDto<PostResponseDto>>.Success(response);
+    }
+
+    public async Task<Result<PostResponseDto>> CreatePost(
+        Guid userId,
+        PostCreateRequestDto postCreateRequestDto
+    )
     {
         //Check that user can create posts
         if (!_requestingUser.UserId.HasValue || !await _policyService.CanParticipateInForum())
