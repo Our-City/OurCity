@@ -6,6 +6,7 @@ import type { Post } from "@/models/post";
 import type { Media } from "@/models/media";
 import { getMediaByPostId } from "@/api/mediaService";
 import { useAuthStore } from "@/stores/authenticationStore";
+import { removePostalCode } from '@/utils/locationFormatter';
 
 const props = defineProps<{ post: Post }>();
 
@@ -44,6 +45,8 @@ const authorUsername = computed(() => {
 });
 const commentCount = computed(() => props.post.commentCount ?? 0);
 const postImage = computed(() => media.value[0]?.url || null);
+const formattedLocation = computed(() => removePostalCode(props.post.location));
+
 </script>
 
 <template>
@@ -61,7 +64,7 @@ const postImage = computed(() => media.value[0]?.url || null);
       </h1>
 
       <div class="post-tags">
-        {{ post.location }}
+        {{ formattedLocation }}
       </div>
 
       <div class="post-votes-comments">

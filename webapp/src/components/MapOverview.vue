@@ -8,6 +8,7 @@ import { loadGoogleMaps } from "@/utils/googleMapsLoader";
 import { getMediaByPostId } from "@/api/mediaService";
 import type { Post } from "@/models/post";
 import type { Media } from "@/models/media";
+import { removePostalCode } from '@/utils/locationFormatter';
 
 interface Props {
   posts: Post[];
@@ -279,7 +280,8 @@ function createInfoWindowContent(post: Post, media: Media[]): HTMLDivElement {
   `;
 
   const location = document.createElement("p");
-  location.innerHTML = `<i class="pi pi-map-marker"></i> ${post.location || "Winnipeg"}`;
+  const formattedLocation = removePostalCode(post.location) || "Winnipeg";
+  location.innerHTML = `<i class="pi pi-map-marker"></i> ${formattedLocation}`;
   location.style.cssText = `
     margin: 0 0 8px 0;
     font-size: 12px;
