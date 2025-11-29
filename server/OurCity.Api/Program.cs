@@ -55,6 +55,7 @@ builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IPolicyService, PolicyService>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IMediaService, MediaService>();
+builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 builder.Services.AddSingleton<AwsS3Service>();
 
 //Configruation
