@@ -4,7 +4,7 @@
   e.g, loading posts, creating new posts, etc.
   Also assisted with handling comment updates from child CommentList. -->
 <script setup lang="ts">
-import { ref, onMounted,computed } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import TextArea from "primevue/textarea";
 import PageHeader from "@/components/PageHeader.vue";
@@ -13,7 +13,7 @@ import ImageGalleria from "@/components/ImageGalleria.vue";
 import VoteBox from "@/components/VoteBox.vue";
 import CommentList from "@/components/CommentList.vue";
 import MapDisplay from "@/components/MapDisplay.vue";
-import { removePostalCode } from '@/utils/locationFormatter';
+import { removePostalCode } from "@/utils/locationFormatter";
 
 import { getPostById, voteOnPost } from "@/api/postService";
 import { getMediaByPostId } from "@/api/mediaService";
@@ -58,7 +58,7 @@ async function loadPostData() {
 
 // Computed property for formatted location
 const formattedLocation = computed(() => {
-  if (!post.value?.location) return '';
+  if (!post.value?.location) return "";
   return removePostalCode(post.value.location);
 });
 

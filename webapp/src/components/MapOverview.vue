@@ -8,7 +8,7 @@ import { loadGoogleMaps } from "@/utils/googleMapsLoader";
 import { getMediaByPostId } from "@/api/mediaService";
 import type { Post } from "@/models/post";
 import type { Media } from "@/models/media";
-import { removePostalCode } from '@/utils/locationFormatter';
+import { removePostalCode } from "@/utils/locationFormatter";
 
 interface Props {
   posts: Post[];
