@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Infrastructure.Database.App;
 using OurCity.Api.Infrastructure.Database.Host;
 using Testcontainers.PostgreSql;

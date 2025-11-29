@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos.User;
+using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Infrastructure.Database.App;
 using OurCity.Api.Services.Mappings;
 

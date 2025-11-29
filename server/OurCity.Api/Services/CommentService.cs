@@ -6,6 +6,7 @@ using OurCity.Api.Common.Dtos.Comments;
 using OurCity.Api.Common.Dtos.Pagination;
 using OurCity.Api.Common.Enum;
 using OurCity.Api.Infrastructure;
+using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Infrastructure.Database.App;
 using OurCity.Api.Services.Mappings;
 

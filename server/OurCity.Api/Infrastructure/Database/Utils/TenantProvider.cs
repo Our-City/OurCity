@@ -1,4 +1,4 @@
-﻿namespace OurCity.Api.Infrastructure.Database;
+﻿namespace OurCity.Api.Infrastructure.Database.Utils;
 
 public interface ITenantProvider
 {

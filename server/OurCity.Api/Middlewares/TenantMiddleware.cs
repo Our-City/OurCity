@@ -1,4 +1,5 @@
 ﻿using OurCity.Api.Infrastructure.Database;
+using OurCity.Api.Infrastructure.Database.Utils;
 
 namespace OurCity.Api.Middlewares;
 

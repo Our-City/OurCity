@@ -1,4 +1,5 @@
 using OurCity.Api.Common.Dtos.Tag;
+using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Infrastructure.Database.App;
 
 namespace OurCity.Api.Services.Mappings;

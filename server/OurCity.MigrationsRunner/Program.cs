@@ -2,6 +2,7 @@
 using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Infrastructure.Database.App;
 using OurCity.Api.Infrastructure.Database.Host;
+using OurCity.Api.Infrastructure.Database.Utils;
 
 /*
  * Code taken largely from ChatGPT, asking how to run migrations for a docker postgres container

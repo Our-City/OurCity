@@ -6,6 +6,7 @@ using OurCity.Api.Infrastructure;
 using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Infrastructure.Database.App;
 using OurCity.Api.Infrastructure.Database.Host;
+using OurCity.Api.Infrastructure.Database.Utils;
 using OurCity.Api.Middlewares;
 using OurCity.Api.Services;
 using OurCity.Api.Services.Authorization;

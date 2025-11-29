@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Infrastructure.Database.App;
 
 namespace OurCity.Api.Services.Authorization.CanMutateThisPost;

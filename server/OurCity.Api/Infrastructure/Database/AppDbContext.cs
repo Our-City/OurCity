@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using OurCity.Api.Infrastructure.Database.Utils;
 
-namespace OurCity.Api.Infrastructure.Database.App;
+namespace OurCity.Api.Infrastructure.Database;
 
 public class AppDbContext : IdentityDbContext<User, UserRole, Guid>
 {

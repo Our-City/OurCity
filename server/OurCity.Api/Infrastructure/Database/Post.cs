@@ -1,6 +1,6 @@
 using OurCity.Api.Common.Enum;
 
-namespace OurCity.Api.Infrastructure.Database.App;
+namespace OurCity.Api.Infrastructure.Database;
 
 public class Post
 {

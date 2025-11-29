@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Infrastructure.Database.App;
 
 namespace OurCity.Api.Infrastructure;

@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using OurCity.Api.Infrastructure.Database.Host;
-
-namespace OurCity.Api.Infrastructure.Database;
+﻿namespace OurCity.Api.Infrastructure.Database.Utils;
 
 public interface ITenantConnectionStringFactory
 {
