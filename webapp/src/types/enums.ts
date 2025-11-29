@@ -14,3 +14,9 @@ export enum VoteType {
   DOWNVOTE = -1,
   NOVOTE = 0,
 }
+
+export enum Period {
+  Day = "Day",
+  Month = "Month",
+  Year = "Year",
+}
