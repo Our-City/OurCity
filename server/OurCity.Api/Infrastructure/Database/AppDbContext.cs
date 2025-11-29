@@ -116,6 +116,15 @@ public class AppDbContext : IdentityDbContext<User, UserRole, Guid>
         });
 
         modelBuilder.Entity<PostBookmark>()
-            .HasKey(b => new { b.UserId, b.PostId });
+            .HasOne(pb => pb.User)
+            .WithMany(u => u.PostBookmarks)
+            .HasForeignKey(pb => pb.UserId)
+            .OnDelete(DeleteBehavior.Cascade); 
+        
+        modelBuilder.Entity<PostBookmark>()
+            .HasOne(pb => pb.Post)
+            .WithMany(p => p.Bookmarks)
+            .HasForeignKey(pb => pb.PostId)
+            .OnDelete(DeleteBehavior.Cascade); 
     }
 }
