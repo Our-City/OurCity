@@ -11,6 +11,7 @@ public class AppDbContext : IdentityDbContext<User, UserRole, Guid>
     public DbSet<PostVote> PostVotes { get; set; }
     public DbSet<CommentVote> CommentVotes { get; set; }
     public DbSet<Tag> Tags { get; set; }
+    public DbSet<PostBookmark> PostBookmarks { get; set; }
 
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options) { }
@@ -113,5 +114,8 @@ public class AppDbContext : IdentityDbContext<User, UserRole, Guid>
                 new Tag { Id = Guid.Parse("9e4f0c3f-02e4-4c88-bf89-9cc7cf7b63c3"), Name = "Events" }
             );
         });
+
+        modelBuilder.Entity<PostBookmark>()
+            .HasKey(b => new { b.UserId, b.PostId });
     }
 }
