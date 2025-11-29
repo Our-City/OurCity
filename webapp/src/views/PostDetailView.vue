@@ -4,7 +4,7 @@
   e.g, loading posts, creating new posts, etc.
   Also assisted with handling comment updates from child CommentList. -->
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import TextArea from "primevue/textarea";
 import PageHeader from "@/components/PageHeader.vue";
@@ -13,6 +13,7 @@ import ImageGalleria from "@/components/ImageGalleria.vue";
 import VoteBox from "@/components/VoteBox.vue";
 import CommentList from "@/components/CommentList.vue";
 import MapDisplay from "@/components/MapDisplay.vue";
+import { removePostalCode } from "@/utils/locationFormatter";
 
 import { getPostById, voteOnPost } from "@/api/postService";
 import { getMediaByPostId } from "@/api/mediaService";
@@ -54,6 +55,12 @@ async function loadPostData() {
     isLoading.value = false;
   }
 }
+
+// Computed property for formatted location
+const formattedLocation = computed(() => {
+  if (!post.value?.location) return "";
+  return removePostalCode(post.value.location);
+});
 
 // submit a new comment on the post
 async function submitComment() {
@@ -139,8 +146,8 @@ onMounted(loadPostData);
 
               <h1 class="post-title" data-testid="post-title">{{ post.title }}</h1>
 
-              <div v-if="post.location" class="post-location">
-                {{ post.location }}
+              <div v-if="formattedLocation" class="post-location">
+                {{ formattedLocation }}
               </div>
 
               <div class="post-tags">
@@ -204,7 +211,7 @@ onMounted(loadPostData);
             <MapDisplay
               :latitude="post.latitude"
               :longitude="post.longitude"
-              :location-name="post.location"
+              :location-name="formattedLocation"
               height="500px"
               :zoom="15"
             />
@@ -260,7 +267,7 @@ onMounted(loadPostData);
   width: 100%;
   background: var(--primary-background-color);
   border: 0.1rem solid var(--border-color);
-  padding: 2rem 5rem 3rem 5rem;
+  padding: 4rem 5rem 3rem 5rem;
 }
 
 .post-tags {
@@ -363,8 +370,8 @@ onMounted(loadPostData);
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  width: 25rem;
-  height: 700px;
+  width: 40rem;
+  height: 42rem;
   background: var(--primary-background-color);
   border: 0.1rem solid var(--border-color);
   border-radius: 1rem;
@@ -393,11 +400,5 @@ onMounted(loadPostData);
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--primary-text-color);
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 </style>
