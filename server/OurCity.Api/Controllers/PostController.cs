@@ -158,9 +158,7 @@ public class PostController : ControllerBase
     [ProducesResponseType(typeof(PostResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> BookmarkPost(
-        [FromRoute] Guid postId
-    )
+    public async Task<IActionResult> BookmarkPost([FromRoute] Guid postId)
     {
         var userId = User.GetUserId();
 

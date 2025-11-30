@@ -9,7 +9,7 @@ public interface IPostBookmarkRepository
     Task<IEnumerable<PostBookmark>> GetBookmarksByUser(Guid userId, Guid? cursor, int limit);
     Task Add(PostBookmark bookmark);
     Task Remove(PostBookmark bookmark);
-    Task SaveChangesAsync(); 
+    Task SaveChangesAsync();
 }
 
 public class PostBookmarkRepository : IPostBookmarkRepository
@@ -23,18 +23,19 @@ public class PostBookmarkRepository : IPostBookmarkRepository
 
     public async Task<PostBookmark?> GetBookmarkByUserAndPostId(Guid userId, Guid postId)
     {
-        return await _appDbContext.PostBookmarks
-            .Include(b => b.Post)
-            .FirstOrDefaultAsync(b =>
-                b.PostId == postId && b.UserId == userId
-            );
+        return await _appDbContext
+            .PostBookmarks.Include(b => b.Post)
+            .FirstOrDefaultAsync(b => b.PostId == postId && b.UserId == userId);
     }
 
-    public async Task<IEnumerable<PostBookmark>> GetBookmarksByUser(Guid userId, Guid? cursor, int limit)
+    public async Task<IEnumerable<PostBookmark>> GetBookmarksByUser(
+        Guid userId,
+        Guid? cursor,
+        int limit
+    )
     {
         IQueryable<PostBookmark> query = _appDbContext
-            .PostBookmarks
-            .Where(b => b.UserId == userId)
+            .PostBookmarks.Where(b => b.UserId == userId)
             .Include(b => b.Post)
             .OrderByDescending(b => b.BookmarkedAt);
 
@@ -49,7 +50,7 @@ public class PostBookmarkRepository : IPostBookmarkRepository
                         b.BookmarkedAt == cursorBookmark.BookmarkedAt
                         && b.Id.CompareTo(cursorBookmark.Id) < 0
                     )
-                ); 
+                );
             }
         }
 

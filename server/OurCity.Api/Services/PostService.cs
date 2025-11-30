@@ -32,10 +32,7 @@ public interface IPostService
         Guid postId,
         PostVoteRequestDto postVoteRequestDto
     );
-    Task<Result<PostResponseDto>> BookmarkPost(
-        Guid userId,
-        Guid postId
-    );
+    Task<Result<PostResponseDto>> BookmarkPost(Guid userId, Guid postId);
     Task<Result<PostResponseDto>> DeletePost(Guid userId, Guid postId);
 }
 
@@ -115,9 +112,7 @@ public class PostService : IPostService
         var bookmarks = await _postBookmarkRepository.GetBookmarksByUser(userId, cursor, limit + 1);
         var hasNextPage = bookmarks.Count() > limit;
         var pageItems = bookmarks.Take(limit);
-        var posts = pageItems
-            .Select(b => b.Post?.ToDto(userId))
-            .ToList();
+        var posts = pageItems.Select(b => b.Post?.ToDto(userId)).ToList();
 
         var response = new PaginatedResponseDto<PostResponseDto>
         {
@@ -236,10 +231,7 @@ public class PostService : IPostService
         return Result<PostResponseDto>.Success(post.ToDto(_requestingUser.UserId, canMutatePost));
     }
 
-    public async Task<Result<PostResponseDto>> BookmarkPost(
-        Guid userId,
-        Guid postId
-    )
+    public async Task<Result<PostResponseDto>> BookmarkPost(Guid userId, Guid postId)
     {
         var post = await _postRepository.GetSlimPostbyId(postId);
 
@@ -248,7 +240,10 @@ public class PostService : IPostService
             return Result<PostResponseDto>.Failure(ErrorMessages.PostNotFound);
         }
 
-        var existingBookmark = await _postBookmarkRepository.GetBookmarkByUserAndPostId(userId, postId);
+        var existingBookmark = await _postBookmarkRepository.GetBookmarkByUserAndPostId(
+            userId,
+            postId
+        );
 
         if (existingBookmark != null)
         {
@@ -256,7 +251,8 @@ public class PostService : IPostService
         }
         else
         {
-            await _postBookmarkRepository.Add(new PostBookmark
+            await _postBookmarkRepository.Add(
+                new PostBookmark
                 {
                     PostId = postId,
                     UserId = userId,
@@ -264,7 +260,7 @@ public class PostService : IPostService
                 }
             );
         }
-        
+
         await _postBookmarkRepository.SaveChangesAsync();
 
         return Result<PostResponseDto>.Success(post.ToDto(userId));
