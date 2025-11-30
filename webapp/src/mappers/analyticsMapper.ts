@@ -30,6 +30,7 @@ export function toAnalyticsTimeSeries(dto: AnalyticsTimeSeriesResponseDto): Anal
 
 // maps an AnalyticsTagsDto to an AnalyticsTags model
 export function toAnalyticsTags(dto: AnalyticsTagsResponseDto): AnalyticsTags {
+    console.log("Dto:", dto);
     return {
         period: dto.Period,
         tagBuckets: dto.TagBuckets.map(bucket => ({

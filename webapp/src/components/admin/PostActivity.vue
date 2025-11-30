@@ -3,9 +3,10 @@ import { ref, onMounted } from "vue";
 import { CContainer, CRow, CCol, CCard, CCardBody, CCardHeader, CButtonGroup, CButton } from "@coreui/vue";
 import PostsOverTime from "./Charts/PostsOverTime.vue";
 import TagBreakdown from "./Charts/TagBreakdown.vue";
+import { Period } from "@/types/enums";
 
 // Time period selection
-const selectedPeriod = ref('day');
+const selectedPeriod  = ref(Period.Day);
 
 // Stats data
 const stats = ref({
@@ -51,20 +52,20 @@ onMounted(() => {
           <CCol class="text-end">
             <CButtonGroup>
               <CButton 
-                :class="{ active: selectedPeriod === 'day' }"
-                @click="selectPeriod('day')"
+                :class="{ active: selectedPeriod === Period.Day }"
+                @click="selectPeriod(Period.Day)"
               >
                 Day
               </CButton>
               <CButton 
-                :class="{ active: selectedPeriod === 'month' }"
-                @click="selectPeriod('month')"
+                :class="{ active: selectedPeriod === Period.Month }"
+                @click="selectPeriod(Period.Month)"
               >
                 Month
               </CButton>
               <CButton 
-                :class="{ active: selectedPeriod === 'year' }"
-                @click="selectPeriod('year')"
+                :class="{ active: selectedPeriod === Period.Year }"
+                @click="selectPeriod(Period.Year)"
               >
                 Year
               </CButton>
@@ -123,7 +124,7 @@ onMounted(() => {
             <PostsOverTime :period="selectedPeriod"/>
           </CCol>
           <CCol>
-            <TagBreakdown/>
+            <TagBreakdown :period="selectedPeriod"/>
           </CCol>
         </CRow>
       </CCardBody>

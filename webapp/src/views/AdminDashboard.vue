@@ -8,7 +8,6 @@ import SideBar from "@/components/SideBar.vue";
 import { useAuthStore } from "@/stores/authenticationStore";
 import { CContainer, CCard, CCardBody, CCardHeader, CRow, CCol } from "@coreui/vue";
 import PostActivity from "@/components/admin/PostActivity.vue";
-import TagBreakdown from "@/components/admin/Charts/TagBreakdown.vue";
 
 const auth = useAuthStore();
 

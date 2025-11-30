@@ -29,7 +29,7 @@ public class AnalyticsService : IAnalyticsService
         // Placeholder implementation
         var summary = new AnalyticsSummaryResponseDto
         {
-            Period = Period.Day,
+            Period = analyticsRequestDto.Period,
             Start = DateTime.UtcNow.AddDays(-1),
             End = DateTime.UtcNow,
             TotalPosts = 100,
@@ -46,7 +46,7 @@ public class AnalyticsService : IAnalyticsService
         // Placeholder implementation
         var timeSeries = new AnalyticsTimeSeriesResponseDto
         {
-            Period = Period.Day,
+            Period = analyticsRequestDto.Period,
             Buckets = new List<AnalyticsTimeSeriesBucketDto>{
                 new AnalyticsTimeSeriesBucketDto{
                     BucketStart = DateTime.UtcNow.AddHours(-1),
@@ -74,8 +74,8 @@ public class AnalyticsService : IAnalyticsService
         // Placeholder implementation
         var tagBreakdown = new AnalyticsTagsResponseDto
         {
-            Period = Period.Day,
-            Tags = new List<AnalyticsTagBucketDto>{
+            Period = analyticsRequestDto.Period,
+            TagBuckets = new List<AnalyticsTagBucketDto>{
                 new AnalyticsTagBucketDto{
                     TagID = Guid.NewGuid(),
                     TagName = "Environment",
