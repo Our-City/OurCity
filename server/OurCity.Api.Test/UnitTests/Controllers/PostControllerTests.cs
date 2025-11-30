@@ -838,13 +838,14 @@ public class PostControllerTests
             UpvoteCount = 0,
             DownvoteCount = 0,
             IsDeleted = false,
+            CanMutate = false,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
         };
 
         // Arrange
         _mockPostService
-            .Setup(s => s.BookmarkPost(_testUserId, _testPostId))
+            .Setup(s => s.BookmarkPost(_testPostId))
             .ReturnsAsync(Result<PostResponseDto>.Success(responseDto));
 
         // Act
@@ -856,34 +857,7 @@ public class PostControllerTests
         Assert.Equal(_testPostId, returnedPost.Id);
         Assert.Equal("Test Post", returnedPost.Title);
 
-        _mockPostService.Verify(s => s.BookmarkPost(_testUserId, _testPostId), Times.Once);
-    }
-
-    [Fact]
-    public async Task BookmarkPost_WithoutAuthentication_ReturnsProblemDetails()
-    {
-        // Arrange
-        SetupAnonymousUser();
-        var updateDto = new PostUpdateRequestDto
-        {
-            Title = "Bookmarked Title",
-            Description = "Bookmarked Description",
-        };
-
-        // Act
-        var result = await _controller.BookmarkPost(_testPostId);
-
-        // Assert
-        var objectResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(StatusCodes.Status401Unauthorized, objectResult.StatusCode);
-
-        var problemDetails = Assert.IsType<ProblemDetails>(objectResult.Value);
-        Assert.Equal(ErrorMessages.UserNotAuthenticated, problemDetails.Detail);
-
-        _mockPostService.Verify(
-            s => s.BookmarkPost(It.IsAny<Guid>(), It.IsAny<Guid>()),
-            Times.Never
-        );
+        _mockPostService.Verify(s => s.BookmarkPost(_testPostId), Times.Once);
     }
 
     #endregion
@@ -907,6 +881,7 @@ public class PostControllerTests
                 UpvoteCount = 0,
                 DownvoteCount = 0,
                 IsDeleted = false,
+                CanMutate = false,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
             },
@@ -921,6 +896,7 @@ public class PostControllerTests
                 UpvoteCount = 0,
                 DownvoteCount = 0,
                 IsDeleted = false,
+                CanMutate = false,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
             },
@@ -933,7 +909,7 @@ public class PostControllerTests
         };
 
         _mockPostService
-            .Setup(s => s.GetBookmarkedPosts(_testUserId, null, 25))
+            .Setup(s => s.GetBookmarkedPosts(null, 25))
             .ReturnsAsync(Result<PaginatedResponseDto<PostResponseDto>>.Success(paginatedResponse));
 
         // Act
@@ -948,29 +924,7 @@ public class PostControllerTests
         Assert.Equal("Test Post 2", returnedPosts[1].Title);
         Assert.Null(returnedData.NextCursor);
 
-        _mockPostService.Verify(s => s.GetBookmarkedPosts(_testUserId, null, 25), Times.Once);
-    }
-
-    [Fact]
-    public async Task GetBookmarkedPosts_WithoutAuthentication_ReturnsProblemDetails()
-    {
-        // Arrange
-        SetupAnonymousUser();
-
-        // Act
-        var result = await _controller.GetBookmarkedPosts(null, 25);
-
-        // Assert
-        var objectResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(StatusCodes.Status401Unauthorized, objectResult.StatusCode);
-
-        var problemDetails = Assert.IsType<ProblemDetails>(objectResult.Value);
-        Assert.Equal(ErrorMessages.UserNotAuthenticated, problemDetails.Detail);
-
-        _mockPostService.Verify(
-            s => s.GetBookmarkedPosts(It.IsAny<Guid>(), It.IsAny<Guid?>(), It.IsAny<int>()),
-            Times.Never
-        );
+        _mockPostService.Verify(s => s.GetBookmarkedPosts(null, 25), Times.Once);
     }
 
     #endregion

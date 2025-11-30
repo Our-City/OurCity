@@ -850,9 +850,11 @@ public class PostServiceTests
         _mockPostBookmarkRepository
             .Setup(r => r.GetBookmarkByUserAndPostId(_testUserId, _testPostId))
             .ReturnsAsync((PostBookmark?)null);
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
+        _mockPolicyService.Setup(u => u.CanParticipateInForum()).ReturnsAsync(true);
 
         // Act
-        var result = await _service.BookmarkPost(_testUserId, _testPostId);
+        var result = await _service.BookmarkPost(_testPostId);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -886,9 +888,11 @@ public class PostServiceTests
             .Setup(r => r.Remove(existingBookmark))
             .Returns(Task.CompletedTask);
         _mockPostRepository.Setup(r => r.SaveChangesAsync()).Returns(Task.CompletedTask);
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
+        _mockPolicyService.Setup(u => u.CanParticipateInForum()).ReturnsAsync(true);
 
         // Act
-        var result = await _service.BookmarkPost(_testUserId, _testPostId);
+        var result = await _service.BookmarkPost(_testPostId);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -902,9 +906,11 @@ public class PostServiceTests
     {
         // Arrange
         _mockPostRepository.Setup(r => r.GetSlimPostbyId(_testPostId)).ReturnsAsync((Post?)null);
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
+        _mockPolicyService.Setup(u => u.CanParticipateInForum()).ReturnsAsync(true);
 
         // Act
-        var result = await _service.BookmarkPost(_testUserId, _testPostId);
+        var result = await _service.BookmarkPost(_testPostId);
 
         // Assert
         Assert.False(result.IsSuccess);
@@ -921,12 +927,14 @@ public class PostServiceTests
     public async Task GetBookmarkedPosts_WithNoBookmarks_ReturnsEmptyList()
     {
         // Arrange
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
+        _mockPolicyService.Setup(u => u.CanParticipateInForum()).ReturnsAsync(true);
         _mockPostBookmarkRepository
             .Setup(r => r.GetBookmarksByUser(_testUserId, null, 26))
             .ReturnsAsync(new List<PostBookmark>());
 
         // Act
-        var result = await _service.GetBookmarkedPosts(_testUserId, null, 25);
+        var result = await _service.GetBookmarkedPosts(null, 25);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -964,9 +972,11 @@ public class PostServiceTests
         _mockPostBookmarkRepository
             .Setup(r => r.GetBookmarksByUser(_testUserId, null, 26))
             .ReturnsAsync(bookmarks);
+        _mockCurrentUser.Setup(u => u.UserId).Returns(_testUserId);
+        _mockPolicyService.Setup(u => u.CanParticipateInForum()).ReturnsAsync(true);
 
         // Act
-        var result = await _service.GetBookmarkedPosts(_testUserId, null, 25);
+        var result = await _service.GetBookmarkedPosts(null, 25);
 
         // Assert
         Assert.True(result.IsSuccess);

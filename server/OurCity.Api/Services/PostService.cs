@@ -15,25 +15,13 @@ public interface IPostService
     Task<Result<PaginatedResponseDto<PostResponseDto>>> GetPosts(
         PostGetAllRequestDto postGetAllRequestDto
     );
-    Task<Result<PostResponseDto>> GetPostById(Guid? userId, Guid postId);
-    Task<Result<PaginatedResponseDto<PostResponseDto>>> GetBookmarkedPosts(
-        Guid userId,
-        Guid? cursor,
-        int limit
-    );
-    Task<Result<PostResponseDto>> CreatePost(Guid userId, PostCreateRequestDto postRequestDto);
-    Task<Result<PostResponseDto>> UpdatePost(
-        Guid userId,
-        Guid postId,
-        PostUpdateRequestDto postRequestDto
-    );
-    Task<Result<PostResponseDto>> VotePost(
-        Guid userId,
-        Guid postId,
-        PostVoteRequestDto postVoteRequestDto
-    );
-    Task<Result<PostResponseDto>> BookmarkPost(Guid userId, Guid postId);
-    Task<Result<PostResponseDto>> DeletePost(Guid userId, Guid postId);
+    Task<Result<PostResponseDto>> GetPostById(Guid postId);
+    Task<Result<PaginatedResponseDto<PostResponseDto>>> GetBookmarkedPosts(Guid? cursor, int limit);
+    Task<Result<PostResponseDto>> CreatePost(PostCreateRequestDto postRequestDto);
+    Task<Result<PostResponseDto>> UpdatePost(Guid postId, PostUpdateRequestDto postRequestDto);
+    Task<Result<PostResponseDto>> VotePost(Guid postId, PostVoteRequestDto postVoteRequestDto);
+    Task<Result<PostResponseDto>> BookmarkPost(Guid postId);
+    Task<Result<PostResponseDto>> DeletePost(Guid postId);
 }
 
 public class PostService : IPostService
@@ -104,15 +92,25 @@ public class PostService : IPostService
     }
 
     public async Task<Result<PaginatedResponseDto<PostResponseDto>>> GetBookmarkedPosts(
-        Guid userId,
         Guid? cursor,
         int limit
     )
     {
-        var bookmarks = await _postBookmarkRepository.GetBookmarksByUser(userId, cursor, limit + 1);
+        if (!_requestingUser.UserId.HasValue || !await _policyService.CanParticipateInForum())
+        {
+            return Result<PaginatedResponseDto<PostResponseDto>>.Failure(
+                ErrorMessages.Unauthorized
+            );
+        }
+
+        var bookmarks = await _postBookmarkRepository.GetBookmarksByUser(
+            _requestingUser.UserId.Value,
+            cursor,
+            limit + 1
+        );
         var hasNextPage = bookmarks.Count() > limit;
         var pageItems = bookmarks.Take(limit);
-        var posts = pageItems.Select(b => b.Post?.ToDto(userId)).ToList();
+        var posts = pageItems.Select(b => b.Post?.ToDto(_requestingUser.UserId, true)).ToList();
 
         var response = new PaginatedResponseDto<PostResponseDto>
         {
@@ -123,10 +121,7 @@ public class PostService : IPostService
         return Result<PaginatedResponseDto<PostResponseDto>>.Success(response);
     }
 
-    public async Task<Result<PostResponseDto>> CreatePost(
-        Guid userId,
-        PostCreateRequestDto postCreateRequestDto
-    )
+    public async Task<Result<PostResponseDto>> CreatePost(PostCreateRequestDto postCreateRequestDto)
     {
         //Check that user can create posts
         if (!_requestingUser.UserId.HasValue || !await _policyService.CanParticipateInForum())
@@ -231,8 +226,13 @@ public class PostService : IPostService
         return Result<PostResponseDto>.Success(post.ToDto(_requestingUser.UserId, canMutatePost));
     }
 
-    public async Task<Result<PostResponseDto>> BookmarkPost(Guid userId, Guid postId)
+    public async Task<Result<PostResponseDto>> BookmarkPost(Guid postId)
     {
+        if (!_requestingUser.UserId.HasValue || !await _policyService.CanParticipateInForum())
+        {
+            return Result<PostResponseDto>.Failure(ErrorMessages.Unauthorized);
+        }
+
         var post = await _postRepository.GetSlimPostbyId(postId);
 
         if (post == null)
@@ -241,7 +241,7 @@ public class PostService : IPostService
         }
 
         var existingBookmark = await _postBookmarkRepository.GetBookmarkByUserAndPostId(
-            userId,
+            _requestingUser.UserId.Value,
             postId
         );
 
@@ -255,7 +255,7 @@ public class PostService : IPostService
                 new PostBookmark
                 {
                     PostId = postId,
-                    UserId = userId,
+                    UserId = _requestingUser.UserId.Value,
                     BookmarkedAt = DateTime.UtcNow,
                 }
             );
@@ -263,10 +263,12 @@ public class PostService : IPostService
 
         await _postBookmarkRepository.SaveChangesAsync();
 
-        return Result<PostResponseDto>.Success(post.ToDto(userId));
+        return Result<PostResponseDto>.Success(
+            post.ToDto(_requestingUser.UserId, await _policyService.CanMutateThisPost(post))
+        );
     }
 
-    public async Task<Result<PostResponseDto>> DeletePost(Guid userId, Guid postId)
+    public async Task<Result<PostResponseDto>> DeletePost(Guid postId)
     {
         //Check that post exists
         var post = await _postRepository.GetSlimPostbyId(postId);

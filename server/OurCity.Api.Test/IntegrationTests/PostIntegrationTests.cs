@@ -772,7 +772,7 @@ public class PostIntegrationTests : IClassFixture<OurCityWebApplicationFactory>,
         var response = await client.PutAsync($"{_baseUrl}/posts/{_testPostId}/bookmarks", null);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
     [Fact]
@@ -865,7 +865,7 @@ public class PostIntegrationTests : IClassFixture<OurCityWebApplicationFactory>,
         var response = await client.GetAsync($"{_baseUrl}/posts/bookmarks");
 
         // Assert
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
     [Fact]
