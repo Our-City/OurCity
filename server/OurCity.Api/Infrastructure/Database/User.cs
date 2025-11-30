@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Microsoft.AspNetCore.Identity;
 
 namespace OurCity.Api.Infrastructure.Database;
@@ -22,4 +23,7 @@ public class User : IdentityUser<Guid>
     public List<PostVote> PostVotes { get; set; } = new();
 
     public List<PostBookmark> PostBookmarks { get; set; } = new();
+
+    public List<Report> SubmittedReports { get; set; } = new();
+    public List<Report> ReceivedReports { get; set; } = new();
 }

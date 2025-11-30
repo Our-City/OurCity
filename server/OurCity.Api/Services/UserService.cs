@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos.User;
+using OurCity.Api.Infrastructure;
 using OurCity.Api.Infrastructure.Database;
+using OurCity.Api.Services.Authorization;
 using OurCity.Api.Services.Mappings;
 
 namespace OurCity.Api.Services;
@@ -12,18 +14,28 @@ public interface IUserService
     Task<Result<UserResponseDto>> GetUserById(Guid id);
     Task<Result<UserResponseDto>> CreateUser(UserCreateRequestDto userRequestDto);
     Task<Result<UserResponseDto>> UpdateUser(Guid id, UserUpdateRequestDto userRequestDto);
+    Task<Result<bool>> ReportUser(Guid id, UserReportRequestDto userReportRequestDto);
     Task<Result<UserResponseDto>> DeleteUser(Guid id);
 }
 
 public class UserService : IUserService
 {
+    private readonly ICurrentUser _requestingUser;
+    private readonly IPolicyService _policyService;
     private readonly UserManager<User> _userManager;
-    private readonly AppDbContext _dbContext;
-
-    public UserService(UserManager<User> userManager, AppDbContext dbContext)
+    private readonly IReportRepository _reportRepository;
+    
+    public UserService(
+        ICurrentUser requestingUser,
+        IPolicyService policyService,
+        IReportRepository reportRepository,
+        UserManager<User> userManager
+    )
     {
+        _requestingUser = requestingUser;
+        _policyService = policyService;
+        _reportRepository = reportRepository;
         _userManager = userManager;
-        _dbContext = dbContext;
     }
 
     public async Task<Result<UserResponseDto>> GetUserById(Guid id)
@@ -76,6 +88,51 @@ public class UserService : IUserService
             );
 
         return Result<UserResponseDto>.Success(user.ToDto());
+    }
+
+    public async Task<Result<bool>> ReportUser(Guid id, UserReportRequestDto userReportRequestDto)
+    {
+        if (!_requestingUser.UserId.HasValue || !await _policyService.CanParticipateInForum())
+        {
+            return Result<bool>.Failure(
+                ErrorMessages.Unauthorized
+            );
+        }
+
+        if (_requestingUser.UserId.Value == id)
+        {
+            return Result<bool>.Failure(
+                ErrorMessages.CantReportSelf
+            );
+        }
+
+        var user = await _userManager.FindByIdAsync(id.ToString());
+
+        if (user == null)
+            return Result<bool>.Failure(ErrorMessages.UserNotFound);
+
+        var existingReport = await _reportRepository.GetReportById(id);
+        if (existingReport != null)
+        {
+            await _reportRepository.Remove(existingReport);
+        }
+        else
+        {
+            await _reportRepository.Add(
+                new Report
+                {
+                    Id = Guid.NewGuid(),
+                    TargetId = id,
+                    ReporterId = _requestingUser.UserId.Value,
+                    Reason = userReportRequestDto.Reason,
+                    ReportedAt = DateTime.UtcNow,
+                }
+            );
+        }
+        
+        await _reportRepository.SaveChangesAsync();
+
+        return Result<bool>.Success(true);   
     }
 
     public async Task<Result<UserResponseDto>> DeleteUser(Guid id)
