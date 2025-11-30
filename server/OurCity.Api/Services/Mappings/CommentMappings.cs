@@ -9,15 +9,7 @@ namespace OurCity.Api.Services.Mappings;
 
 public static class CommentMappings
 {
-    public static IEnumerable<CommentResponseDto> ToDtos(
-        this IEnumerable<Comment> comments,
-        Guid? userId
-    )
-    {
-        return comments.Select(comment => comment.ToDto(userId));
-    }
-
-    public static CommentResponseDto ToDto(this Comment comment, Guid? userId)
+    public static CommentResponseDto ToDto(this Comment comment, Guid? userId, bool canMutate)
     {
         return new CommentResponseDto
         {
@@ -32,6 +24,7 @@ public static class CommentMappings
                 ? comment.Votes.FirstOrDefault(vote => vote.VoterId.Equals(userId))?.VoteType
                 ?? VoteType.NoVote
                 : VoteType.NoVote,
+            CanMutate = canMutate,
             IsDeleted = comment.IsDeleted,
             CreatedAt = comment.CreatedAt,
             UpdatedAt = comment.UpdatedAt,

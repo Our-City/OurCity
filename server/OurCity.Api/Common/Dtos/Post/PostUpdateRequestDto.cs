@@ -10,7 +10,7 @@ public class PostUpdateRequestDto
         MinimumLength = 1,
         ErrorMessage = "Title must be between 1 and 50 characters"
     )]
-    [RegularExpression(@"^(?!\s*$).+", ErrorMessage = "Title cannot be only whitespace")]
+    [RegularExpression(@"^\s*\S.*$", ErrorMessage = "Title cannot be only whitespace")]
     public string? Title { get; set; }
 
     [StringLength(
@@ -18,11 +18,11 @@ public class PostUpdateRequestDto
         MinimumLength = 1,
         ErrorMessage = "Description must be between 1 and 500 characters"
     )]
-    [RegularExpression(@"^(?!\s*$).+", ErrorMessage = "Description cannot be only whitespace")]
+    [RegularExpression(@"^\s*\S[\s\S]*$", ErrorMessage = "Description cannot be only whitespace")]
     public string? Description { get; set; }
 
-    [StringLength(50, ErrorMessage = "Location cannot exceed 50 characters")]
+    [StringLength(150, ErrorMessage = "Location cannot exceed 150 characters")]
     public string? Location { get; set; }
 
-    public List<Guid>? TagIds { get; set; }
+    public List<Guid>? Tags { get; set; }
 }

@@ -228,8 +228,14 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("double precision");
+
                     b.Property<string>("Location")
                         .HasColumnType("text");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("double precision");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -246,6 +252,30 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.HasIndex("AuthorId");
 
                     b.ToTable("Posts");
+                });
+
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.PostBookmark", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("BookmarkedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PostBookmarks");
                 });
 
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.PostVote", b =>
@@ -615,6 +645,25 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Navigation("Author");
                 });
 
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.PostBookmark", b =>
+                {
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Post", "Post")
+                        .WithMany("Bookmarks")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OurCity.Api.Infrastructure.Database.User", "User")
+                        .WithMany("PostBookmarks")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.PostVote", b =>
                 {
                     b.HasOne("OurCity.Api.Infrastructure.Database.Post", "Post")
@@ -656,6 +705,8 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Post", b =>
                 {
+                    b.Navigation("Bookmarks");
+
                     b.Navigation("Comments");
 
                     b.Navigation("Media");
@@ -666,6 +717,8 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.User", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("PostBookmarks");
 
                     b.Navigation("PostVotes");
 

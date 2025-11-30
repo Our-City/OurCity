@@ -9,18 +9,34 @@
 import type { MaybeAxiosError } from "@/types/common/maybeAxiosError";
 
 /**
+ * Formats comma-separated error messages into a readable multi-line format
+ */
+function formatErrorMessage(message: string): string {
+  // Check if the message contains comma-separated sentences
+  if (message.includes(".,")) {
+    return message
+      .split(".,")
+      .map((msg) => msg.trim())
+      .filter((msg) => msg.length > 0)
+      .map((msg) => (msg.endsWith(".") ? msg : msg + "."))
+      .join("<br>");
+  }
+  return message;
+}
+
+/**
  * Attempts to extract a meaningful error message from an unknown error value.
  * Falls back to the provided default when no message can be found.
  */
 export function resolveErrorMessage(error: unknown, fallbackMessage: string): string {
   if (typeof error === "string" && error.trim()) {
-    return error;
+    return formatErrorMessage(error);
   }
 
   if (error instanceof Error) {
     const message = error.message?.trim();
     if (message) {
-      return message;
+      return formatErrorMessage(message);
     }
   }
 
@@ -40,14 +56,14 @@ export function resolveErrorMessage(error: unknown, fallbackMessage: string): st
         if (typeof candidate === "string") {
           const trimmed = candidate.trim();
           if (trimmed) {
-            return trimmed;
+            return formatErrorMessage(trimmed);
           }
         }
       }
     }
 
     if (typeof maybeAxiosError.message === "string" && maybeAxiosError.message.trim()) {
-      return maybeAxiosError.message.trim();
+      return formatErrorMessage(maybeAxiosError.message.trim());
     }
   }
 

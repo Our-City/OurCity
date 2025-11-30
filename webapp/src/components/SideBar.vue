@@ -49,8 +49,7 @@ onMounted(fetchTags);
 
     <div class="sidebar-divider"></div>
 
-    <!-- Optional: add (WIP) if you want -->
-    <h4 class="filter-title">Filter by tag (WIP)</h4>
+    <h4 class="filter-title">Filter by tag</h4>
 
     <button
       class="tag-button all-tags"
@@ -61,7 +60,7 @@ onMounted(fetchTags);
     </button>
 
     <!-- scrollable tag list -->
-    <div class="tag-list disabled">
+    <div class="tag-list">
       <button
         v-for="tag in tags"
         :key="tag.id"
@@ -91,12 +90,14 @@ onMounted(fetchTags);
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  width: 18rem;
+  width: 20rem;
   padding: 1rem;
-  height: 100vh;
+  height: 100%;
   background: var(--primary-background-color);
-  border-right: 1px solid var(--border-color);
   box-sizing: border-box;
+  z-index: 10;
+  position: relative;
+  box-shadow: 0 10rem 10rem rgba(0, 0, 0, 0.05);
 }
 
 /* buttons */

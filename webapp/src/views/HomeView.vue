@@ -8,6 +8,7 @@ import Card from "primevue/card";
 import PageHeader from "@/components/PageHeader.vue";
 import PostList from "@/components/PostList.vue";
 import SideBar from "@/components/SideBar.vue";
+import MapOverview from "@/components/MapOverview.vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/authenticationStore";
 import { usePostFilters } from "@/composables/usePostFilters";
@@ -88,7 +89,13 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
             </div>
           </div>
 
-          <div class="map-overview">Map Overview Coming Soon</div>
+          <div class="map-overview">
+            <div class="map-overview-header">
+              <i class="pi pi-map"></i>
+              <h3>Map Overview</h3>
+            </div>
+            <MapOverview :posts="postFilters.posts.value" height="calc(100% - 60px)" />
+          </div>
         </div>
       </div>
     </div>
@@ -98,11 +105,18 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
 <style scoped>
 .home-page {
   padding: 1rem;
+  height: 100vh;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .home-page-layout {
   display: flex;
-  height: 100vh;
+  height: calc(100vh - 2rem);
   overflow: hidden;
 }
 
@@ -118,19 +132,19 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
   background: var(--neutral-color);
   margin: 1rem 1.5rem 1rem 1rem;
   border-radius: 1rem;
-  padding: 3rem 10rem 3rem 4rem;
+  padding: 1.75rem 10rem 2.5rem 4rem;
 }
 
 .create-post-title {
-  font-size: 4rem;
+  font-size: 3rem;
   color: var(--secondary-text-color);
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .create-post-description {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   color: var(--secondary-text-color);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .create-post-button {
@@ -138,7 +152,7 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
   align-items: center;
   background: var(--primary-background-color);
   color: var(--primary-text-color);
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   border: none;
   border-radius: 0.75rem;
@@ -165,62 +179,71 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
   border-radius: 1rem;
   flex: 1;
   max-width: 100%;
-  min-width: 0;
+  min-width: 60%;
   overflow: visible;
 }
 
 .map-overview {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
-  width: 20rem;
-  height: 65rem;
+  gap: 1rem;
+  width: 40rem;
+  height: 50rem;
   background: var(--primary-background-color);
   border: 0.1rem solid var(--border-color);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  position: sticky;
+  top: 1rem;
+  overflow: hidden;
+}
+
+.map-overview-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.map-overview-header i {
+  font-size: 1.5rem;
+  color: var(--primary-color, #3b82f6);
+}
+
+.map-overview-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary-text-color);
 }
 
 .load-more-container {
   display: flex;
   justify-content: center;
-  padding: 1rem;
+  padding: 2rem 0;
 }
 
 .load-more-button {
   background: var(--primary-background-color);
   color: var(--primary-text-color);
   border: 1px solid var(--border-color);
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   padding: 0.75rem 2rem;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .load-more-button:hover:not(:disabled) {
   background: var(--primary-background-color-hover);
+  border-color: var(--primary-color);
 }
 
 .load-more-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.spinner {
-  margin-top: 1rem;
-  width: 4rem;
-  height: 4rem;
-  border: 0.25rem solid #ccc;
-  border-top: 0.25rem solid #1976d2;
-  border-radius: 100%;
-  animation: spin 1.5s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 </style>
