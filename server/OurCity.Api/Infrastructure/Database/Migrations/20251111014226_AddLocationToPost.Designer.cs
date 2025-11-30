@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using OurCity.Api.Infrastructure.Database;
@@ -11,9 +12,11 @@ using OurCity.Api.Infrastructure.Database;
 namespace OurCity.Api.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251111014226_AddLocationToPost")]
+    partial class AddLocationToPost
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -252,30 +255,6 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.HasIndex("AuthorId");
 
                     b.ToTable("Posts");
-                });
-
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.PostBookmark", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("BookmarkedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("PostId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PostId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("PostBookmarks");
                 });
 
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.PostVote", b =>
@@ -645,25 +624,6 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Navigation("Author");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.PostBookmark", b =>
-                {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.Post", "Post")
-                        .WithMany("Bookmarks")
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("OurCity.Api.Infrastructure.Database.User", "User")
-                        .WithMany("PostBookmarks")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Post");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.PostVote", b =>
                 {
                     b.HasOne("OurCity.Api.Infrastructure.Database.Post", "Post")
@@ -705,8 +665,6 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Post", b =>
                 {
-                    b.Navigation("Bookmarks");
-
                     b.Navigation("Comments");
 
                     b.Navigation("Media");
@@ -717,8 +675,6 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.User", b =>
                 {
                     b.Navigation("Comments");
-
-                    b.Navigation("PostBookmarks");
 
                     b.Navigation("PostVotes");
 

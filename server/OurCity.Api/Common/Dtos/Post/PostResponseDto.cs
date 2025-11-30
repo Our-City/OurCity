@@ -10,6 +10,8 @@ public class PostResponseDto
     public required string Title { get; set; }
     public required string Description { get; set; }
     public string? Location { get; set; }
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
     public string? AuthorName { get; set; }
     public int UpvoteCount { get; set; }
     public int DownvoteCount { get; set; }
@@ -17,6 +19,7 @@ public class PostResponseDto
     public PostVisibility Visibility { get; set; }
     public required List<TagResponseDto> Tags { get; set; }
     public VoteType VoteStatus { get; set; }
+    public required bool CanMutate { get; set; }
     public bool IsDeleted { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }

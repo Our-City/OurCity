@@ -18,6 +18,8 @@ export function toPost(dto: PostResponseDto): Post {
     title: dto.title,
     description: dto.description,
     location: dto.location,
+    latitude: dto.latitude,
+    longitude: dto.longitude,
     authorName: dto.authorName,
     upvoteCount: dto.upvoteCount,
     downvoteCount: dto.downvoteCount,
@@ -44,6 +46,8 @@ export function toPostCreateRequestDto(post: Post): PostCreateRequestDto {
     title: post.title,
     description: post.description,
     location: post.location,
+    latitude: post.latitude,
+    longitude: post.longitude,
     tags: post.tags.map((tag) => tag.id),
   };
 }
@@ -53,6 +57,8 @@ export function toPostUpdateRequestDto(post: Post): PostUpdateRequestDto {
     title: post.title,
     description: post.description,
     location: post.location,
+    latitude: post.latitude,
+    longitude: post.longitude,
     tags: post.tags.map((tag) => tag.id),
   };
 }

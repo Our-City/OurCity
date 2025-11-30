@@ -1,15 +1,14 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OurCity.Api.Configuration;
+using OurCity.Api.Extensions;
 using OurCity.Api.Infrastructure;
 using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Middlewares;
 using OurCity.Api.Services;
 using OurCity.Api.Services.Authorization;
-using OurCity.Api.Services.Authorization.CanCreatePosts;
-using OurCity.Api.Services.Authorization.CanMutateThisPost;
+using OurCity.Api.Services.Authorization.Policies;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -47,6 +46,7 @@ builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<IPostVoteRepository, PostVoteRepository>();
 builder.Services.AddScoped<ICommentVoteRepository, CommentVoteRepository>();
 builder.Services.AddScoped<IMediaRepository, MediaRepository>();
+builder.Services.AddScoped<IPostBookmarkRepository, PostBookmarkRepository>();
 
 //Service
 builder.Services.AddScoped<IPostService, PostService>();
@@ -101,8 +101,10 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 //Authorization
-builder.Services.AddSingleton<IAuthorizationHandler, CanCreatePostsHandler>();
-builder.Services.AddSingleton<IAuthorizationHandler, CanMutateThisPostHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, CanParticipateInForumHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, CanMutateThisPostHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, CanMutateThisCommentHandler>();
+builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 builder.Services.AddAuthorization(options =>
 {
     options.AddOurCityPolicies();
@@ -110,6 +112,7 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
+//Configure exception handling for the API
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -117,6 +120,15 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler();
+}
+
+//Seed ESSENTIAL data
+if (!app.Environment.IsTestEnvironment())
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        await AppDbContextSeeder.SeedAsync(scope.ServiceProvider);
+    }
 }
 
 app.UseHttpsRedirection();

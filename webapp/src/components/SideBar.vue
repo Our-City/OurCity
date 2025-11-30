@@ -49,8 +49,7 @@ onMounted(fetchTags);
 
     <div class="sidebar-divider"></div>
 
-    <!-- Optional: add (WIP) if you want -->
-    <h4 class="filter-title">Filter by tag (WIP)</h4>
+    <h4 class="filter-title">Filter by tag</h4>
 
     <button
       class="tag-button all-tags"
@@ -61,7 +60,7 @@ onMounted(fetchTags);
     </button>
 
     <!-- scrollable tag list -->
-    <div class="tag-list disabled">
+    <div class="tag-list">
       <button
         v-for="tag in tags"
         :key="tag.id"

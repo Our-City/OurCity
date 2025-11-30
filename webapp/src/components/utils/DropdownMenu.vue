@@ -2,7 +2,7 @@
   CoPilot was asked to provide help with CSS styling and for help with syntax.
   It also assisted with error handling.-->
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch, nextTick, onUnmounted } from "vue";
 
 interface Props {
   buttonClass?: string;
@@ -24,34 +24,34 @@ const closeDropdown = () => {
   isDropdownVisible.value = false;
 };
 
-// Close dropdown when clicking outside
+const container = ref<HTMLElement | null>(null);
 const handleClickOutside = (event: Event) => {
   const target = event.target as HTMLElement;
-  const dropdown = document.querySelector(".dropdown-container");
-  if (dropdown && !dropdown.contains(target)) {
+  if (container.value && !container.value.contains(target)) {
     closeDropdown();
   }
 };
 
-// Add click outside listener when dropdown is open
 const handleDropdownToggle = () => {
   toggleDropdown();
-  if (isDropdownVisible.value) {
+};
+
+watch(isDropdownVisible, async (visible) => {
+  if (visible) {
+    await nextTick();
     document.addEventListener("click", handleClickOutside);
   } else {
     document.removeEventListener("click", handleClickOutside);
   }
-};
+});
 
-// Cleanup listener when component unmounts
-import { onUnmounted } from "vue";
 onUnmounted(() => {
   document.removeEventListener("click", handleClickOutside);
 });
 </script>
 
 <template>
-  <div class="dropdown-container">
+  <div class="dropdown-container" ref="container">
     <button :class="props.buttonClass" @click="handleDropdownToggle">
       <slot name="button" class="dropdown-button">
         <!-- Default button content -->
@@ -85,7 +85,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem;
-  border-radius: 0.25rem;
+  border-radius: 0.75rem;
   transition: background-color 0.2s ease;
 }
 
