@@ -7,6 +7,7 @@
 /// </credits>
 using Moq;
 using OurCity.Api.Common;
+using OurCity.Api.Common.Dtos.Pagination;
 using OurCity.Api.Common.Dtos.Post;
 using OurCity.Api.Common.Enum;
 using OurCity.Api.Infrastructure;
@@ -25,6 +26,7 @@ public class PostServiceTests
     private readonly Mock<IPostRepository> _mockPostRepository;
     private readonly Mock<ITagRepository> _mockTagRepository;
     private readonly Mock<IPostVoteRepository> _mockPostVoteRepository;
+    private readonly Mock<IPostBookmarkRepository> _mockPostBookmarkRepository;
     private readonly PostService _service;
     private readonly Guid _testUserId = Guid.NewGuid();
     private readonly Guid _testPostId = Guid.NewGuid();
@@ -37,13 +39,15 @@ public class PostServiceTests
         _mockPostRepository = new Mock<IPostRepository>();
         _mockTagRepository = new Mock<ITagRepository>();
         _mockPostVoteRepository = new Mock<IPostVoteRepository>();
+        _mockPostBookmarkRepository = new Mock<IPostBookmarkRepository>();
 
         _service = new PostService(
             _mockCurrentUser.Object,
             _mockPolicyService.Object,
             _mockPostRepository.Object,
             _mockTagRepository.Object,
-            _mockPostVoteRepository.Object
+            _mockPostVoteRepository.Object,
+            _mockPostBookmarkRepository.Object
         );
     }
 
@@ -826,6 +830,153 @@ public class PostServiceTests
         // Assert
         Assert.True(result.IsSuccess);
         Assert.True(post.UpdatedAt > originalUpdatedAt);
+    }
+
+    #endregion
+
+    #region BookmarkPosts Tests
+
+    [Fact]
+    public async Task BookmarkPost_WithValidData_ReturnsSuccess()
+    {
+        // Arrange
+        var post = CreateTestSlimPost(_testPostId, Guid.NewGuid(), "Test Post");
+
+        _mockPostRepository.Setup(r => r.GetSlimPostbyId(_testPostId)).ReturnsAsync(post);
+        _mockPostBookmarkRepository
+            .Setup(r => r.Add(It.IsAny<PostBookmark>()))
+            .Returns(Task.CompletedTask);
+        _mockPostRepository.Setup(r => r.SaveChangesAsync()).Returns(Task.CompletedTask);
+        _mockPostBookmarkRepository
+            .Setup(r => r.GetBookmarkByUserAndPostId(_testUserId, _testPostId))
+            .ReturnsAsync((PostBookmark?)null);
+
+        // Act
+        var result = await _service.BookmarkPost(_testUserId, _testPostId);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Data);
+        _mockPostBookmarkRepository.Verify(
+            r =>
+                r.Add(It.Is<PostBookmark>(b => b.PostId == _testPostId && b.UserId == _testUserId)),
+            Times.Once
+        );
+        _mockPostBookmarkRepository.Verify(r => r.SaveChangesAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task BookmarkPost_WithExistingBookmark_RemovesBookmark()
+    {
+        // Arrange
+        var post = CreateTestSlimPost(_testPostId, Guid.NewGuid(), "Test Post");
+        var existingBookmark = new PostBookmark
+        {
+            Id = Guid.NewGuid(),
+            PostId = _testPostId,
+            UserId = _testUserId,
+            BookmarkedAt = DateTime.UtcNow,
+        };
+
+        _mockPostRepository.Setup(r => r.GetSlimPostbyId(_testPostId)).ReturnsAsync(post);
+        _mockPostBookmarkRepository
+            .Setup(r => r.GetBookmarkByUserAndPostId(_testUserId, _testPostId))
+            .ReturnsAsync(existingBookmark);
+        _mockPostBookmarkRepository
+            .Setup(r => r.Remove(existingBookmark))
+            .Returns(Task.CompletedTask);
+        _mockPostRepository.Setup(r => r.SaveChangesAsync()).Returns(Task.CompletedTask);
+
+        // Act
+        var result = await _service.BookmarkPost(_testUserId, _testPostId);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Data);
+        _mockPostBookmarkRepository.Verify(r => r.Remove(existingBookmark), Times.Once);
+        _mockPostBookmarkRepository.Verify(r => r.SaveChangesAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task BookmarkPost_WithNonExistentPost_ReturnsFailure()
+    {
+        // Arrange
+        _mockPostRepository.Setup(r => r.GetSlimPostbyId(_testPostId)).ReturnsAsync((Post?)null);
+
+        // Act
+        var result = await _service.BookmarkPost(_testUserId, _testPostId);
+
+        // Assert
+        Assert.False(result.IsSuccess);
+        Assert.Equal(ErrorMessages.PostNotFound, result.Error);
+        _mockPostBookmarkRepository.Verify(r => r.Add(It.IsAny<PostBookmark>()), Times.Never);
+        _mockPostBookmarkRepository.Verify(r => r.SaveChangesAsync(), Times.Never);
+    }
+
+    #endregion
+
+    #region GetBookmarkedPosts Tests
+
+    [Fact]
+    public async Task GetBookmarkedPosts_WithNoBookmarks_ReturnsEmptyList()
+    {
+        // Arrange
+        _mockPostBookmarkRepository
+            .Setup(r => r.GetBookmarksByUser(_testUserId, null, 26))
+            .ReturnsAsync(new List<PostBookmark>());
+
+        // Act
+        var result = await _service.GetBookmarkedPosts(_testUserId, null, 25);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Data);
+        Assert.Empty(result.Data.Items);
+
+        _mockPostBookmarkRepository.Verify(
+            r => r.GetBookmarksByUser(_testUserId, null, 26),
+            Times.Once
+        );
+    }
+
+    [Fact]
+    public async Task GetBookmarkedPosts_WithBookmarks_ReturnsPaginatedBookmarks()
+    {
+        // Arrange
+        var bookmarks = new List<PostBookmark>
+        {
+            new PostBookmark
+            {
+                Id = Guid.NewGuid(),
+                PostId = Guid.NewGuid(),
+                UserId = _testUserId,
+                BookmarkedAt = DateTime.UtcNow,
+            },
+            new PostBookmark
+            {
+                Id = Guid.NewGuid(),
+                PostId = Guid.NewGuid(),
+                UserId = _testUserId,
+                BookmarkedAt = DateTime.UtcNow,
+            },
+        };
+
+        _mockPostBookmarkRepository
+            .Setup(r => r.GetBookmarksByUser(_testUserId, null, 26))
+            .ReturnsAsync(bookmarks);
+
+        // Act
+        var result = await _service.GetBookmarkedPosts(_testUserId, null, 25);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Data);
+        Assert.Equal(bookmarks.Count, result.Data.Items.Count());
+
+        _mockPostBookmarkRepository.Verify(
+            r => r.GetBookmarksByUser(_testUserId, null, 26),
+            Times.Once
+        );
     }
 
     #endregion
