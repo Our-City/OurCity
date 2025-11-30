@@ -34,7 +34,7 @@ public class UserService : IUserService
             .FirstOrDefaultAsync(u => u.Id == id);
 
         if (user is null)
-            return Result<UserResponseDto>.Failure("User not found.");
+            return Result<UserResponseDto>.Failure(ErrorMessages.UserNotFound);
 
         return Result<UserResponseDto>.Success(user.ToDto());
     }
@@ -44,7 +44,7 @@ public class UserService : IUserService
         //check if the user already exists
         var existentUser = await _userManager.FindByNameAsync(userCreateRequestDto.Username);
         if (existentUser is not null)
-            return Result<UserResponseDto>.Failure("User already exists");
+            return Result<UserResponseDto>.Failure(ErrorMessages.UserAlreadyExists);
 
         var newUser = new User { UserName = userCreateRequestDto.Username };
 
@@ -66,7 +66,7 @@ public class UserService : IUserService
         var user = await _userManager.FindByIdAsync(id.ToString());
 
         if (user == null)
-            return Result<UserResponseDto>.Failure("User not found.");
+            return Result<UserResponseDto>.Failure(ErrorMessages.UserNotFound);
 
         var updateResult = await _userManager.SetUserNameAsync(user, userUpdateRequestDto.Username);
 
@@ -83,7 +83,7 @@ public class UserService : IUserService
         var user = await _userManager.FindByIdAsync(id.ToString());
 
         if (user == null)
-            return Result<UserResponseDto>.Failure("User not found.");
+            return Result<UserResponseDto>.Failure(ErrorMessages.UserNotFound);
 
         var deleteResult = await _userManager.DeleteAsync(user);
 
