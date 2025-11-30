@@ -1,13 +1,11 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch, onMounted } from "vue";
 import { CChart } from "@coreui/vue-chartjs";
+import { Period } from "@/types/enums";
+import { getAnalyticsTimeSeries } from "@/api/analyticsService";
 
 const props = defineProps({
-  period: {
-    type: String,
-    required: true,
-    validator: (value) => ['day', 'month', 'year'].includes(value)
-  }
+  period: Period
 });
 
 const chartData = ref({
@@ -65,63 +63,61 @@ const chartOptions = ref({
   }
 });
 
-// Generate labels and mock data based on period
-const generateChartData = () => {
-  let labels = [];
-  let data = [];
+const isLoading = ref(false);
+const error = ref<string | null>(null);
 
-  if (props.period === 'day') {
-    // Hourly for last 24 hours
-    for (let i = 23; i >= 0; i--) {
-      const hour = new Date();
-      hour.setHours(hour.getHours() - i);
-      labels.push(hour.getHours() + ':00');
-      data.push(Math.floor(Math.random() * 10)); // Mock data
+const fetchChartData = async () => {
+  try {
+    isLoading.value = true;
+    error.value = null;
+
+    const response = await getAnalyticsTimeSeries(props.period);
+
+    let labels: string[] = [];
+    let data: number[] = [];
+
+    if (props.period === Period.Day) {
+      labels = response.series.map(entry => entry.bucketStart.toISOString().slice(11, 16));
+      data = response.series.map(entry => entry.postCount);
+    } else if (props.period === Period.Month) {
+      labels = response.series.map(entry => entry.bucketStart.toISOString().slice(0, 10));
+      data = response.series.map(entry => entry.postCount);
+    } else if (props.period === Period.Year) {
+      labels = response.series.map(entry => entry.bucketStart.toISOString().slice(0, 7));
+      data = response.series.map(entry => entry.postCount);
     }
-  } else if (props.period === 'month') {
-    // Daily for last 30 days
-    for (let i = 29; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      labels.push((date.getMonth() + 1) + '/' + date.getDate());
-      data.push(Math.floor(Math.random() * 20)); // Mock data
+
+    // Create new object to trigger reactivity
+    chartData.value = {
+      labels: labels,
+      datasets: [{
+        label: 'Posts Created',
+        backgroundColor: 'rgba(2, 101, 194, 0.1)',
+        borderColor: 'rgba(2, 101, 194, 1)',
+        pointBackgroundColor: 'rgba(2, 101, 194, 1)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgba(2, 101, 194, 1)',
+        data: data,
+        fill: true,
+        tension: 0.4
+      }]
     }
-  } else if (props.period === 'year') {
-    // Monthly for last 12 months
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    for (let i = 11; i >= 0; i--) {
-      const date = new Date();
-      date.setMonth(date.getMonth() - i);
-      labels.push(monthNames[date.getMonth()]);
-      data.push(Math.floor(Math.random() * 500)); // Mock data
-    }
+  } catch (err) {
+    console.error("Failed to fetch chart data:", err);
+    error.value = "Failed to fetch chart data";
+  } finally {
+    isLoading.value = false;
   }
-
-  // Create new object to trigger reactivity
-  chartData.value = {
-    labels: labels,
-    datasets: [{
-      label: 'Posts Created',
-      backgroundColor: 'rgba(2, 101, 194, 0.1)',
-      borderColor: 'rgba(2, 101, 194, 1)',
-      pointBackgroundColor: 'rgba(2, 101, 194, 1)',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgba(2, 101, 194, 1)',
-      data: data,
-      fill: true,
-      tension: 0.4
-    }]
-  };
 };
 
 // Watch for period changes
 watch(() => props.period, () => {
-  generateChartData();
+  fetchChartData();
 });
 
 onMounted(() => {
-  generateChartData();
+  fetchChartData();
 });
 </script>
 

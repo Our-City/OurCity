@@ -5,33 +5,33 @@ export interface AnalyticsRequestDto {
 }
 
 export interface AnalyticsSummaryResponseDto {
-    Period : Period;
-    Start : string; // ISO date string
-    End : string;   // ISO date string
-    TotalPosts : number;
-    TotalUpvotes : number;
-    TotalDownvotes : number;
-    TotalComments : number;
+    period : Period;
+    start : string; // ISO date string
+    end : string;   // ISO date string
+    totalPosts : number;
+    totalUpvotes : number;
+    totalDownvotes : number;
+    totalComments : number;
 }
 
 export interface AnalyticsTimeSeriesBucketDto {
-    BucketStart : string; // ISO date string
-    BucketEnd : string;   // ISO date string
-    PostCount : number;
+    bucketStart : string; // ISO date string
+    bucketEnd : string;   // ISO date string
+    postCount : number;
 }
 
 export interface AnalyticsTimeSeriesResponseDto {
-    Period : Period;
-    Buckets : AnalyticsTimeSeriesBucketDto[];
+    period : Period;
+    buckets : AnalyticsTimeSeriesBucketDto[];
 }
 
 export interface AnalyticsTagBucketDto {
-    TagId : string;
-    TagName : string;
-    PostCount : number;
+    tagId : string;
+    tagName : string;
+    postCount : number;
 }
 
 export interface AnalyticsTagsResponseDto {
-    Period : Period;
-    TagBuckets : AnalyticsTagBucketDto[];
+    period : Period;
+    tagBuckets : AnalyticsTagBucketDto[];
 }

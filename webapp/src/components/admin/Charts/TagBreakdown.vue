@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { CChart } from "@coreui/vue-chartjs";
-import { getTags } from "@/api/tagService";
-import { getAnalyticsSummary, getAnalyticsTags } from "@/api/analyticsService";
+import { getAnalyticsTags } from "@/api/analyticsService";
 import { Period } from "@/types/enums";
 
 const props = defineProps<{
@@ -60,21 +59,20 @@ const chartOptions = ref({
       }
     }
   },
-  // Pie charts don't use scales, removed for pie chart compatibility
 });
 
 const isLoading = ref(false);
 const error = ref<string | null>(null);
 
 // Load tags and generate mock post counts
-const loadTagData = async (period : Period) => {
+const loadTagData = async () => {
   try {
     isLoading.value = true;
     error.value = null;
     
-    const response = await getAnalyticsTags(period)
-
-    console.log("Analytics Tags Response:", response);
+    const response = await getAnalyticsTags(props.period);
+    const labels = response.tagBuckets.map(tag => tag.tagName);
+    const data = response.tagBuckets.map(tag => tag.postCount);
     
     // Generate colors for each tag
     const colors = [
@@ -100,19 +98,19 @@ const loadTagData = async (period : Period) => {
     ];
     
     // Repeat colors if there are more tags than colors
-    // const backgroundColor = labels.map((_, i) => colors[i % colors.length]);
-    // const borderColor = labels.map((_, i) => borderColors[i % borderColors.length]);
+    const backgroundColor = labels.map((_, i) => colors[i % colors.length]);
+    const borderColor = labels.map((_, i) => borderColors[i % borderColors.length]);
     
-    // chartData.value = {
-    //   labels: labels,
-    //   datasets: [{
-    //     label: 'Posts by Tag',
-    //     data: data,
-    //     backgroundColor: backgroundColor,
-    //     borderColor: borderColor,
-    //     borderWidth: 2
-    //   }]
-    // };
+    chartData.value = {
+      labels: labels,
+      datasets: [{
+        label: 'Posts by Tag',
+        data: data,
+        backgroundColor: backgroundColor,
+        borderColor: borderColor,
+        borderWidth: 2
+      }]
+    };
   } catch (err) {
     console.error("Failed to load tag data:", err);
     error.value = "Failed to load tag data";

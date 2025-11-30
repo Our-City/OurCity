@@ -1,6 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { CContainer, CRow, CCol, CCard, CCardBody, CCardHeader, CButtonGroup, CButton } from "@coreui/vue";
+import { getAnalyticsSummary } from "@/api/analyticsService";
 import PostsOverTime from "./Charts/PostsOverTime.vue";
 import TagBreakdown from "./Charts/TagBreakdown.vue";
 import { Period } from "@/types/enums";
@@ -17,22 +18,32 @@ const stats = ref({
 });
 
 // Handle period selection
-const selectPeriod = (period) => {
+const selectPeriod = (period: Period) => {
   selectedPeriod.value = period;
   fetchStats();
 };
 
+const isLoading = ref(false);
+const error = ref<string | null>(null);
+
 // Fetch stats based on selected period
 const fetchStats = async () => {
-  // TODO: Replace with actual API call that uses selectedPeriod.value
-  // Simulating API call with mock data that changes based on period
-  const mockData = {
-    day: { newPosts: 24, upvotes: 156, downvotes: 23, comments: 89 },
-    month: { newPosts: 342, upvotes: 2145, downvotes: 287, comments: 1234 },
-    year: { newPosts: 4128, upvotes: 25896, downvotes: 3452, comments: 14890 }
-  };
-  
-  stats.value = mockData[selectedPeriod.value];
+  try {
+    isLoading.value = true;
+    error.value = null;
+
+    const period = selectedPeriod.value;
+    const response = await getAnalyticsSummary(period);
+    stats.value.newPosts = response.totalPosts;
+    stats.value.upvotes = response.totalUpvotes;
+    stats.value.downvotes = response.totalDownvotes;
+    stats.value.comments = response.totalComments;
+  } catch (err) {
+    console.error("Failed to fetch stats:", err);
+    error.value = "Failed to fetch stats";
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 // Fetch stats on mount

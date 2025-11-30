@@ -19,6 +19,5 @@ export async function getAnalyticsTimeSeries(period: Period): Promise<AnalyticsT
 export async function getAnalyticsTags(period: Period): Promise<AnalyticsTags> {
     const dto: AnalyticsRequestDto = { period };
     const response = await api.get<AnalyticsTagsResponseDto>( `/analytics/tag-breakdown`, { params: dto });
-    console.log("Response Data:", response.data);
     return toAnalyticsTags(response.data);
 }

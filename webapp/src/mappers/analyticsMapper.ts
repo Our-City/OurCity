@@ -6,37 +6,36 @@ import type { AnalyticsSummaryResponseDto, AnalyticsTimeSeriesResponseDto, Analy
 // maps an AnalyticsSummaryDto to an AnalyticsSummary model
 export function toAnalyticsSummary(dto: AnalyticsSummaryResponseDto): AnalyticsSummary {
     return {
-        period: dto.Period,
-        startDate: new Date(dto.Start),
-        endDate: new Date(dto.End),
-        totalPosts: dto.TotalPosts,
-        totalUpvotes: dto.TotalUpvotes,
-        totalDownvotes: dto.TotalDownvotes,
-        totalComments: dto.TotalComments,
+        period: dto.period,
+        startDate: new Date(dto.start),
+        endDate: new Date(dto.end),
+        totalPosts: dto.totalPosts,
+        totalUpvotes: dto.totalUpvotes,
+        totalDownvotes: dto.totalDownvotes,
+        totalComments: dto.totalComments,
     };
 }
 
 // maps an AnalyticsTimeSeriesDto to an AnalyticsTimeSeries model
 export function toAnalyticsTimeSeries(dto: AnalyticsTimeSeriesResponseDto): AnalyticsTimeSeries {
     return {
-        period: dto.Period,
-        series: dto.Buckets.map(bucket => ({
-            bucketStart: new Date(bucket.BucketStart),
-            bucketEnd: new Date(bucket.BucketEnd),
-            postCount: bucket.PostCount,
+        period: dto.period,
+        series: dto.buckets.map(bucket => ({
+            bucketStart: new Date(bucket.bucketStart),
+            bucketEnd: new Date(bucket.bucketEnd),
+            postCount: bucket.postCount,
         })),
     };
 }
 
 // maps an AnalyticsTagsDto to an AnalyticsTags model
 export function toAnalyticsTags(dto: AnalyticsTagsResponseDto): AnalyticsTags {
-    console.log("Dto:", dto);
     return {
-        period: dto.Period,
-        tagBuckets: dto.TagBuckets.map(bucket => ({
-            tagId: bucket.TagId,
-            tagName: bucket.TagName,
-            postCount: bucket.PostCount,
+        period: dto.period,
+        tagBuckets: dto.tagBuckets.map(bucket => ({
+            tagId: bucket.tagId,
+            tagName: bucket.tagName,
+            postCount: bucket.postCount,
         })),
     };
 }
