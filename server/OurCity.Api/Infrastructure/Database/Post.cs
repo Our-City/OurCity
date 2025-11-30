@@ -36,4 +36,6 @@ public class Post
     public List<PostVote> Votes { get; set; } = new();
 
     public List<Media> Media { get; set; } = new();
+
+    public List<PostBookmark> Bookmarks { get; set; } = new();
 }

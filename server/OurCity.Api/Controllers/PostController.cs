@@ -24,7 +24,7 @@ public class PostController : ControllerBase
     [Authorize]
     [EndpointSummary("Create a new post")]
     [EndpointDescription("Creates a new post with the provided data")]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(PostResponseDto), StatusCodes.Status201Created)]
     public async Task<IActionResult> CreatePost(
         [FromBody] PostCreateRequestDto postCreateRequestDto
@@ -71,13 +71,33 @@ public class PostController : ControllerBase
         return Ok(res.Data);
     }
 
+    [HttpGet]
+    [Route("bookmarks")]
+    [EndpointSummary("Get bookmarked posts")]
+    [EndpointDescription("Retrieves all posts bookmarked by the authenticated user")]
+    [ProducesResponseType(typeof(IEnumerable<PostResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetBookmarkedPosts(
+        [FromQuery] Guid? cursor,
+        [FromQuery] int limit = 25
+    )
+    {
+        var res = await _postService.GetBookmarkedPosts(cursor, limit);
+
+        if (!res.IsSuccess)
+        {
+            return Problem(statusCode: StatusCodes.Status403Forbidden, detail: res.Error);
+        }
+
+        return Ok(res.Data);
+    }
+
     [HttpPut]
     [Authorize]
     [Route("{postId}")]
     [EndpointSummary("Update an existing post")]
     [EndpointDescription("Updates an existing post with the provided data")]
     [ProducesResponseType(typeof(PostResponseDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> UpdatePost(
@@ -113,6 +133,30 @@ public class PostController : ControllerBase
     )
     {
         var res = await _postService.VotePost(postId, postVoteRequestDto);
+
+        if (!res.IsSuccess)
+        {
+            return Problem(
+                statusCode: (res.Error != null && res.Error.Equals(ErrorMessages.PostNotFound))
+                    ? StatusCodes.Status404NotFound
+                    : StatusCodes.Status403Forbidden,
+                detail: res.Error
+            );
+        }
+
+        return Ok(res.Data);
+    }
+
+    [HttpPut]
+    [Route("{postId}/bookmarks")]
+    [EndpointSummary("Bookmark a post")]
+    [EndpointDescription("Bookmarks/saves a post for the authenticated user")]
+    [ProducesResponseType(typeof(PostResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> BookmarkPost([FromRoute] Guid postId)
+    {
+        var res = await _postService.BookmarkPost(postId);
 
         if (!res.IsSuccess)
         {

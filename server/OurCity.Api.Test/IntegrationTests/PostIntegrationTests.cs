@@ -760,4 +760,167 @@ public class PostIntegrationTests : IClassFixture<OurCityWebApplicationFactory>,
     }
 
     #endregion
+
+    #region BookmarkPost Tests
+
+    [Fact]
+    public async Task BookmarkPost_WithoutLogin_ReturnUnauthorized()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        // Act
+        var response = await client.PutAsync($"{_baseUrl}/posts/{_testPostId}/bookmarks", null);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task BookmarkPost_WithValidPost_SavesBookmarkToDatabase()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        // Arrange
+        var loginRequest = new UserCreateRequestDto
+        {
+            Username = _ourCityApi.StubUsername,
+            Password = _ourCityApi.StubPassword,
+        };
+
+        // Act
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
+        var response = await client.PutAsync($"{_baseUrl}/posts/{_testPostId}/bookmarks", null);
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        var bookmarkedPost = await response.Content.ReadFromJsonAsync<PostResponseDto>();
+        Assert.NotNull(bookmarkedPost);
+
+        // Verify in database
+        using var scope = _ourCityApi.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var bookmark = await db.PostBookmarks.FirstOrDefaultAsync(b => b.PostId == _testPostId);
+        Assert.NotNull(bookmark);
+    }
+
+    [Fact]
+    public async Task BookmarkPost_TogglingBookmark_RemovesBookmarkFromDatabase()
+    {
+        using var client = _ourCityApi.CreateClient();
+        var loginRequest = new UserCreateRequestDto
+        {
+            Username = _ourCityApi.StubUsername,
+            Password = _ourCityApi.StubPassword,
+        };
+
+        // Act
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
+        await client.PutAsync($"{_baseUrl}/posts/{_testPostId}/bookmarks", null);
+
+        var response = await client.PutAsync($"{_baseUrl}/posts/{_testPostId}/bookmarks", null);
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        var toggledPost = await response.Content.ReadFromJsonAsync<PostResponseDto>();
+        Assert.NotNull(toggledPost);
+
+        // Verify bookmark removed from database
+        using var scope = _ourCityApi.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var bookmark = await db.PostBookmarks.FirstOrDefaultAsync(b => b.PostId == _testPostId);
+        Assert.Null(bookmark);
+    }
+
+    [Fact]
+    public async Task BookmarkPost_WithNonExistentPost_ReturnsNotFound()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        // Arrange
+        var nonExistentId = Guid.NewGuid();
+        var loginRequest = new UserCreateRequestDto
+        {
+            Username = _ourCityApi.StubUsername,
+            Password = _ourCityApi.StubPassword,
+        };
+
+        // Act
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
+        var response = await client.PutAsync($"{_baseUrl}/posts/{nonExistentId}/bookmarks", null);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    #endregion
+
+    #region GetBookmarkedPosts Tests
+
+    [Fact]
+    public async Task GetBookmarkedPosts_WithoutLogin_ReturnUnauthorized()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        // Act
+        var response = await client.GetAsync($"{_baseUrl}/posts/bookmarks");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetBookmarkedPosts_WithBookmarks_ReturnsBookmarkedPosts()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        // Arrange
+        var loginRequest = new UserCreateRequestDto
+        {
+            Username = _ourCityApi.StubUsername,
+            Password = _ourCityApi.StubPassword,
+        };
+
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
+        await client.PutAsync($"{_baseUrl}/posts/{_testPostId}/bookmarks", null);
+
+        // Act
+        var response = await client.GetAsync($"{_baseUrl}/posts/bookmarks");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        var result = await response.Content.ReadFromJsonAsync<
+            PaginatedResponseDto<PostResponseDto>
+        >();
+        Assert.NotNull(result);
+        Assert.Single(result.Items);
+        Assert.Equal(_testPostId, result.Items.First().Id);
+    }
+
+    [Fact]
+    public async Task GetBookmarkedPosts_WithoutBookmarks_ReturnsEmptyList()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        // Arrange
+        var loginRequest = new UserCreateRequestDto
+        {
+            Username = _ourCityApi.StubUsername,
+            Password = _ourCityApi.StubPassword,
+        };
+
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
+
+        // Act
+        var response = await client.GetAsync($"{_baseUrl}/posts/bookmarks");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        var result = await response.Content.ReadFromJsonAsync<
+            PaginatedResponseDto<PostResponseDto>
+        >();
+        Assert.NotNull(result);
+        Assert.Empty(result.Items);
+    }
+
+    #endregion
 }

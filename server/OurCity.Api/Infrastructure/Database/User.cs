@@ -20,4 +20,6 @@ public class User : IdentityUser<Guid>
     public List<Comment> Comments { get; set; } = new();
 
     public List<PostVote> PostVotes { get; set; } = new();
+
+    public List<PostBookmark> PostBookmarks { get; set; } = new();
 }
