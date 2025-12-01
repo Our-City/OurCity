@@ -23,6 +23,6 @@ public class User : IdentityUser<Guid>
 
     public List<PostBookmark> PostBookmarks { get; set; } = new();
 
-    public List<Report> SubmittedReports { get; set; } = new();
-    public List<Report> ReceivedReports { get; set; } = new();
+    public List<UserReport> SubmittedReports { get; set; } = new();
+    public List<UserReport> ReceivedReports { get; set; } = new();
 }

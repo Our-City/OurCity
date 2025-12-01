@@ -23,18 +23,18 @@ public class UserService : IUserService
     private readonly ICurrentUser _requestingUser;
     private readonly IPolicyService _policyService;
     private readonly UserManager<User> _userManager;
-    private readonly IReportRepository _reportRepository;
+    private readonly IUserReportRepository _userReportRepository;
 
     public UserService(
         ICurrentUser requestingUser,
         IPolicyService policyService,
-        IReportRepository reportRepository,
+        IUserReportRepository userReportRepository,
         UserManager<User> userManager
     )
     {
         _requestingUser = requestingUser;
         _policyService = policyService;
-        _reportRepository = reportRepository;
+        _userReportRepository = userReportRepository;
         _userManager = userManager;
     }
 
@@ -107,21 +107,21 @@ public class UserService : IUserService
         if (user == null)
             return Result<bool>.Failure(ErrorMessages.UserNotFound);
 
-        var existingReport = await _reportRepository.GetReportByReporterAndTargetId(
+        var existingReport = await _userReportRepository.GetReportByReporterAndTargetUserId(
             _requestingUser.UserId.Value,
             id
         );
         if (existingReport != null)
         {
-            await _reportRepository.Remove(existingReport);
+            await _userReportRepository.Remove(existingReport);
         }
         else
         {
-            await _reportRepository.Add(
-                new Report
+            await _userReportRepository.Add(
+                new UserReport
                 {
                     Id = Guid.NewGuid(),
-                    TargetId = id,
+                    TargetUserId = id,
                     ReporterId = _requestingUser.UserId.Value,
                     Reason = userReportRequestDto.Reason,
                     ReportedAt = DateTime.UtcNow,
@@ -129,7 +129,7 @@ public class UserService : IUserService
             );
         }
 
-        await _reportRepository.SaveChangesAsync();
+        await _userReportRepository.SaveChangesAsync();
 
         return Result<bool>.Success(true);
     }

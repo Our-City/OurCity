@@ -71,7 +71,7 @@ public class OurCityWebApplicationFactory : WebApplicationFactory<Program>
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         await db.Database.ExecuteSqlRawAsync(
-            "TRUNCATE TABLE \"PostVotes\", \"CommentVotes\", \"Comments\", \"Posts\", \"Tags\", \"Media\", \"Reports\" RESTART IDENTITY CASCADE;"
+            "TRUNCATE TABLE \"PostVotes\", \"CommentVotes\", \"Comments\", \"Posts\", \"Tags\", \"Media\", \"UserReports\" RESTART IDENTITY CASCADE;"
         );
     }
 

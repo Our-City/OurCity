@@ -1,10 +1,10 @@
 namespace OurCity.Api.Infrastructure.Database;
 
-public class Report
+public class UserReport
 {
     public Guid Id { get; set; }
 
-    public Guid TargetId { get; set; }
+    public Guid TargetUserId { get; set; }
 
     public Guid ReporterId { get; set; }
 

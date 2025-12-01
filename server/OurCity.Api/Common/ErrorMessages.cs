@@ -42,6 +42,6 @@ public static class ErrorMessages
     // Votes
     public const string InvalidVoteType = "Invalid vote type";
 
-    // Reports
+    // User Reports
     public const string CantReportSelf = "You cannot report yourself";
 }
