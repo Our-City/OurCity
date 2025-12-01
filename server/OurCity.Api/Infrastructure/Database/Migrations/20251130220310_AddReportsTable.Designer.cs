@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using OurCity.Api.Infrastructure.Database;
@@ -11,9 +12,11 @@ using OurCity.Api.Infrastructure.Database;
 namespace OurCity.Api.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251130220310_AddReportsTable")]
+    partial class AddReportsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -305,6 +308,34 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.ToTable("PostVotes");
                 });
 
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Report", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ReportedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ReporterId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TargetId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReporterId");
+
+                    b.HasIndex("TargetId");
+
+                    b.ToTable("Reports");
+                });
+
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tag", b =>
                 {
                     b.Property<Guid>("Id")
@@ -490,34 +521,6 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.UserReport", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Reason")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("ReportedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("ReporterId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("TargetUserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReporterId");
-
-                    b.HasIndex("TargetUserId");
-
-                    b.ToTable("UserReports");
                 });
 
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.UserRole", b =>
@@ -711,7 +714,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Navigation("Voter");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.UserReport", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Report", b =>
                 {
                     b.HasOne("OurCity.Api.Infrastructure.Database.User", "Reporter")
                         .WithMany("SubmittedReports")
@@ -721,7 +724,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
 
                     b.HasOne("OurCity.Api.Infrastructure.Database.User", "TargetUser")
                         .WithMany("ReceivedReports")
-                        .HasForeignKey("TargetUserId")
+                        .HasForeignKey("TargetId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

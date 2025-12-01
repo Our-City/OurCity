@@ -12,6 +12,7 @@ public class AppDbContext : IdentityDbContext<User, UserRole, Guid>
     public DbSet<CommentVote> CommentVotes { get; set; }
     public DbSet<Tag> Tags { get; set; }
     public DbSet<PostBookmark> PostBookmarks { get; set; }
+    public DbSet<UserReport> UserReports { get; set; }
 
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options) { }
@@ -128,5 +129,20 @@ public class AppDbContext : IdentityDbContext<User, UserRole, Guid>
             .WithMany(p => p.Bookmarks)
             .HasForeignKey(pb => pb.PostId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<UserReport>(entity =>
+        {
+            entity
+                .HasOne(r => r.Reporter)
+                .WithMany(u => u.SubmittedReports)
+                .HasForeignKey(r => r.ReporterId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity
+                .HasOne(r => r.TargetUser)
+                .WithMany(u => u.ReceivedReports)
+                .HasForeignKey(r => r.TargetUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
     }
 }

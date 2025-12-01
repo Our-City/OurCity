@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos.User;
+using OurCity.Api.Infrastructure;
 using OurCity.Api.Infrastructure.Database;
+using OurCity.Api.Services.Authorization;
 using OurCity.Api.Services.Mappings;
 
 namespace OurCity.Api.Services;
@@ -12,18 +14,28 @@ public interface IUserService
     Task<Result<UserResponseDto>> GetUserById(Guid id);
     Task<Result<UserResponseDto>> CreateUser(UserCreateRequestDto userRequestDto);
     Task<Result<UserResponseDto>> UpdateUser(Guid id, UserUpdateRequestDto userRequestDto);
+    Task<Result<bool>> ReportUser(Guid id, UserReportRequestDto userReportRequestDto);
     Task<Result<UserResponseDto>> DeleteUser(Guid id);
 }
 
 public class UserService : IUserService
 {
+    private readonly ICurrentUser _requestingUser;
+    private readonly IPolicyService _policyService;
     private readonly UserManager<User> _userManager;
-    private readonly AppDbContext _dbContext;
+    private readonly IUserReportRepository _userReportRepository;
 
-    public UserService(UserManager<User> userManager, AppDbContext dbContext)
+    public UserService(
+        ICurrentUser requestingUser,
+        IPolicyService policyService,
+        IUserReportRepository userReportRepository,
+        UserManager<User> userManager
+    )
     {
+        _requestingUser = requestingUser;
+        _policyService = policyService;
+        _userReportRepository = userReportRepository;
         _userManager = userManager;
-        _dbContext = dbContext;
     }
 
     public async Task<Result<UserResponseDto>> GetUserById(Guid id)
@@ -34,7 +46,7 @@ public class UserService : IUserService
             .FirstOrDefaultAsync(u => u.Id == id);
 
         if (user is null)
-            return Result<UserResponseDto>.Failure("User not found.");
+            return Result<UserResponseDto>.Failure(ErrorMessages.UserNotFound);
 
         return Result<UserResponseDto>.Success(user.ToDto());
     }
@@ -44,7 +56,7 @@ public class UserService : IUserService
         //check if the user already exists
         var existentUser = await _userManager.FindByNameAsync(userCreateRequestDto.Username);
         if (existentUser is not null)
-            return Result<UserResponseDto>.Failure("User already exists");
+            return Result<UserResponseDto>.Failure(ErrorMessages.UserAlreadyExists);
 
         var newUser = new User { UserName = userCreateRequestDto.Username };
 
@@ -66,7 +78,7 @@ public class UserService : IUserService
         var user = await _userManager.FindByIdAsync(id.ToString());
 
         if (user == null)
-            return Result<UserResponseDto>.Failure("User not found.");
+            return Result<UserResponseDto>.Failure(ErrorMessages.UserNotFound);
 
         var updateResult = await _userManager.SetUserNameAsync(user, userUpdateRequestDto.Username);
 
@@ -78,12 +90,56 @@ public class UserService : IUserService
         return Result<UserResponseDto>.Success(user.ToDto());
     }
 
+    public async Task<Result<bool>> ReportUser(Guid id, UserReportRequestDto userReportRequestDto)
+    {
+        if (!_requestingUser.UserId.HasValue || !await _policyService.CanParticipateInForum())
+        {
+            return Result<bool>.Failure(ErrorMessages.Unauthorized);
+        }
+
+        if (_requestingUser.UserId.Value == id)
+        {
+            return Result<bool>.Failure(ErrorMessages.CantReportSelf);
+        }
+
+        var user = await _userManager.FindByIdAsync(id.ToString());
+
+        if (user == null)
+            return Result<bool>.Failure(ErrorMessages.UserNotFound);
+
+        var existingReport = await _userReportRepository.GetReportByReporterAndTargetUserId(
+            _requestingUser.UserId.Value,
+            id
+        );
+        if (existingReport != null)
+        {
+            await _userReportRepository.Remove(existingReport);
+        }
+        else
+        {
+            await _userReportRepository.Add(
+                new UserReport
+                {
+                    Id = Guid.NewGuid(),
+                    TargetUserId = id,
+                    ReporterId = _requestingUser.UserId.Value,
+                    Reason = userReportRequestDto.Reason,
+                    ReportedAt = DateTime.UtcNow,
+                }
+            );
+        }
+
+        await _userReportRepository.SaveChangesAsync();
+
+        return Result<bool>.Success(true);
+    }
+
     public async Task<Result<UserResponseDto>> DeleteUser(Guid id)
     {
         var user = await _userManager.FindByIdAsync(id.ToString());
 
         if (user == null)
-            return Result<UserResponseDto>.Failure("User not found.");
+            return Result<UserResponseDto>.Failure(ErrorMessages.UserNotFound);
 
         var deleteResult = await _userManager.DeleteAsync(user);
 
