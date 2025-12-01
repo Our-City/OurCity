@@ -28,6 +28,7 @@ export function toPost(dto: PostResponseDto): Post {
     visibility: dto.visibility,
     tags: toTags(dto.tags),
     isDeleted: dto.isDeleted,
+    canMutate: dto.canMutate,
     voteStatus: parseVoteType(dto.voteStatus),
     createdAt: new Date(dto.createdAt),
     updatedAt: new Date(dto.updatedAt),

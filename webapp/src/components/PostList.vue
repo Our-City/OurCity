@@ -27,6 +27,9 @@ const emit = defineEmits<{
   toggleSort: [];
 }>();
 
+// filter out deleted posts
+const visiblePosts = computed(() => props.posts.filter((post) => !post.isDeleted));
+
 // dynamic icon depending on order
 const sortOrderIcon = computed(() =>
   props.sortOrder === "Desc" ? "pi pi-sort-amount-down" : "pi pi-sort-amount-up",
@@ -67,7 +70,7 @@ const sortButtonLabel = computed(() => {
         <p>{{ error }}</p>
       </div>
 
-      <div v-else-if="posts.length === 0" class="empty-message">
+      <div v-else-if="visiblePosts.length === 0" class="empty-message">
         <i class="pi pi-inbox"></i>
         <p>No posts found</p>
         <p class="empty-subtitle">Try adjusting your filters or check back later</p>
@@ -75,7 +78,7 @@ const sortButtonLabel = computed(() => {
 
       <router-link
         v-else
-        v-for="post in posts"
+        v-for="post in visiblePosts"
         :key="post.id"
         :to="`/posts/${post.id}`"
         class="post-link"
