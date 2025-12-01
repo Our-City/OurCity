@@ -205,12 +205,6 @@ onMounted(loadPostData);
         <div v-else-if="post" class="post-detail-content-layout">
           <div class="post-content">
             <div class="post-card">
-              <div class="post-tags">
-                <span v-for="tag in post.tags" :key="tag.id" class="tag-pill">
-                  {{ tag.name }}
-                </span>
-              </div>
-
               <div class="post-header">
                 <h1 class="post-title" data-testid="post-title">{{ post.title }}</h1>
                 <Dropdown>
