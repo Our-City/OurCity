@@ -273,11 +273,14 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
     {
         using var client = _ourCityApi.CreateClient();
 
-        var response = await client.PutAsync($"{_baseUrl}/admin/users/{_ourCityApi.StubUserId}/ban", null);
+        var response = await client.PutAsync(
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId}/ban",
+            null
+        );
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
-    
+
     [Fact]
     public async Task NonAdminBanningUserFails()
     {
@@ -290,8 +293,11 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         };
 
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
-        
-        var response = await client.PutAsync($"{_baseUrl}/admin/users/{_ourCityApi.StubUserId2}/ban", null);
+
+        var response = await client.PutAsync(
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId2}/ban",
+            null
+        );
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
@@ -309,7 +315,10 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
 
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
 
-        var response = await client.PutAsync($"{_baseUrl}/admin/users/{_ourCityApi.StubUserId2}/unban", null);
+        var response = await client.PutAsync(
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId2}/unban",
+            null
+        );
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
@@ -327,7 +336,10 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
 
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
 
-        var response = await client.PutAsync($"{_baseUrl}/admin/users/{_ourCityApi.AdminUserId}/ban", null);
+        var response = await client.PutAsync(
+            $"{_baseUrl}/admin/users/{_ourCityApi.AdminUserId}/ban",
+            null
+        );
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
@@ -345,11 +357,14 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
 
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
 
-        var response = await client.PutAsync($"{_baseUrl}/admin/users/{_ourCityApi.AdminUserId}/unban", null);
+        var response = await client.PutAsync(
+            $"{_baseUrl}/admin/users/{_ourCityApi.AdminUserId}/unban",
+            null
+        );
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
-    
+
     [Fact]
     public async Task AdminBanningNonExistentUserFails()
     {
@@ -399,9 +414,12 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
 
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
 
-        var response = await client.PutAsync($"{_baseUrl}/admin/users/{_ourCityApi.StubUserId}/ban", null);
+        var response = await client.PutAsync(
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId}/ban",
+            null
+        );
         var responseContent = await response.Content.ReadFromJsonAsync<UserResponseDto>();
-        
+
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.True(responseContent?.IsBanned);
     }
@@ -419,19 +437,25 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
 
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
 
-        var banResponse = await client.PutAsync($"{_baseUrl}/admin/users/{_ourCityApi.StubUserId}/ban", null);
+        var banResponse = await client.PutAsync(
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId}/ban",
+            null
+        );
         var banResponseContent = await banResponse.Content.ReadFromJsonAsync<UserResponseDto>();
-        
+
         Assert.Equal(HttpStatusCode.OK, banResponse.StatusCode);
         Assert.True(banResponseContent?.IsBanned);
-        
-        var unbanResponse = await client.PutAsync($"{_baseUrl}/admin/users/{_ourCityApi.StubUserId}/unban", null);
+
+        var unbanResponse = await client.PutAsync(
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId}/unban",
+            null
+        );
         var unbanResponseContent = await unbanResponse.Content.ReadFromJsonAsync<UserResponseDto>();
-        
+
         Assert.Equal(HttpStatusCode.OK, unbanResponse.StatusCode);
         Assert.False(unbanResponseContent?.IsBanned);
     }
-    
+
     [Fact]
     public async Task GetBannedUsersEmptyWithNoBannedUsers()
     {
@@ -446,8 +470,10 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
 
         var response = await client.GetAsync($"{_baseUrl}/admin/users/banned");
-        var responseContent = await response.Content.ReadFromJsonAsync<PaginatedResponseDto<UserResponseDto>>();
-        
+        var responseContent = await response.Content.ReadFromJsonAsync<
+            PaginatedResponseDto<UserResponseDto>
+        >();
+
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Empty(responseContent?.Items ?? []);
     }
@@ -466,14 +492,16 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
 
         await client.PutAsync($"{_baseUrl}/admin/users/{_ourCityApi.StubUserId}/ban", null);
-        
+
         var response = await client.GetAsync($"{_baseUrl}/admin/users/banned");
-        var responseContent = await response.Content.ReadFromJsonAsync<PaginatedResponseDto<UserResponseDto>>();
-        
+        var responseContent = await response.Content.ReadFromJsonAsync<
+            PaginatedResponseDto<UserResponseDto>
+        >();
+
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal(1, responseContent?.Items.Count());
     }
-    
+
     [Fact]
     public async Task GetHighlyReportedUsersReturnsHighlyReportedUser()
     {
@@ -488,7 +516,9 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
 
         var response = await client.GetAsync($"{_baseUrl}/admin/users/reported");
-        var responseContent = await response.Content.ReadFromJsonAsync<PaginatedResponseDto<UserResponseDto>>();
+        var responseContent = await response.Content.ReadFromJsonAsync<
+            PaginatedResponseDto<UserResponseDto>
+        >();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal(1, responseContent?.Items.Count());

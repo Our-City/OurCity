@@ -114,22 +114,63 @@ public class OurCityWebApplicationFactory : WebApplicationFactory<Program>
 
             newUser = new User { Id = StubUserId2, UserName = StubUsername2 };
             userManager.CreateAsync(newUser, StubPassword2).Wait();
-            
-            newUser = new User { Id = AdminUserId, UserName = AdminUsername, SecurityStamp = Guid.NewGuid().ToString() };
+
+            newUser = new User
+            {
+                Id = AdminUserId,
+                UserName = AdminUsername,
+                SecurityStamp = Guid.NewGuid().ToString(),
+            };
             roleManager.CreateAsync(new UserRole(UserRoles.Admin)).Wait();
             userManager.CreateAsync(newUser, AdminPassword).Wait();
             userManager.AddToRoleAsync(newUser, UserRoles.Admin).Wait();
 
-            newUser = new User
-            {
-                Id = HighlyReportedUserId, 
-                UserName = HighlyReportedUsername
-            };
-            db.UserReports.Add(new UserReport { Id = Guid.NewGuid(), Reason = "Because I can", TargetUserId = HighlyReportedUserId, ReporterId = StubUserId });
-            db.UserReports.Add(new UserReport { Id = Guid.NewGuid(), Reason = "Because I can", TargetUserId = HighlyReportedUserId, ReporterId = StubUserId });
-            db.UserReports.Add(new UserReport { Id = Guid.NewGuid(), Reason = "Because I can", TargetUserId = HighlyReportedUserId, ReporterId = StubUserId });
-            db.UserReports.Add(new UserReport { Id = Guid.NewGuid(), Reason = "Because I can", TargetUserId = HighlyReportedUserId, ReporterId = StubUserId });
-            db.UserReports.Add(new UserReport { Id = Guid.NewGuid(), Reason = "Because I can", TargetUserId = HighlyReportedUserId, ReporterId = StubUserId });
+            newUser = new User { Id = HighlyReportedUserId, UserName = HighlyReportedUsername };
+            db.UserReports.Add(
+                new UserReport
+                {
+                    Id = Guid.NewGuid(),
+                    Reason = "Because I can",
+                    TargetUserId = HighlyReportedUserId,
+                    ReporterId = StubUserId,
+                }
+            );
+            db.UserReports.Add(
+                new UserReport
+                {
+                    Id = Guid.NewGuid(),
+                    Reason = "Because I can",
+                    TargetUserId = HighlyReportedUserId,
+                    ReporterId = StubUserId,
+                }
+            );
+            db.UserReports.Add(
+                new UserReport
+                {
+                    Id = Guid.NewGuid(),
+                    Reason = "Because I can",
+                    TargetUserId = HighlyReportedUserId,
+                    ReporterId = StubUserId,
+                }
+            );
+            db.UserReports.Add(
+                new UserReport
+                {
+                    Id = Guid.NewGuid(),
+                    Reason = "Because I can",
+                    TargetUserId = HighlyReportedUserId,
+                    ReporterId = StubUserId,
+                }
+            );
+            db.UserReports.Add(
+                new UserReport
+                {
+                    Id = Guid.NewGuid(),
+                    Reason = "Because I can",
+                    TargetUserId = HighlyReportedUserId,
+                    ReporterId = StubUserId,
+                }
+            );
             userManager.CreateAsync(newUser, HighlyReportedPassword).Wait();
 
             //stub post
