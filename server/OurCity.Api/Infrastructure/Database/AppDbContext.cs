@@ -136,13 +136,13 @@ public class AppDbContext : IdentityDbContext<User, UserRole, Guid>
                 .HasOne(r => r.Reporter)
                 .WithMany(u => u.SubmittedReports)
                 .HasForeignKey(r => r.ReporterId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             entity
                 .HasOne(r => r.TargetUser)
                 .WithMany(u => u.ReceivedReports)
                 .HasForeignKey(r => r.TargetUserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

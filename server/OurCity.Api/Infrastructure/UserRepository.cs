@@ -11,6 +11,7 @@ public interface IUserRepository
     Task<IEnumerable<User>> GetUsers(UserFilter? userFilter);
     Task<User> BanUser(User user);
     Task<User> UnbanUser(User user);
+    Task<User> DeleteUser(User user);
 }
 
 public class UserRepository : IUserRepository
@@ -72,6 +73,16 @@ public class UserRepository : IUserRepository
     public async Task<User> UnbanUser(User user)
     {
         user.IsBanned = false;
+
+        _appDbContext.Users.Update(user);
+        await _appDbContext.SaveChangesAsync();
+
+        return user;
+    }
+    
+    public async Task<User> DeleteUser(User user)
+    {
+        user.IsDeleted = true;
 
         _appDbContext.Users.Update(user);
         await _appDbContext.SaveChangesAsync();

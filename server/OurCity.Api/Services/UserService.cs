@@ -94,7 +94,7 @@ public class UserService : IUserService
             .Include(u => u.Comments)
             .FirstOrDefaultAsync(u => u.Id == id);
 
-        if (user is null)
+        if (user is null || user.IsDeleted)
             return Result<UserResponseDto>.Failure(ErrorMessages.UserNotFound);
 
         return Result<UserResponseDto>.Success(user.ToDto());
@@ -126,7 +126,7 @@ public class UserService : IUserService
     {
         var user = await _userManager.FindByIdAsync(id.ToString());
 
-        if (user == null)
+        if (user == null || user.IsDeleted)
             return Result<UserResponseDto>.Failure(ErrorMessages.UserNotFound);
 
         var updateResult = await _userManager.SetUserNameAsync(user, userUpdateRequestDto.Username);
@@ -153,7 +153,7 @@ public class UserService : IUserService
 
         var user = await _userManager.FindByIdAsync(id.ToString());
 
-        if (user == null)
+        if (user == null || user.IsDeleted)
             return Result<bool>.Failure(ErrorMessages.UserNotFound);
 
         var existingReport = await _userReportRepository.GetReportByReporterAndTargetUserId(
@@ -196,7 +196,7 @@ public class UserService : IUserService
         var user = await _userManager.FindByIdAsync(id.ToString());
 
         //Check if user even exists
-        if (user is null)
+        if (user is null || user.IsDeleted)
             return Result<UserResponseDto>.Failure(ErrorMessages.UserNotFound);
 
         //Check if user already banned
@@ -221,7 +221,7 @@ public class UserService : IUserService
         var user = await _userManager.FindByIdAsync(id.ToString());
 
         //Check if user does not exist
-        if (user is null)
+        if (user is null || user.IsDeleted)
             return Result<UserResponseDto>.Failure(ErrorMessages.UserNotFound);
 
         //Check if user already is not banned
@@ -237,16 +237,11 @@ public class UserService : IUserService
     {
         var user = await _userManager.FindByIdAsync(id.ToString());
 
-        if (user == null)
+        if (user == null || user.IsDeleted)
             return Result<UserResponseDto>.Failure(ErrorMessages.UserNotFound);
 
-        var deleteResult = await _userManager.DeleteAsync(user);
+        var userAfterDelete = await _userRepository.DeleteUser(user);
 
-        if (!deleteResult.Succeeded)
-            return Result<UserResponseDto>.Failure(
-                string.Join(",", deleteResult.Errors.Select(e => e.Description))
-            );
-
-        return Result<UserResponseDto>.Success(user.ToDto());
+        return Result<UserResponseDto>.Success(userAfterDelete.ToDto());
     }
 }
