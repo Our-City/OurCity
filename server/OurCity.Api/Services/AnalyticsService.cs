@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos.Analytics;
+using OurCity.Api.Common.Dtos.Post;
 using OurCity.Api.Common.Enum;
 using OurCity.Api.Infrastructure;
 using OurCity.Api.Infrastructure.Database;
@@ -56,7 +57,7 @@ public class AnalyticsService : IAnalyticsService
         };
 
         var allPosts = await _postRepository.GetAllPosts(
-            new Common.Dtos.Post.PostGetAllRequestDto
+            new PostGetAllRequestDto
             {
                 Limit = int.MaxValue,
                 SortBy = "date",
