@@ -52,22 +52,25 @@ async function loadPostData() {
     isLoading.value = true;
 
     post.value = await getPostById(postId);
-    
+
     // Check if post is deleted
     if (post.value.isDeleted) {
       errorMessage.value = "Post not found";
       isLoading.value = false;
       return;
     }
-    
+
     images.value = await getMediaByPostId(postId);
     const { items } = await getCommentsByPostId(postId);
     comments.value = items;
   } catch (err) {
     console.error("Failed to load post details:", err);
-    
+
     // handle 404 specifically
-    if (err instanceof Error && (err.message?.includes("not found") || err.message?.includes("404"))) {
+    if (
+      err instanceof Error &&
+      (err.message?.includes("not found") || err.message?.includes("404"))
+    ) {
       errorMessage.value = "Post not found";
     } else {
       errorMessage.value = "Failed to load post details.";
