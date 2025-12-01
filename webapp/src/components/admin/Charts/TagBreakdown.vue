@@ -63,7 +63,7 @@ const chartOptions = ref({
   },
 });
 
-const isLoading = ref(false);
+const isLoading = ref(true);
 const error = ref<string | null>(null);
 
 // Load tags and generate mock post counts
