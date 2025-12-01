@@ -12,7 +12,11 @@ public class AnalyticsController : ControllerBase
 {
     private readonly ILogger<AnalyticsController> _logger;
     private readonly IAnalyticsService _analyticsService;
-    public AnalyticsController(IAnalyticsService analyticsService, ILogger<AnalyticsController> logger)
+
+    public AnalyticsController(
+        IAnalyticsService analyticsService,
+        ILogger<AnalyticsController> logger
+    )
     {
         _analyticsService = analyticsService;
         _logger = logger;
@@ -23,7 +27,9 @@ public class AnalyticsController : ControllerBase
     [EndpointSummary("Get activity metrics summary")]
     [EndpointDescription("Gets a summary of activity metrics for analytics purposes")]
     [ProducesResponseType(typeof(AnalyticsSummaryResponseDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetActivityMetricsSummary([FromQuery] AnalyticsRequestDto analyticsRequestDto)
+    public async Task<IActionResult> GetActivityMetricsSummary(
+        [FromQuery] AnalyticsRequestDto analyticsRequestDto
+    )
     {
         var res = await _analyticsService.GetActivityMetricsSummary(analyticsRequestDto);
 
@@ -35,7 +41,9 @@ public class AnalyticsController : ControllerBase
     [EndpointSummary("Get time series of posts created")]
     [EndpointDescription("Gets a set of time series buckets for posts created over time")]
     [ProducesResponseType(typeof(AnalyticsTimeSeriesResponseDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetActivityMetricsTimeSeries([FromQuery] AnalyticsRequestDto analyticsRequestDto)
+    public async Task<IActionResult> GetActivityMetricsTimeSeries(
+        [FromQuery] AnalyticsRequestDto analyticsRequestDto
+    )
     {
         var res = await _analyticsService.GetActivityMetricsTimeSeries(analyticsRequestDto);
 
@@ -47,7 +55,9 @@ public class AnalyticsController : ControllerBase
     [EndpointSummary("Get tag breakdown of posts")]
     [EndpointDescription("Gets a set of post counts broken down by tag")]
     [ProducesResponseType(typeof(AnalyticsTagsResponseDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetActivityMetricsTagBreakdown([FromQuery] AnalyticsRequestDto analyticsRequestDto)
+    public async Task<IActionResult> GetActivityMetricsTagBreakdown(
+        [FromQuery] AnalyticsRequestDto analyticsRequestDto
+    )
     {
         var res = await _analyticsService.GetActivityMetricsTagBreakdown(analyticsRequestDto);
 
