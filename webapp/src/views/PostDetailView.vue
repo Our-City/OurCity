@@ -63,11 +63,11 @@ async function loadPostData() {
     images.value = await getMediaByPostId(postId);
     const { items } = await getCommentsByPostId(postId);
     comments.value = items;
-  } catch (err: any) {
+  } catch (err) {
     console.error("Failed to load post details:", err);
     
-    // Handle 404 specifically
-    if (err.message?.includes("not found") || err.message?.includes("404")) {
+    // handle 404 specifically
+    if (err instanceof Error && (err.message?.includes("not found") || err.message?.includes("404"))) {
       errorMessage.value = "Post not found";
     } else {
       errorMessage.value = "Failed to load post details.";
