@@ -5,7 +5,7 @@ namespace OurCity.Api.Infrastructure;
 
 public interface IReportRepository
 {
-    Task<Report?> GetReportById(Guid id);
+    Task<Report?> GetReportByReporterAndTargetId(Guid reporterId, Guid targetId);
     Task<IEnumerable<Report>> GetReportsByTargetUser(Guid targetId);
     Task<int> GetReportsCountByTargetUser(Guid targetId);
     Task Add(Report report);
@@ -22,9 +22,10 @@ public class ReportRepository : IReportRepository
         _appDbContext = appDbContext;
     }
 
-    public async Task<Report?> GetReportById(Guid id)
+    public async Task<Report?> GetReportByReporterAndTargetId(Guid reporterId, Guid targetId)
     {
-        return await _appDbContext.Reports.FirstOrDefaultAsync(r => r.Id == id);
+        return await _appDbContext.Reports
+        .FirstOrDefaultAsync(r => r.ReporterId == reporterId && r.TargetId == targetId);
     }
 
     public async Task<IEnumerable<Report>> GetReportsByTargetUser(Guid targetId)
