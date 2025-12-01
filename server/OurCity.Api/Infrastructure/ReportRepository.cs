@@ -6,8 +6,8 @@ namespace OurCity.Api.Infrastructure;
 public interface IReportRepository
 {
     Task<Report?> GetReportById(Guid id);
-    Task<IEnumerable<Report>> GetReportsByTargerUser(Guid targetId);
-    Task<int> GetReportsCountByTargerUser(Guid targetId);
+    Task<IEnumerable<Report>> GetReportsByTargetUser(Guid targetId);
+    Task<int> GetReportsCountByTargetUser(Guid targetId);
     Task Add(Report report);
     Task Remove(Report report);
     Task SaveChangesAsync();
@@ -27,7 +27,7 @@ public class ReportRepository : IReportRepository
         return await _appDbContext.Reports.FirstOrDefaultAsync(r => r.Id == id);
     }
 
-    public async Task<IEnumerable<Report>> GetReportsByTargerUser(Guid targetId)
+    public async Task<IEnumerable<Report>> GetReportsByTargetUser(Guid targetId)
     {
         return await _appDbContext
             .Reports.Where(r => r.TargetId == targetId)
@@ -35,7 +35,7 @@ public class ReportRepository : IReportRepository
             .ToListAsync();
     }
 
-    public async Task<int> GetReportsCountByTargerUser(Guid targetId)
+    public async Task<int> GetReportsCountByTargetUser(Guid targetId)
     {
         return await _appDbContext.Reports.CountAsync(r => r.TargetId == targetId);
     }
