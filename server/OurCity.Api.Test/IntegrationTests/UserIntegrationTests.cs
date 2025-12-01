@@ -186,4 +186,69 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
+
+    [Fact]
+    public async Task ReportingExistentUserSucceeds()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        var loginRequest = new UserCreateRequestDto
+        {
+            Username = _ourCityApi.StubUsername,
+            Password = _ourCityApi.StubPassword,
+        };
+
+        var reportRequest = new UserReportRequestDto { Reason = "Test Reporting Reason" };
+
+        // log in as the stubbed user and create a new user to report
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
+
+        var response = await client.PutAsJsonAsync(
+            $"{_baseUrl}/users/{_ourCityApi.StubUserId2}/reports",
+            reportRequest
+        );
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task ReportingNonExistentUserFails()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        var loginRequest = new UserCreateRequestDto
+        {
+            Username = _ourCityApi.StubUsername,
+            Password = _ourCityApi.StubPassword,
+        };
+
+        var reportRequest = new UserReportRequestDto { Reason = "Test Reporting Reason" };
+
+        var nonExistentId = Guid.NewGuid();
+
+        // log in as the stubbed user and create a new user to report
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
+
+        var response = await client.PutAsJsonAsync(
+            $"{_baseUrl}/users/{nonExistentId}/reports",
+            reportRequest
+        );
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task ReportingWithoutAuthenticationFails()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        var reportRequest = new UserReportRequestDto { Reason = "Test Reporting Reason" };
+
+        var response = await client.PutAsJsonAsync(
+            $"{_baseUrl}/users/{_ourCityApi.StubUserId2}/reports",
+            reportRequest
+        );
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
 }
