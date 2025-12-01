@@ -25,6 +25,10 @@ public class OurCityWebApplicationFactory : WebApplicationFactory<Program>
     public readonly string StubUsername = "StubUser";
     public readonly string StubPassword = "TestPassword1!";
 
+    public readonly Guid StubUserId2 = Guid.NewGuid();
+    public readonly string StubUsername2 = "StubUser2";
+    public readonly string StubPassword2 = "TestPassword2!";
+
     public readonly Guid StubPostId = Guid.NewGuid();
     public readonly string StubPostTitle = "Test Title";
     public readonly string StubPostDescription = "Test Description";
@@ -67,7 +71,7 @@ public class OurCityWebApplicationFactory : WebApplicationFactory<Program>
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         await db.Database.ExecuteSqlRawAsync(
-            "TRUNCATE TABLE \"PostVotes\", \"CommentVotes\", \"Comments\", \"Posts\", \"Tags\", \"Media\" RESTART IDENTITY CASCADE;"
+            "TRUNCATE TABLE \"PostVotes\", \"CommentVotes\", \"Comments\", \"Posts\", \"Tags\", \"Media\", \"Reports\" RESTART IDENTITY CASCADE;"
         );
     }
 
@@ -92,10 +96,14 @@ public class OurCityWebApplicationFactory : WebApplicationFactory<Program>
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             db.Database.Migrate();
 
-            //stub user
+            //stub 2 users
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
             var newUser = new User { Id = StubUserId, UserName = StubUsername };
             userManager.CreateAsync(newUser, StubPassword).Wait();
+
+            userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+            newUser = new User { Id = StubUserId2, UserName = StubUsername2 };
+            userManager.CreateAsync(newUser, StubPassword2).Wait();
 
             //stub post
             var stubPost = new Post
