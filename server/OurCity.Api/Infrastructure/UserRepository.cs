@@ -79,7 +79,7 @@ public class UserRepository : IUserRepository
 
         return user;
     }
-    
+
     public async Task<User> DeleteUser(User user)
     {
         user.IsDeleted = true;
