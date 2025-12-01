@@ -132,12 +132,14 @@ public class AppDbContext : IdentityDbContext<User, UserRole, Guid>
 
         modelBuilder.Entity<Report>(entity =>
         {
-            entity.HasOne(r => r.Reporter)
+            entity
+                .HasOne(r => r.Reporter)
                 .WithMany(u => u.SubmittedReports)
                 .HasForeignKey(r => r.ReporterId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasOne(r => r.TargetUser)
+            entity
+                .HasOne(r => r.TargetUser)
                 .WithMany(u => u.ReceivedReports)
                 .HasForeignKey(r => r.TargetId)
                 .OnDelete(DeleteBehavior.Restrict);

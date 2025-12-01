@@ -24,7 +24,7 @@ public class UserService : IUserService
     private readonly IPolicyService _policyService;
     private readonly UserManager<User> _userManager;
     private readonly IReportRepository _reportRepository;
-    
+
     public UserService(
         ICurrentUser requestingUser,
         IPolicyService policyService,
@@ -94,16 +94,12 @@ public class UserService : IUserService
     {
         if (!_requestingUser.UserId.HasValue || !await _policyService.CanParticipateInForum())
         {
-            return Result<bool>.Failure(
-                ErrorMessages.Unauthorized
-            );
+            return Result<bool>.Failure(ErrorMessages.Unauthorized);
         }
 
         if (_requestingUser.UserId.Value == id)
         {
-            return Result<bool>.Failure(
-                ErrorMessages.CantReportSelf
-            );
+            return Result<bool>.Failure(ErrorMessages.CantReportSelf);
         }
 
         var user = await _userManager.FindByIdAsync(id.ToString());
@@ -129,10 +125,10 @@ public class UserService : IUserService
                 }
             );
         }
-        
+
         await _reportRepository.SaveChangesAsync();
 
-        return Result<bool>.Success(true);   
+        return Result<bool>.Success(true);
     }
 
     public async Task<Result<UserResponseDto>> DeleteUser(Guid id)

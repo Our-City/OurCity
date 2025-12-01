@@ -15,5 +15,4 @@ public class Report
     // Navigation Properties
     public User? TargetUser { get; set; }
     public User? Reporter { get; set; }
-
 }

@@ -24,9 +24,7 @@ public class ReportRepository : IReportRepository
 
     public async Task<Report?> GetReportById(Guid id)
     {
-        return await _appDbContext
-            .Reports
-            .FirstOrDefaultAsync(r => r.Id == id);
+        return await _appDbContext.Reports.FirstOrDefaultAsync(r => r.Id == id);
     }
 
     public async Task<IEnumerable<Report>> GetReportsByTargerUser(Guid targetId)
@@ -39,9 +37,7 @@ public class ReportRepository : IReportRepository
 
     public async Task<int> GetReportsCountByTargerUser(Guid targetId)
     {
-        return await _appDbContext
-            .Reports
-            .CountAsync(r => r.TargetId == targetId);
+        return await _appDbContext.Reports.CountAsync(r => r.TargetId == targetId);
     }
 
     public async Task Add(Report report)
