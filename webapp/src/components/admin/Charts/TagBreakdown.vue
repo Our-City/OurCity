@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, watch, onMounted } from "vue";
 import { CChart } from "@coreui/vue-chartjs";
 import { getAnalyticsTags } from "@/api/analyticsService";
 import { Period } from "@/types/enums";
@@ -119,8 +119,13 @@ const loadTagData = async () => {
   }
 };
 
+// Watch for period changes
+watch(() => props.period, () => {
+  loadTagData();
+});
+
 onMounted(() => {
-  loadTagData(props.period);
+  loadTagData();
 });
 </script>
 
