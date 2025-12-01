@@ -24,8 +24,9 @@ public class ReportRepository : IReportRepository
 
     public async Task<Report?> GetReportByReporterAndTargetId(Guid reporterId, Guid targetId)
     {
-        return await _appDbContext.Reports
-        .FirstOrDefaultAsync(r => r.ReporterId == reporterId && r.TargetId == targetId);
+        return await _appDbContext.Reports.FirstOrDefaultAsync(r =>
+            r.ReporterId == reporterId && r.TargetId == targetId
+        );
     }
 
     public async Task<IEnumerable<Report>> GetReportsByTargetUser(Guid targetId)

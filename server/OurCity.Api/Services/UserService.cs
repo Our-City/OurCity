@@ -107,7 +107,10 @@ public class UserService : IUserService
         if (user == null)
             return Result<bool>.Failure(ErrorMessages.UserNotFound);
 
-        var existingReport = await _reportRepository.GetReportByReporterAndTargetId(_requestingUser.UserId.Value, id);
+        var existingReport = await _reportRepository.GetReportByReporterAndTargetId(
+            _requestingUser.UserId.Value,
+            id
+        );
         if (existingReport != null)
         {
             await _reportRepository.Remove(existingReport);
