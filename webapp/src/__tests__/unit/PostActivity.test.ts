@@ -54,7 +54,7 @@ describe("PostActivity", () => {
 
   it("renders the component with title", () => {
     getAnalyticsSummary.mockResolvedValue(mockSummaryData);
-    
+
     const wrapper = mount(PostActivity);
 
     expect(wrapper.find("h3").text()).toBe("Activity");
@@ -62,13 +62,13 @@ describe("PostActivity", () => {
 
   it("renders all three period buttons", () => {
     getAnalyticsSummary.mockResolvedValue(mockSummaryData);
-    
+
     const wrapper = mount(PostActivity);
 
     const buttons = wrapper.findAll("button");
     expect(buttons.length).toBeGreaterThanOrEqual(3);
-    
-    const buttonTexts = buttons.map(btn => btn.text());
+
+    const buttonTexts = buttons.map((btn) => btn.text());
     expect(buttonTexts).toContain("Day");
     expect(buttonTexts).toContain("Month");
     expect(buttonTexts).toContain("Year");
@@ -76,7 +76,7 @@ describe("PostActivity", () => {
 
   it("has Day period selected by default", () => {
     getAnalyticsSummary.mockResolvedValue(mockSummaryData);
-    
+
     const wrapper = mount(PostActivity);
 
     expect(wrapper.vm.selectedPeriod).toBe(Period.Day);
@@ -84,7 +84,7 @@ describe("PostActivity", () => {
 
   it("renders all four stat cards", () => {
     getAnalyticsSummary.mockResolvedValue(mockSummaryData);
-    
+
     const wrapper = mount(PostActivity);
 
     expect(wrapper.find(".stat-card.new-posts").exists()).toBe(true);
@@ -95,7 +95,7 @@ describe("PostActivity", () => {
 
   it("fetches analytics summary on mount", async () => {
     getAnalyticsSummary.mockResolvedValue(mockSummaryData);
-    
+
     mount(PostActivity);
 
     await flushPromises();
@@ -106,7 +106,7 @@ describe("PostActivity", () => {
 
   it("displays correct stat values", async () => {
     getAnalyticsSummary.mockResolvedValue(mockSummaryData);
-    
+
     const wrapper = mount(PostActivity);
 
     await flushPromises();
@@ -120,7 +120,7 @@ describe("PostActivity", () => {
 
   it("displays correct stat labels", async () => {
     getAnalyticsSummary.mockResolvedValue(mockSummaryData);
-    
+
     const wrapper = mount(PostActivity);
 
     await flushPromises();
@@ -134,7 +134,7 @@ describe("PostActivity", () => {
 
   it("changes period when Day button is clicked", async () => {
     getAnalyticsSummary.mockResolvedValue(mockSummaryData);
-    
+
     const wrapper = mount(PostActivity);
     await flushPromises();
 
@@ -143,7 +143,7 @@ describe("PostActivity", () => {
     await wrapper.vm.$nextTick();
 
     const buttons = wrapper.findAll("button");
-    const dayButton = buttons.find(btn => btn.text() === "Day");
+    const dayButton = buttons.find((btn) => btn.text() === "Day");
     await dayButton!.trigger("click");
 
     expect(wrapper.vm.selectedPeriod).toBe(Period.Day);
@@ -151,12 +151,12 @@ describe("PostActivity", () => {
 
   it("changes period when Month button is clicked", async () => {
     getAnalyticsSummary.mockResolvedValue(mockSummaryData);
-    
+
     const wrapper = mount(PostActivity);
     await flushPromises();
 
     const buttons = wrapper.findAll("button");
-    const monthButton = buttons.find(btn => btn.text() === "Month");
+    const monthButton = buttons.find((btn) => btn.text() === "Month");
     await monthButton!.trigger("click");
 
     expect(wrapper.vm.selectedPeriod).toBe(Period.Month);
@@ -164,12 +164,12 @@ describe("PostActivity", () => {
 
   it("changes period when Year button is clicked", async () => {
     getAnalyticsSummary.mockResolvedValue(mockSummaryData);
-    
+
     const wrapper = mount(PostActivity);
     await flushPromises();
 
     const buttons = wrapper.findAll("button");
-    const yearButton = buttons.find(btn => btn.text() === "Year");
+    const yearButton = buttons.find((btn) => btn.text() === "Year");
     await yearButton!.trigger("click");
 
     expect(wrapper.vm.selectedPeriod).toBe(Period.Year);
@@ -177,7 +177,7 @@ describe("PostActivity", () => {
 
   it("refetches stats when period changes", async () => {
     getAnalyticsSummary.mockResolvedValue(mockSummaryData);
-    
+
     const wrapper = mount(PostActivity);
     await flushPromises();
 
@@ -195,7 +195,7 @@ describe("PostActivity", () => {
     getAnalyticsSummary.mockResolvedValue(monthData);
 
     const buttons = wrapper.findAll("button");
-    const monthButton = buttons.find(btn => btn.text() === "Month");
+    const monthButton = buttons.find((btn) => btn.text() === "Month");
     await monthButton!.trigger("click");
     await flushPromises();
 
@@ -205,7 +205,7 @@ describe("PostActivity", () => {
 
   it("updates stat values when period changes", async () => {
     getAnalyticsSummary.mockResolvedValue(mockSummaryData);
-    
+
     const wrapper = mount(PostActivity);
     await flushPromises();
 
@@ -224,7 +224,7 @@ describe("PostActivity", () => {
     getAnalyticsSummary.mockResolvedValue(monthData);
 
     const buttons = wrapper.findAll("button");
-    const monthButton = buttons.find(btn => btn.text() === "Month");
+    const monthButton = buttons.find((btn) => btn.text() === "Month");
     await monthButton!.trigger("click");
     await flushPromises();
 
@@ -237,7 +237,7 @@ describe("PostActivity", () => {
 
   it("renders PostsOverTime component", () => {
     getAnalyticsSummary.mockResolvedValue(mockSummaryData);
-    
+
     const wrapper = mount(PostActivity);
 
     expect(wrapper.findComponent({ name: "PostsOverTime" }).exists()).toBe(true);
@@ -245,7 +245,7 @@ describe("PostActivity", () => {
 
   it("renders TagBreakdown component", () => {
     getAnalyticsSummary.mockResolvedValue(mockSummaryData);
-    
+
     const wrapper = mount(PostActivity);
 
     expect(wrapper.findComponent({ name: "TagBreakdown" }).exists()).toBe(true);
@@ -253,7 +253,7 @@ describe("PostActivity", () => {
 
   it("passes selected period to PostsOverTime component", async () => {
     getAnalyticsSummary.mockResolvedValue(mockSummaryData);
-    
+
     const wrapper = mount(PostActivity);
     await flushPromises();
 
@@ -261,7 +261,7 @@ describe("PostActivity", () => {
     expect(postsOverTime.props("period")).toBe(Period.Day);
 
     const buttons = wrapper.findAll("button");
-    const monthButton = buttons.find(btn => btn.text() === "Month");
+    const monthButton = buttons.find((btn) => btn.text() === "Month");
     await monthButton!.trigger("click");
     await wrapper.vm.$nextTick();
 
@@ -271,7 +271,7 @@ describe("PostActivity", () => {
 
   it("passes selected period to TagBreakdown component", async () => {
     getAnalyticsSummary.mockResolvedValue(mockSummaryData);
-    
+
     const wrapper = mount(PostActivity);
     await flushPromises();
 
@@ -279,7 +279,7 @@ describe("PostActivity", () => {
     expect(tagBreakdown.props("period")).toBe(Period.Day);
 
     const buttons = wrapper.findAll("button");
-    const yearButton = buttons.find(btn => btn.text() === "Year");
+    const yearButton = buttons.find((btn) => btn.text() === "Year");
     await yearButton!.trigger("click");
     await wrapper.vm.$nextTick();
 
@@ -290,7 +290,7 @@ describe("PostActivity", () => {
   it("handles API errors gracefully", async () => {
     const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     getAnalyticsSummary.mockRejectedValue(new Error("API Error"));
-    
+
     const wrapper = mount(PostActivity);
 
     await flushPromises();
@@ -308,7 +308,7 @@ describe("PostActivity", () => {
       resolvePromise = resolve;
     });
     getAnalyticsSummary.mockReturnValue(promise);
-    
+
     const wrapper = mount(PostActivity);
 
     // Should be loading initially
@@ -324,7 +324,7 @@ describe("PostActivity", () => {
 
   it("initializes stats with zero values", () => {
     getAnalyticsSummary.mockResolvedValue(mockSummaryData);
-    
+
     const wrapper = mount(PostActivity);
 
     // Before data loads, stats should be 0
@@ -336,24 +336,24 @@ describe("PostActivity", () => {
 
   it("applies active class to selected period button", async () => {
     getAnalyticsSummary.mockResolvedValue(mockSummaryData);
-    
+
     const wrapper = mount(PostActivity);
     await flushPromises();
 
     const buttons = wrapper.findAll("button");
-    const dayButton = buttons.find(btn => btn.text() === "Day");
-    
+    const dayButton = buttons.find((btn) => btn.text() === "Day");
+
     expect(dayButton!.classes()).toContain("active");
   });
 
   it("updates active class when period changes", async () => {
     getAnalyticsSummary.mockResolvedValue(mockSummaryData);
-    
+
     const wrapper = mount(PostActivity);
     await flushPromises();
 
     const buttons = wrapper.findAll("button");
-    const monthButton = buttons.find(btn => btn.text() === "Month");
+    const monthButton = buttons.find((btn) => btn.text() === "Month");
     await monthButton!.trigger("click");
     await wrapper.vm.$nextTick();
 

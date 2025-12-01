@@ -57,7 +57,7 @@ describe("PostsOverTime", () => {
 
   it("renders the component with title", () => {
     getAnalyticsTimeSeries.mockResolvedValue(mockTimeSeriesData);
-    
+
     const wrapper = mount(PostsOverTime, {
       props: {
         period: Period.Day,
@@ -69,7 +69,7 @@ describe("PostsOverTime", () => {
 
   it("renders the chart wrapper", () => {
     getAnalyticsTimeSeries.mockResolvedValue(mockTimeSeriesData);
-    
+
     const wrapper = mount(PostsOverTime, {
       props: {
         period: Period.Day,
@@ -81,7 +81,7 @@ describe("PostsOverTime", () => {
 
   it("fetches analytics data on mount", async () => {
     getAnalyticsTimeSeries.mockResolvedValue(mockTimeSeriesData);
-    
+
     mount(PostsOverTime, {
       props: {
         period: Period.Day,
@@ -96,7 +96,7 @@ describe("PostsOverTime", () => {
 
   it("formats labels correctly for Day period (HH:MM format)", async () => {
     getAnalyticsTimeSeries.mockResolvedValue(mockTimeSeriesData);
-    
+
     const wrapper = mount(PostsOverTime, {
       props: {
         period: Period.Day,
@@ -128,9 +128,9 @@ describe("PostsOverTime", () => {
         },
       ],
     };
-    
+
     getAnalyticsTimeSeries.mockResolvedValue(monthData);
-    
+
     const wrapper = mount(PostsOverTime, {
       props: {
         period: Period.Month,
@@ -161,9 +161,9 @@ describe("PostsOverTime", () => {
         },
       ],
     };
-    
+
     getAnalyticsTimeSeries.mockResolvedValue(yearData);
-    
+
     const wrapper = mount(PostsOverTime, {
       props: {
         period: Period.Year,
@@ -180,7 +180,7 @@ describe("PostsOverTime", () => {
 
   it("populates chart data with post counts", async () => {
     getAnalyticsTimeSeries.mockResolvedValue(mockTimeSeriesData);
-    
+
     const wrapper = mount(PostsOverTime, {
       props: {
         period: Period.Day,
@@ -197,7 +197,7 @@ describe("PostsOverTime", () => {
 
   it("refetches data when period prop changes", async () => {
     getAnalyticsTimeSeries.mockResolvedValue(mockTimeSeriesData);
-    
+
     const wrapper = mount(PostsOverTime, {
       props: {
         period: Period.Day,
@@ -230,7 +230,7 @@ describe("PostsOverTime", () => {
   it("handles API errors gracefully", async () => {
     const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     getAnalyticsTimeSeries.mockRejectedValue(new Error("API Error"));
-    
+
     const wrapper = mount(PostsOverTime, {
       props: {
         period: Period.Day,
@@ -252,7 +252,7 @@ describe("PostsOverTime", () => {
       resolvePromise = resolve;
     });
     getAnalyticsTimeSeries.mockReturnValue(promise);
-    
+
     const wrapper = mount(PostsOverTime, {
       props: {
         period: Period.Day,
@@ -272,7 +272,7 @@ describe("PostsOverTime", () => {
 
   it("applies correct chart styling and options", async () => {
     getAnalyticsTimeSeries.mockResolvedValue(mockTimeSeriesData);
-    
+
     const wrapper = mount(PostsOverTime, {
       props: {
         period: Period.Day,
@@ -290,7 +290,7 @@ describe("PostsOverTime", () => {
 
   it("configures chart options correctly", async () => {
     getAnalyticsTimeSeries.mockResolvedValue(mockTimeSeriesData);
-    
+
     const wrapper = mount(PostsOverTime, {
       props: {
         period: Period.Day,
@@ -312,9 +312,9 @@ describe("PostsOverTime", () => {
       period: Period.Day,
       series: [],
     };
-    
+
     getAnalyticsTimeSeries.mockResolvedValue(emptyData);
-    
+
     const wrapper = mount(PostsOverTime, {
       props: {
         period: Period.Day,

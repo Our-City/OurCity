@@ -1,20 +1,29 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { CContainer, CRow, CCol, CCard, CCardBody, CCardHeader, CButtonGroup, CButton } from "@coreui/vue";
+import {
+  CContainer,
+  CRow,
+  CCol,
+  CCard,
+  CCardBody,
+  CCardHeader,
+  CButtonGroup,
+  CButton,
+} from "@coreui/vue";
 import { getAnalyticsSummary } from "@/api/analyticsService";
 import PostsOverTime from "./Charts/PostsOverTime.vue";
 import TagBreakdown from "./Charts/TagBreakdown.vue";
 import { Period } from "@/types/enums";
 
 // Time period selection
-const selectedPeriod  = ref(Period.Day);
+const selectedPeriod = ref(Period.Day);
 
 // Stats data
 const stats = ref({
   newPosts: 0,
   upvotes: 0,
   downvotes: 0,
-  comments: 0
+  comments: 0,
 });
 
 // Handle period selection
@@ -62,19 +71,19 @@ onMounted(() => {
           </CCol>
           <CCol class="text-end">
             <CButtonGroup>
-              <CButton 
+              <CButton
                 :class="{ active: selectedPeriod === Period.Day }"
                 @click="selectPeriod(Period.Day)"
               >
                 Day
               </CButton>
-              <CButton 
+              <CButton
                 :class="{ active: selectedPeriod === Period.Month }"
                 @click="selectPeriod(Period.Month)"
               >
                 Month
               </CButton>
-              <CButton 
+              <CButton
                 :class="{ active: selectedPeriod === Period.Year }"
                 @click="selectPeriod(Period.Year)"
               >
@@ -88,7 +97,7 @@ onMounted(() => {
       <CCardBody>
         <CRow :xs="{ cols: 1, gutterY: 5 }">
           <CCol>
-            <CRow :s="{ cols: 1, gutterY: 5 }" :m="{ cols: 2}" :xl="{ cols: 4 }">
+            <CRow :s="{ cols: 1, gutterY: 5 }" :m="{ cols: 2 }" :xl="{ cols: 4 }">
               <CCol>
                 <CCard class="stat-card new-posts">
                   <CCardBody>
@@ -132,10 +141,10 @@ onMounted(() => {
             </CRow>
           </CCol>
           <CCol>
-            <PostsOverTime :period="selectedPeriod"/>
+            <PostsOverTime :period="selectedPeriod" />
           </CCol>
           <CCol>
-            <TagBreakdown :period="selectedPeriod"/>
+            <TagBreakdown :period="selectedPeriod" />
           </CCol>
         </CRow>
       </CCardBody>

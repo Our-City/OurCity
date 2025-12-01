@@ -194,7 +194,6 @@ test.describe("Admin Dashboard", () => {
       await page.waitForTimeout(1000);
 
       const newPostsValue = page.locator(".stat-card.new-posts .stat-value");
-      const dayValue = await newPostsValue.textContent();
 
       const monthButton = page.getByRole("button", { name: /^Month$/i });
       await monthButton.click();
@@ -290,8 +289,7 @@ test.describe("Admin Dashboard", () => {
   test.describe("Data Loading", () => {
     test("should load data on page mount", async ({ page }) => {
       const responsePromise = page.waitForResponse(
-        (response) =>
-          response.url().includes("/analytics/summary") && response.status() === 200,
+        (response) => response.url().includes("/analytics/summary") && response.status() === 200,
       );
 
       await page.goto("/admin");

@@ -62,7 +62,7 @@ describe("TagBreakdown", () => {
 
   it("renders the component with title", () => {
     getAnalyticsTags.mockResolvedValue(mockTagData);
-    
+
     const wrapper = mount(TagBreakdown, {
       props: {
         period: Period.Day,
@@ -74,7 +74,7 @@ describe("TagBreakdown", () => {
 
   it("renders the chart container", () => {
     getAnalyticsTags.mockResolvedValue(mockTagData);
-    
+
     const wrapper = mount(TagBreakdown, {
       props: {
         period: Period.Day,
@@ -86,7 +86,7 @@ describe("TagBreakdown", () => {
 
   it("fetches tag data on mount", async () => {
     getAnalyticsTags.mockResolvedValue(mockTagData);
-    
+
     mount(TagBreakdown, {
       props: {
         period: Period.Day,
@@ -101,7 +101,7 @@ describe("TagBreakdown", () => {
 
   it("populates chart with tag names as labels", async () => {
     getAnalyticsTags.mockResolvedValue(mockTagData);
-    
+
     const wrapper = mount(TagBreakdown, {
       props: {
         period: Period.Day,
@@ -121,7 +121,7 @@ describe("TagBreakdown", () => {
 
   it("populates chart with post counts as data", async () => {
     getAnalyticsTags.mockResolvedValue(mockTagData);
-    
+
     const wrapper = mount(TagBreakdown, {
       props: {
         period: Period.Day,
@@ -138,7 +138,7 @@ describe("TagBreakdown", () => {
 
   it("assigns colors to each tag", async () => {
     getAnalyticsTags.mockResolvedValue(mockTagData);
-    
+
     const wrapper = mount(TagBreakdown, {
       props: {
         period: Period.Day,
@@ -164,7 +164,7 @@ describe("TagBreakdown", () => {
     };
 
     getAnalyticsTags.mockResolvedValue(manyTagsData);
-    
+
     const wrapper = mount(TagBreakdown, {
       props: {
         period: Period.Day,
@@ -177,13 +177,13 @@ describe("TagBreakdown", () => {
     expect(chartData.datasets[0].backgroundColor).toHaveLength(12);
     // Colors should repeat (there are 8 predefined colors)
     expect(chartData.datasets[0].backgroundColor![0]).toBe(
-      chartData.datasets[0].backgroundColor![8]
+      chartData.datasets[0].backgroundColor![8],
     );
   });
 
   it("refetches data when period prop changes", async () => {
     getAnalyticsTags.mockResolvedValue(mockTagData);
-    
+
     const wrapper = mount(TagBreakdown, {
       props: {
         period: Period.Day,
@@ -216,7 +216,7 @@ describe("TagBreakdown", () => {
   it("handles API errors gracefully", async () => {
     const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     getAnalyticsTags.mockRejectedValue(new Error("API Error"));
-    
+
     const wrapper = mount(TagBreakdown, {
       props: {
         period: Period.Day,
@@ -235,7 +235,7 @@ describe("TagBreakdown", () => {
   it("displays error message when API fails", async () => {
     const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     getAnalyticsTags.mockRejectedValue(new Error("API Error"));
-    
+
     const wrapper = mount(TagBreakdown, {
       props: {
         period: Period.Day,
@@ -256,7 +256,7 @@ describe("TagBreakdown", () => {
       resolvePromise = resolve;
     });
     getAnalyticsTags.mockReturnValue(promise);
-    
+
     const wrapper = mount(TagBreakdown, {
       props: {
         period: Period.Day,
@@ -280,7 +280,7 @@ describe("TagBreakdown", () => {
 
   it("configures chart as doughnut type", async () => {
     getAnalyticsTags.mockResolvedValue(mockTagData);
-    
+
     const wrapper = mount(TagBreakdown, {
       props: {
         period: Period.Day,
@@ -296,7 +296,7 @@ describe("TagBreakdown", () => {
 
   it("configures chart options correctly", async () => {
     getAnalyticsTags.mockResolvedValue(mockTagData);
-    
+
     const wrapper = mount(TagBreakdown, {
       props: {
         period: Period.Day,
@@ -314,7 +314,7 @@ describe("TagBreakdown", () => {
 
   it("formats tooltip with percentage", async () => {
     getAnalyticsTags.mockResolvedValue(mockTagData);
-    
+
     const wrapper = mount(TagBreakdown, {
       props: {
         period: Period.Day,
@@ -325,7 +325,7 @@ describe("TagBreakdown", () => {
 
     const chartOptions = wrapper.vm.chartOptions;
     const tooltipCallback = chartOptions.plugins.tooltip.callbacks.label;
-    
+
     // Mock context for tooltip
     const mockContext = {
       label: "Construction",
@@ -344,9 +344,9 @@ describe("TagBreakdown", () => {
       period: Period.Day,
       tagBuckets: [],
     };
-    
+
     getAnalyticsTags.mockResolvedValue(emptyData);
-    
+
     const wrapper = mount(TagBreakdown, {
       props: {
         period: Period.Day,
@@ -371,9 +371,9 @@ describe("TagBreakdown", () => {
         },
       ],
     };
-    
+
     getAnalyticsTags.mockResolvedValue(singleTagData);
-    
+
     const wrapper = mount(TagBreakdown, {
       props: {
         period: Period.Day,

@@ -19,13 +19,15 @@ const chartData = ref<{
   }>;
 }>({
   labels: [],
-  datasets: [{
-    label: 'Posts by Tag',
-    data: [],
-    backgroundColor: [],
-    borderColor: [],
-    borderWidth: 2
-  }]
+  datasets: [
+    {
+      label: "Posts by Tag",
+      data: [],
+      backgroundColor: [],
+      borderColor: [],
+      borderWidth: 2,
+    },
+  ],
 });
 
 const chartOptions = ref({
@@ -33,31 +35,31 @@ const chartOptions = ref({
   maintainAspectRatio: false,
   plugins: {
     legend: {
-      position: 'right' as const,
+      position: "right" as const,
       labels: {
         padding: 15,
         font: {
-          size: 12
-        }
-      }
+          size: 12,
+        },
+      },
     },
     tooltip: {
       enabled: true,
       external: undefined,
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      backgroundColor: "rgba(0, 0, 0, 0.8)",
       padding: 12,
-      titleColor: '#fff',
-      bodyColor: '#fff',
+      titleColor: "#fff",
+      bodyColor: "#fff",
       callbacks: {
-        label: function(context: any) {
-          const label = context.label || '';
+        label: function (context: { label: string; parsed: number; dataset: { data: number[] } }) {
+          const label = context.label || "";
           const value = context.parsed || 0;
           const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
           const percentage = ((value / total) * 100).toFixed(1);
           return `${label}: ${value} (${percentage}%)`;
-        }
-      }
-    }
+        },
+      },
+    },
   },
 });
 
@@ -69,47 +71,49 @@ const loadTagData = async () => {
   try {
     isLoading.value = true;
     error.value = null;
-    
+
     const response = await getAnalyticsTags(props.period);
-    const labels = response.tagBuckets.map(tag => tag.tagName);
-    const data = response.tagBuckets.map(tag => tag.postCount);
-    
+    const labels = response.tagBuckets.map((tag) => tag.tagName);
+    const data = response.tagBuckets.map((tag) => tag.postCount);
+
     // Generate colors for each tag
     const colors = [
-      '#0265C2',
-      '#001627',
-      '#3385D0',
-      '#013F7A',
-      '#66A5DD',
-      '#99C4E9',
-      '#0153A0',
-      '#002A52',
+      "#0265C2",
+      "#001627",
+      "#3385D0",
+      "#013F7A",
+      "#66A5DD",
+      "#99C4E9",
+      "#0153A0",
+      "#002A52",
     ];
-    
+
     const borderColors = [
-      '#0265C2',
-      '#001627',
-      '#3385D0',
-      '#013F7A',
-      '#66A5DD',
-      '#99C4E9',
-      '#0153A0',
-      '#002A52',
+      "#0265C2",
+      "#001627",
+      "#3385D0",
+      "#013F7A",
+      "#66A5DD",
+      "#99C4E9",
+      "#0153A0",
+      "#002A52",
     ];
-    
+
     // Repeat colors if there are more tags than colors
     const backgroundColor = labels.map((_, i) => colors[i % colors.length]);
     const borderColor = labels.map((_, i) => borderColors[i % borderColors.length]);
-    
+
     chartData.value = {
       labels: labels,
-      datasets: [{
-        label: 'Posts by Tag',
-        data: data,
-        backgroundColor: backgroundColor,
-        borderColor: borderColor,
-        borderWidth: 2
-      }]
+      datasets: [
+        {
+          label: "Posts by Tag",
+          data: data,
+          backgroundColor: backgroundColor,
+          borderColor: borderColor,
+          borderWidth: 2,
+        },
+      ],
     };
   } catch (err) {
     console.error("Failed to load tag data:", err);
@@ -120,9 +124,12 @@ const loadTagData = async () => {
 };
 
 // Watch for period changes
-watch(() => props.period, () => {
-  loadTagData();
-});
+watch(
+  () => props.period,
+  () => {
+    loadTagData();
+  },
+);
 
 onMounted(() => {
   loadTagData();
@@ -139,11 +146,7 @@ onMounted(() => {
     <div v-else-if="error" class="error-state">
       <p>{{ error }}</p>
     </div>
-    <CChart
-      type="doughnut"
-      :data="chartData"
-      :options="chartOptions"
-    />
+    <CChart type="doughnut" :data="chartData" :options="chartOptions" />
   </div>
 </template>
 
@@ -197,16 +200,16 @@ onMounted(() => {
   .chart-wrapper {
     max-height: 340px;
   }
-  
+
   .chart-container {
     height: 300px;
     max-height: 300px;
   }
-  
+
   .chart-container :deep(canvas) {
     max-height: 300px !important;
   }
-  
+
   .chart-container :deep(.legend) {
     font-size: 10px;
   }

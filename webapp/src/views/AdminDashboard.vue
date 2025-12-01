@@ -2,20 +2,13 @@
   CoPilot was asked to provide help with CSS styling and for help with syntax, and error handling.
   -->
 <script setup lang="ts">
-import { onMounted, computed } from "vue";
+import { onMounted } from "vue";
 import PageHeader from "@/components/PageHeader.vue";
 import SideBar from "@/components/SideBar.vue";
-import { useAuthStore } from "@/stores/authenticationStore";
-import { CContainer, CCard, CCardBody, CCardHeader, CRow, CCol } from "@coreui/vue";
+import { CContainer, CRow, CCol } from "@coreui/vue";
 import PostActivity from "@/components/admin/PostActivity.vue";
 
-const auth = useAuthStore();
-
-onMounted(() => {
-  // Any admin-specific data fetching can be done here
-});
-
-const isLoggedIn = computed(() => auth.isAuthenticated);
+onMounted(() => {});
 </script>
 
 <template>
@@ -32,11 +25,11 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
       <div class="admin-page-body">
         <div class="admin-page-content-layout">
           <h2>Admin Dashboard</h2>
-          <br/>
+          <br />
           <CContainer fluid>
             <CRow>
               <CCol>
-                <PostActivity/>
+                <PostActivity />
               </CCol>
             </CRow>
           </CContainer>
