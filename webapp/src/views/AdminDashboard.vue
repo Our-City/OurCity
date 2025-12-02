@@ -2,13 +2,26 @@
   CoPilot was asked to provide help with CSS styling and for help with syntax, and error handling.
   -->
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import PageHeader from "@/components/PageHeader.vue";
 import SideBar from "@/components/SideBar.vue";
 import { CContainer, CRow, CCol } from "@coreui/vue";
 import PostActivity from "@/components/admin/PostActivity.vue";
+import { canViewAdminDashboard } from "@/api/authorizationService";
 
-onMounted(() => {});
+const isAuthorized = ref<boolean | null>(null);
+const isLoading = ref(true);
+
+onMounted(async () => {
+  try {
+    isAuthorized.value = await canViewAdminDashboard();
+  } catch (error) {
+    console.error("Failed to check admin authorization:", error);
+    isAuthorized.value = false;
+  } finally {
+    isLoading.value = false;
+  }
+});
 </script>
 
 <template>
@@ -23,7 +36,19 @@ onMounted(() => {});
       </div>
 
       <div class="admin-page-body">
-        <div class="admin-page-content-layout">
+        <div v-if="isLoading" class="loading-container">
+          <div class="spinner"></div>
+        </div>
+
+        <div v-else-if="!isAuthorized" class="unauthorized-container">
+          <div class="unauthorized-message">
+            <i class="pi pi-lock" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+            <h2>Access Denied</h2>
+            <p>You do not have permission to view the admin dashboard.</p>
+          </div>
+        </div>
+
+        <div v-else class="admin-page-content-layout">
           <h2>Admin Dashboard</h2>
           <br />
           <CContainer fluid>
@@ -86,6 +111,30 @@ onMounted(() => {});
   to {
     transform: rotate(360deg);
   }
+}
+
+.loading-container,
+.unauthorized-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.unauthorized-message {
+  text-align: center;
+  padding: 2rem;
+  color: var(--tertiary-text-color);
+}
+
+.unauthorized-message h2 {
+  margin-bottom: 0.5rem;
+  color: var(--primary-text-color);
+}
+
+.unauthorized-message p {
+  font-size: 1.1rem;
 }
 
 /* General card styling for all admin dashboard cards */
