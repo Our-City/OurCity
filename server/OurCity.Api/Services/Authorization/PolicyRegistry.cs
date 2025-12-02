@@ -15,6 +15,7 @@ public class Policy
     public static readonly Policy CanMutateThisPost = new("CanMutateThisPost");
     public static readonly Policy CanMutateThisComment = new("CanMutateThisComment");
     public static readonly Policy CanAdministrateForum = new("CanAdministrateForum");
+    public static readonly Policy CanViewAdminDashboard = new("CanViewAdminDashboard");
 
     private string Value { get; }
 
@@ -45,6 +46,11 @@ public static class PolicyRegistry
         options.AddPolicy(
             Policy.CanAdministrateForum,
             policy => policy.Requirements.Add(new CanAdministrateForumRequirement())
+        );
+
+        options.AddPolicy(
+            Policy.CanViewAdminDashboard,
+            policy => policy.Requirements.Add(new CanViewAdminDashboardRequirement())
         );
 
         return options;
