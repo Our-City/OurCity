@@ -20,6 +20,7 @@ public interface IUserService
     Task<Result<UserResponseDto>> BanUser(Guid id);
     Task<Result<UserResponseDto>> UnbanUser(Guid id);
     Task<Result<UserResponseDto>> DeleteUser(Guid id);
+    Task<Result<bool>> PromoteUserToAdmin(Guid id);
 }
 
 public class UserService : IUserService
@@ -243,5 +244,20 @@ public class UserService : IUserService
         var userAfterDelete = await _userRepository.DeleteUser(user);
 
         return Result<UserResponseDto>.Success(userAfterDelete.ToDto());
+    }
+
+    public async Task<Result<bool>> PromoteUserToAdmin(Guid id)
+    {
+        if (!await _policyService.CanAdministrateForum())
+            return Result<bool>.Failure(ErrorMessages.Unauthorized);
+
+        var user = await _userManager.FindByIdAsync(id.ToString());
+
+        if (user == null || user.IsDeleted)
+            return Result<bool>.Failure(ErrorMessages.UserNotFound);
+
+        await _userManager.AddToRoleAsync(user, UserRoles.Admin);
+
+        return Result<bool>.Success(true);
     }
 }

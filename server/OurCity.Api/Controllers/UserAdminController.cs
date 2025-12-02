@@ -108,4 +108,28 @@ public class UserAdminController : ControllerBase
 
         return Ok(res.Data);
     }
+
+    [HttpPut]
+    [Route("{userId:guid}/promote-to-admin")]
+    [EndpointSummary("Promote user to admin")]
+    [EndpointDescription("Promote a user to admin")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> PromoteUserToAdmin([FromRoute] Guid userId)
+    {
+        var res = await _userService.PromoteUserToAdmin(userId);
+
+        if (!res.IsSuccess)
+        {
+            return Problem(
+                statusCode: (res.Error != null && res.Error.Equals(ErrorMessages.UserNotFound))
+                    ? StatusCodes.Status404NotFound
+                    : StatusCodes.Status403Forbidden,
+                detail: res.Error
+            );
+        }
+
+        return NoContent();
+    }
 }

@@ -523,4 +523,76 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal(1, responseContent?.Items.Count());
     }
+
+    [Fact]
+    public async Task PromotingUserAsUnauthenticatedFails()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        var response = await client.PutAsync(
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId}/promote-to-admin",
+            null
+        );
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task PromotingUserAsNonAdminFails()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        var loginRequest = new UserCreateRequestDto
+        {
+            Username = _ourCityApi.StubUsername,
+            Password = _ourCityApi.StubPassword,
+        };
+
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
+
+        var response = await client.PutAsync(
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId2}/promote-to-admin",
+            null
+        );
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task PromotingUserAsAdminSucceeds()
+    {
+        using var client = _ourCityApi.CreateClient();
+
+        //Promote as seeded admin user
+        var initialAdminLoginRequest = new UserCreateRequestDto
+        {
+            Username = _ourCityApi.AdminUsername,
+            Password = _ourCityApi.AdminPassword,
+        };
+
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", initialAdminLoginRequest);
+
+        var initialPromoteResponse = await client.PutAsync(
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId}/promote-to-admin",
+            null
+        );
+
+        Assert.Equal(HttpStatusCode.NoContent, initialPromoteResponse.StatusCode);
+
+        //Promote as new admin user
+        var newAdminLoginRequest = new UserCreateRequestDto
+        {
+            Username = _ourCityApi.StubUsername,
+            Password = _ourCityApi.StubPassword,
+        };
+
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", newAdminLoginRequest);
+
+        var newPromoteResponse = await client.PutAsync(
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId2}/promote-to-admin",
+            null
+        );
+
+        Assert.Equal(HttpStatusCode.NoContent, newPromoteResponse.StatusCode);
+    }
 }

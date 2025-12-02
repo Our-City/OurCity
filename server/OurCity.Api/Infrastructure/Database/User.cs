@@ -8,8 +8,6 @@ public class User : IdentityUser<Guid>
 
     public DateTime UpdatedAt { get; set; }
 
-    public bool IsAdmin { get; set; } = false;
-
     public bool IsBanned { get; set; } = false;
 
     public bool IsDeleted { get; set; } = false;
