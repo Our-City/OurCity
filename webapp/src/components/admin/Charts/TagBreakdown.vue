@@ -32,7 +32,7 @@ const chartData = ref<{
 
 const chartOptions = ref({
   responsive: true,
-  maintainAspectRatio: false,
+  maintainAspectRatio: true,
   plugins: {
     legend: {
       position: "right" as const,
@@ -65,6 +65,7 @@ const chartOptions = ref({
 
 const isLoading = ref(true);
 const error = ref<string | null>(null);
+const hasData = ref(true);
 
 // Load tags and generate mock post counts
 const loadTagData = async () => {
@@ -75,6 +76,9 @@ const loadTagData = async () => {
     const response = await getAnalyticsTags(props.period);
     const labels = response.tagBuckets.map((tag) => tag.tagName);
     const data = response.tagBuckets.map((tag) => tag.postCount);
+
+    // Check if there's any data
+    hasData.value = response.tagBuckets.length > 0;
 
     // Generate colors for each tag
     const colors = [
@@ -146,15 +150,19 @@ onMounted(() => {
     <div v-else-if="error" class="error-state">
       <p>{{ error }}</p>
     </div>
-    <CChart type="doughnut" :data="chartData" :options="chartOptions" />
+    <div v-else-if="!hasData" class="empty-state">
+      <i class="pi pi-chart-pie" style="font-size: 2rem; margin-bottom: 0.5rem; color: var(--tertiary-text-color);"></i>
+      <p>No tagged posts during this period</p>
+    </div>
+    <div v-else class="chart-wrapper">
+      <CChart type="doughnut" :data="chartData" :options="chartOptions" />
+    </div>
   </div>
 </template>
 
 <style scoped>
 .chart-wrapper {
-  position: relative;
-  height: 600px;
-  max-height: 600px;
+  width: 100%;
   padding: 1rem;
   overflow: hidden;
 }
@@ -166,13 +174,21 @@ onMounted(() => {
 }
 
 .loading-state,
-.error-state {
+.error-state,
+.empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 200px;
   color: var(--tertiary-text-color);
+  text-align: center;
+  padding: 2rem;
+}
+
+.empty-state p {
+  font-size: 1rem;
+  margin: 0;
 }
 
 .spinner {

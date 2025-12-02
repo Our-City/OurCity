@@ -65,6 +65,7 @@ const chartOptions = ref({
 
 const isLoading = ref(false);
 const error = ref<string | null>(null);
+const hasData = ref(true);
 
 const fetchChartData = async () => {
   try {
@@ -72,6 +73,10 @@ const fetchChartData = async () => {
     error.value = null;
 
     const response = await getAnalyticsTimeSeries(props.period);
+
+    // Check if there's any data
+    const totalPosts = response.series.reduce((sum, entry) => sum + entry.postCount, 0);
+    hasData.value = totalPosts > 0;
 
     let labels: string[] = [];
     let data: number[] = [];
@@ -128,7 +133,19 @@ onMounted(() => {
 
 <template>
   <h4>Posts Over Time</h4>
-  <div class="chart-wrapper">
+  <div v-if="isLoading" class="empty-state">
+    <div class="spinner"></div>
+    <p>Loading chart data...</p>
+  </div>
+  <div v-else-if="error" class="empty-state">
+    <i class="pi pi-exclamation-circle" style="font-size: 2rem; margin-bottom: 0.5rem; color: var(--negative-color);"></i>
+    <p>{{ error }}</p>
+  </div>
+  <div v-else-if="!hasData" class="empty-state">
+    <i class="pi pi-chart-line" style="font-size: 2rem; margin-bottom: 0.5rem; color: var(--tertiary-text-color);"></i>
+    <p>No posts created during this period</p>
+  </div>
+  <div v-else class="chart-wrapper">
     <CChart type="line" :data="chartData" :options="chartOptions" />
   </div>
 </template>
@@ -139,6 +156,37 @@ onMounted(() => {
   background: white;
   overflow: hidden;
   height: 400px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--tertiary-text-color);
+  padding: 2rem;
+}
+
+.empty-state p {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-left-color: var(--neutral-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 0.5rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 768px) {
