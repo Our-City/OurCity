@@ -530,7 +530,7 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         using var client = _ourCityApi.CreateClient();
 
         var response = await client.PutAsync(
-            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId}/promote-to-admin",
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUsername}/promote-to-admin",
             null
         );
 
@@ -551,7 +551,7 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
 
         var response = await client.PutAsync(
-            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId2}/promote-to-admin",
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUsername2}/promote-to-admin",
             null
         );
 
@@ -573,7 +573,7 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", initialAdminLoginRequest);
 
         var initialPromoteResponse = await client.PutAsync(
-            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId}/promote-to-admin",
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUsername}/promote-to-admin",
             null
         );
 
@@ -589,7 +589,7 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", newAdminLoginRequest);
 
         var newPromoteResponse = await client.PutAsync(
-            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId2}/promote-to-admin",
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUsername2}/promote-to-admin",
             null
         );
 

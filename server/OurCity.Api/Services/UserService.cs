@@ -20,7 +20,7 @@ public interface IUserService
     Task<Result<UserResponseDto>> BanUser(Guid id);
     Task<Result<UserResponseDto>> UnbanUser(Guid id);
     Task<Result<UserResponseDto>> DeleteUser(Guid id);
-    Task<Result<bool>> PromoteUserToAdmin(Guid id);
+    Task<Result<bool>> PromoteUserToAdmin(string username);
 }
 
 public class UserService : IUserService
@@ -246,12 +246,12 @@ public class UserService : IUserService
         return Result<UserResponseDto>.Success(userAfterDelete.ToDto());
     }
 
-    public async Task<Result<bool>> PromoteUserToAdmin(Guid id)
+    public async Task<Result<bool>> PromoteUserToAdmin(string username)
     {
         if (!await _policyService.CanAdministrateForum())
             return Result<bool>.Failure(ErrorMessages.Unauthorized);
 
-        var user = await _userManager.FindByIdAsync(id.ToString());
+        var user = await _userManager.FindByNameAsync(username);
 
         if (user == null || user.IsDeleted)
             return Result<bool>.Failure(ErrorMessages.UserNotFound);

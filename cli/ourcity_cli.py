@@ -106,12 +106,36 @@ def handle_list_posts(session_manager):
         click.echo(f"Error: {message}")
 
 
+def handle_promote(session_manager):
+    if not session_manager.is_logged_in():
+        click.echo("You must be logged in to promote users")
+        return
+
+    username = input("Enter username to promote to admin: ").strip()
+    
+    if not username:
+        click.echo("Username cannot be empty")
+        return
+
+    session = session_manager.load_session()
+    cookies = session.get("cookies")
+
+    api_client = APIClient()
+    success, message = api_client.promote_user_to_admin(username, cookies)
+    
+    if success:
+        click.echo(message)
+    else:
+        click.echo(f"Failed to promote user: {message}")
+
+
 def show_help():
     click.echo("\nAvailable commands:")
     click.echo("  login    - Login to OurCity")
     click.echo("  logout   - Logout from OurCity")
     click.echo("  list     - List all posts")
     click.echo("  post     - Get and display a post by ID")
+    click.echo("  promote  - Promote a user to admin (admin only)")
     click.echo("  help     - Show this help message")
     click.echo("  exit     - Exit the application")
     click.echo()
@@ -154,6 +178,8 @@ def main():
                 handle_list_posts(session_manager)
             elif command == "post":
                 handle_get_post(session_manager)
+            elif command == "promote":
+                handle_promote(session_manager)
             else:
                 click.echo(f"Unknown command: {command}")
                 click.echo("Type 'help' for available commands")

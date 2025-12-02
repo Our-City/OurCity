@@ -110,15 +110,16 @@ public class UserAdminController : ControllerBase
     }
 
     [HttpPut]
-    [Route("{userId:guid}/promote-to-admin")]
+    [Route("{username}/promote-to-admin")]
     [EndpointSummary("Promote user to admin")]
     [EndpointDescription("Promote a user to admin")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> PromoteUserToAdmin([FromRoute] Guid userId)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> PromoteUserToAdmin([FromRoute] string username)
     {
-        var res = await _userService.PromoteUserToAdmin(userId);
+        _logger.LogInformation("PromoteUserToAdmin called with username: {Username}", username);
+        var res = await _userService.PromoteUserToAdmin(username);
 
         if (!res.IsSuccess)
         {

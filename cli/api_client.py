@@ -114,3 +114,29 @@ class APIClient:
             return False, None, "Could not connect to the server. Is it running?"
         except Exception as e:
             return False, None, f"An error occurred: {str(e)}"
+
+    def promote_user_to_admin(self, username: str, cookies: dict) -> Tuple[bool, str]:
+        url = f"{self.base_url}/admin/users/{username}/promote-to-admin"
+        
+        try:
+            session = requests.Session()
+            for key, value in cookies.items():
+                session.cookies.set(key, value)
+            
+            response = session.put(url)
+            
+            if response.status_code == 204:
+                return True, f"Successfully promoted {username} to admin"
+            elif response.status_code == 401:
+                return False, "Not authenticated or session expired"
+            elif response.status_code == 403:
+                return False, "You do not have permission to promote users"
+            elif response.status_code == 404:
+                return False, "User not found"
+            else:
+                return False, f"Request failed with status code {response.status_code}"
+                
+        except requests.exceptions.ConnectionError:
+            return False, "Could not connect to the server. Is it running?"
+        except Exception as e:
+            return False, f"An error occurred: {str(e)}"
