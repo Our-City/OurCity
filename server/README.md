@@ -128,8 +128,12 @@ dotnet tool restore
 ### Create migrations
 
 ```sh
-dotnet ef migrations add <migration-name> -p OurCity.Api
+dotnet ef migrations add <migration-name> -p OurCity.Api --context <MasterDbContext / TenantDbContext>
 ```
+- MasterDbContext
+  - Central Database
+- TenantDbContext
+  - Database per Tenant
 
 ### Run the tests
 

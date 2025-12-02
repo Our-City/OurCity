@@ -3,6 +3,7 @@ using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos.Media;
 using OurCity.Api.Infrastructure;
 using OurCity.Api.Infrastructure.Database;
+using OurCity.Api.Infrastructure.Database.App;
 using OurCity.Api.Services.Mappings;
 
 namespace OurCity.Api.Services;

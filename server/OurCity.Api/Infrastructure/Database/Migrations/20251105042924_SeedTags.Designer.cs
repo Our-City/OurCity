@@ -9,7 +9,7 @@ using OurCity.Api.Infrastructure.Database;
 
 #nullable disable
 
-namespace OurCity.Api.Infrastructure.Database.Migrations
+namespace OurCity.Api.Infrastructure.Database.App.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20251105042924_SeedTags")]

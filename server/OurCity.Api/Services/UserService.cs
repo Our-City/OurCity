@@ -6,6 +6,7 @@ using OurCity.Api.Common.Dtos.User;
 using OurCity.Api.Infrastructure;
 using OurCity.Api.Infrastructure.Database;
 using OurCity.Api.Services.Authorization;
+using OurCity.Api.Infrastructure.Database.App;
 using OurCity.Api.Services.Mappings;
 
 namespace OurCity.Api.Services;

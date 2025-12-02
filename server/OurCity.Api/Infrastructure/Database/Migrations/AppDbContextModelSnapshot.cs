@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using OurCity.Api.Infrastructure.Database;
+using OurCity.Api.Infrastructure.Database.App;
 
 #nullable disable
 
-namespace OurCity.Api.Infrastructure.Database.Migrations
+namespace OurCity.Api.Infrastructure.Database.App.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
@@ -125,7 +125,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Comment", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.Comment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -159,7 +159,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.CommentVote", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.CommentVote", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -183,7 +183,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.ToTable("CommentVotes");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Media", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.Media", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -209,7 +209,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.ToTable("Media");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Post", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.Post", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -305,7 +305,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.ToTable("PostVotes");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tag", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.Tag", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -412,7 +412,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                         });
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.User", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -561,7 +561,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.UserRole", null)
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.UserRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -570,7 +570,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.User", null)
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -579,7 +579,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.User", null)
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -588,13 +588,13 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.UserRole", null)
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.UserRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("OurCity.Api.Infrastructure.Database.User", null)
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -603,22 +603,22 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.User", null)
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Comment", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.Comment", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.User", "Author")
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.User", "Author")
                         .WithMany("Comments")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("OurCity.Api.Infrastructure.Database.Post", "Post")
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.Post", "Post")
                         .WithMany("Comments")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -629,15 +629,15 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Navigation("Post");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.CommentVote", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.CommentVote", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.Comment", "Comment")
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.Comment", "Comment")
                         .WithMany("Votes")
                         .HasForeignKey("CommentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("OurCity.Api.Infrastructure.Database.User", "Voter")
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.User", "Voter")
                         .WithMany()
                         .HasForeignKey("VoterId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -648,9 +648,9 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Navigation("Voter");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Media", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.Media", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.Post", "Post")
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.Post", "Post")
                         .WithMany("Media")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -659,9 +659,9 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Navigation("Post");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Post", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.Post", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.User", "Author")
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.User", "Author")
                         .WithMany("Posts")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -691,13 +691,13 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.PostVote", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.Post", "Post")
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.Post", "Post")
                         .WithMany("Votes")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("OurCity.Api.Infrastructure.Database.User", "Voter")
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.User", "Voter")
                         .WithMany("PostVotes")
                         .HasForeignKey("VoterId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -729,25 +729,25 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("PostTag", b =>
                 {
-                    b.HasOne("OurCity.Api.Infrastructure.Database.Post", null)
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.Post", null)
                         .WithMany()
                         .HasForeignKey("PostsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("OurCity.Api.Infrastructure.Database.Tag", null)
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Tenant.Tag", null)
                         .WithMany()
                         .HasForeignKey("TagsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Comment", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.Comment", b =>
                 {
                     b.Navigation("Votes");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Post", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.Post", b =>
                 {
                     b.Navigation("Bookmarks");
 
@@ -758,7 +758,7 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Navigation("Votes");
                 });
 
-            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.User", b =>
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Tenant.User", b =>
                 {
                     b.Navigation("Comments");
 

@@ -5,6 +5,7 @@ using OurCity.Api.Configuration;
 using OurCity.Api.Extensions;
 using OurCity.Api.Infrastructure;
 using OurCity.Api.Infrastructure.Database;
+using OurCity.Api.Infrastructure.Database.Utils;
 using OurCity.Api.Middlewares;
 using OurCity.Api.Services;
 using OurCity.Api.Services.Authorization;
@@ -35,9 +36,13 @@ builder.Services.AddCors(options =>
 );
 
 //Database
-builder.Services.AddDbContextPool<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres"))
+builder.Services.AddDbContextPool<HostDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Host"))
 );
+
+builder.Services.AddScoped<ITenantProvider, TenantProvider>();
+builder.Services.AddScoped<ITenantConnectionStringFactory, TenantConnectionStringFactory>();
+builder.Services.AddDbContext<AppDbContext>();
 
 //Repository
 builder.Services.AddScoped<IPostRepository, PostRepository>();
@@ -139,6 +144,7 @@ app.UseHttpsRedirection();
 app.UseCors();
 app.UseCorrelationId();
 app.UseSecurityHeaders();
+app.UseTenant();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
@@ -157,4 +163,7 @@ if (app.Environment.IsDevelopment())
 
 app.Run();
 
-public partial class Program { }
+namespace OurCity.Api
+{
+    public partial class Program { }
+}

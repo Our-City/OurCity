@@ -1,6 +1,7 @@
 /// Generative AI - CoPilot was used to assist in the creation of this file.
 using OurCity.Api.Common.Dtos.Media;
 using OurCity.Api.Infrastructure.Database;
+using OurCity.Api.Infrastructure.Database.App;
 
 namespace OurCity.Api.Services.Mappings;
 

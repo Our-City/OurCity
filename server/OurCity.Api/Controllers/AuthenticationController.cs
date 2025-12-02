@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OurCity.Api.Common.Dtos.User;
 using OurCity.Api.Infrastructure.Database;
+using OurCity.Api.Infrastructure.Database.App;
 
 namespace OurCity.Api.Controllers;
 
