@@ -107,6 +107,7 @@ builder.Services.AddScoped<IAuthorizationHandler, CanParticipateInForumHandler>(
 builder.Services.AddScoped<IAuthorizationHandler, CanMutateThisPostHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, CanMutateThisCommentHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, CanAdministrateForumHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, CanViewAdminDashboardHandler>();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 builder.Services.AddAuthorization(options =>
 {

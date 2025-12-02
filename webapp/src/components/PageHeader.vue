@@ -46,6 +46,8 @@ function handleCreatePost(): void {
 }
 
 const isLoggedIn = computed(() => auth.isAuthenticated);
+const isAdmin = computed(() => auth.isAdmin);
+console.log("User", auth.user)
 </script>
 
 <template>
@@ -68,7 +70,7 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
         <button v-if="!isLoggedIn" class="login-button" @click="handleLogin">Login</button>
         <button v-if="!isLoggedIn" class="signup-button" @click="handleSignUp">Sign Up</button>
 
-        <button v-if="isLoggedIn" class="admin-button" @click="goToAdminDashboard">
+        <button v-if="isLoggedIn && isAdmin" class="admin-button" @click="goToAdminDashboard">
           <i class="pi pi-objects-column"></i>
           Admin
         </button>

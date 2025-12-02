@@ -15,6 +15,7 @@ public interface IPolicyService
     Task<bool> CanMutateThisPost(Post post);
     Task<bool> CanMutateThisComment(Comment comment);
     Task<bool> CanAdministrateForum();
+    Task<bool> CanViewAdminDashboard();
 }
 
 public class PolicyService : IPolicyService
@@ -62,6 +63,15 @@ public class PolicyService : IPolicyService
         var authResult = await _authorizationService.AuthorizeAsync(
             _user.Principal,
             Policy.CanAdministrateForum
+        );
+        return authResult.Succeeded;
+    }
+
+    public async Task<bool> CanViewAdminDashboard()
+    {
+        var authResult = await _authorizationService.AuthorizeAsync(
+            _user.Principal,
+            Policy.CanViewAdminDashboard
         );
         return authResult.Succeeded;
     }

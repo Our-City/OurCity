@@ -6,6 +6,7 @@ using OurCity.Api.Common.Dtos.Post;
 using OurCity.Api.Common.Enum;
 using OurCity.Api.Infrastructure;
 using OurCity.Api.Infrastructure.Database;
+using OurCity.Api.Services.Authorization;
 using OurCity.Api.Services.Mappings;
 
 namespace OurCity.Api.Services;
@@ -29,24 +30,33 @@ public class AnalyticsService : IAnalyticsService
     private readonly ITagRepository _tagRepository;
     private readonly IPostVoteRepository _postVoteRepository;
     private readonly ILogger<AnalyticsService> _logger;
+    private readonly ICurrentUser _requestingUser;
+    private readonly IPolicyService _policyService;
 
     public AnalyticsService(
         IPostRepository postRepository,
         ITagRepository tagRepository,
         IPostVoteRepository postVoteRepository,
-        ILogger<AnalyticsService> logger
+        ILogger<AnalyticsService> logger,
+        ICurrentUser requestingUser,
+        IPolicyService policyService
     )
     {
         _postRepository = postRepository;
         _tagRepository = tagRepository;
         _postVoteRepository = postVoteRepository;
         _logger = logger;
+        _requestingUser = requestingUser;
+        _policyService = policyService;
     }
 
     public async Task<Result<AnalyticsSummaryResponseDto>> GetActivityMetricsSummary(
         AnalyticsRequestDto analyticsRequestDto
     )
     {
+        if (!_requestingUser.UserId.HasValue || !await _policyService.CanViewAdminDashboard())
+            return Result<AnalyticsSummaryResponseDto>.Failure(ErrorMessages.Unauthorized);
+
         var endDate = DateTime.UtcNow;
         var startDate = analyticsRequestDto.Period switch
         {
@@ -103,6 +113,9 @@ public class AnalyticsService : IAnalyticsService
         AnalyticsRequestDto analyticsRequestDto
     )
     {
+        if (!_requestingUser.UserId.HasValue || !await _policyService.CanViewAdminDashboard())
+            return Result<AnalyticsTimeSeriesResponseDto>.Failure(ErrorMessages.Unauthorized);
+            
         var now = DateTime.UtcNow;
         var endDate = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0, DateTimeKind.Utc);
         var startDate = analyticsRequestDto.Period switch
@@ -208,6 +221,9 @@ public class AnalyticsService : IAnalyticsService
         AnalyticsRequestDto analyticsRequestDto
     )
     {
+        if (!_requestingUser.UserId.HasValue || !await _policyService.CanViewAdminDashboard())
+            return Result<AnalyticsTagsResponseDto>.Failure(ErrorMessages.Unauthorized);
+            
         var endDate = DateTime.UtcNow;
         var startDate = analyticsRequestDto.Period switch
         {
