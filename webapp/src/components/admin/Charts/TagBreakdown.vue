@@ -45,7 +45,7 @@ const chartOptions = ref({
     },
     tooltip: {
       enabled: true,
-      external: undefined,
+      position: "nearest" as const,
       backgroundColor: "rgba(0, 0, 0, 0.8)",
       padding: 12,
       titleColor: "#fff",
@@ -165,7 +165,8 @@ onMounted(() => {
 
 <style scoped>
 .chart-wrapper {
-  width: 100%;
+  width: min(100%, 50rem);
+  margin: 0 auto;
   padding: 1rem;
   overflow: hidden;
 }
