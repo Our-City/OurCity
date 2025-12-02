@@ -10,8 +10,9 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  buttonClass: "dropdown-button",
-  dropdownClass: "dropdown-menu",
+  // use app-specific class names to avoid conflicts with Bootstrap and CoreUI
+  buttonClass: "oc-dropdown-button",
+  dropdownClass: "oc-dropdown-menu",
 });
 
 const isDropdownVisible = ref(false);
@@ -77,7 +78,7 @@ onUnmounted(() => {
   display: inline-block;
 }
 
-.dropdown-button {
+.oc-dropdown-button {
   background: none;
   border: none;
   cursor: pointer;
@@ -89,11 +90,11 @@ onUnmounted(() => {
   transition: background-color 0.2s ease;
 }
 
-.dropdown-button:hover {
+.oc-dropdown-button:hover {
   background: var(--primary-background-color-hover, rgba(0, 0, 0, 0.05));
 }
 
-.dropdown-menu {
+.oc-dropdown-menu {
   position: absolute;
   box-sizing: border-box;
   top: 100%;
@@ -107,13 +108,13 @@ onUnmounted(() => {
   margin-top: 0.25rem;
 }
 
-.dropdown-menu :deep(ul) {
+.oc-dropdown-menu :deep(ul) {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.dropdown-menu :deep(li) {
+.oc-dropdown-menu :deep(li) {
   padding: 0.75rem 1rem;
   cursor: pointer;
   display: flex;
@@ -123,16 +124,16 @@ onUnmounted(() => {
   transition: background-color 0.2s ease;
 }
 
-.dropdown-menu :deep(li:hover) {
+.oc-dropdown-menu :deep(li:hover) {
   background: var(--primary-background-color-hover, rgba(0, 0, 0, 0.05));
 }
 
-.dropdown-menu :deep(li:first-child) {
+.oc-dropdown-menu :deep(li:first-child) {
   border-top-left-radius: 0.5rem;
   border-top-right-radius: 0.5rem;
 }
 
-.dropdown-menu :deep(li:last-child) {
+.oc-dropdown-menu :deep(li:last-child) {
   border-bottom-left-radius: 0.5rem;
   border-bottom-right-radius: 0.5rem;
 }

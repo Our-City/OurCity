@@ -10,18 +10,18 @@ import DropdownMenu from "@/components/utils/DropdownMenu.vue";
 describe("DropdownMenu", () => {
   it("renders default button and dropdown content", () => {
     const wrapper = mount(DropdownMenu);
-    expect(wrapper.find(".dropdown-button").exists()).toBe(true);
-    expect(wrapper.find(".dropdown-menu").exists()).toBe(true);
+    expect(wrapper.find(".oc-dropdown-button").exists()).toBe(true);
+    expect(wrapper.find(".oc-dropdown-menu").exists()).toBe(true);
 
-    const dropdown = wrapper.find(".dropdown-menu");
+    const dropdown = wrapper.find(".oc-dropdown-menu");
     expect(getComputedStyle(dropdown.element).display).toBe("none");
   });
 
   it("shows and hides dropdown when button is clicked", async () => {
     const wrapper = mount(DropdownMenu);
-    const button = wrapper.find(".dropdown-button");
+    const button = wrapper.find(".oc-dropdown-button");
     await button.trigger("click");
-    expect(wrapper.find(".dropdown-menu").isVisible()).toBe(true);
+    expect(wrapper.find(".oc-dropdown-menu").isVisible()).toBe(true);
 
     wrapper.vm.closeDropdown();
     await wrapper.vm.$nextTick();
@@ -36,7 +36,7 @@ describe("DropdownMenu", () => {
       },
     });
     expect(wrapper.find(".custom-btn").exists()).toBe(true);
-    await wrapper.find(".dropdown-button").trigger("click");
+    await wrapper.find(".oc-dropdown-button").trigger("click");
     expect(wrapper.find(".custom-dd").exists()).toBe(true);
   });
 
@@ -54,7 +54,7 @@ describe("DropdownMenu", () => {
         dropdown: `<button class='close-btn' @click='close'>Close</button>`,
       },
     });
-    await wrapper.find(".dropdown-button").trigger("click");
+    await wrapper.find(".oc-dropdown-button").trigger("click");
     expect(wrapper.find(".close-btn").exists()).toBe(true);
   });
 });
