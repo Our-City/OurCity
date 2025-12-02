@@ -9,7 +9,10 @@ public class CanAdministrateForumHandler : AuthorizationHandler<CanAdministrateF
     private readonly ICurrentUser _user;
     private readonly ILogger<CanAdministrateForumHandler> _logger;
 
-    public CanAdministrateForumHandler(ICurrentUser user, ILogger<CanAdministrateForumHandler> logger)
+    public CanAdministrateForumHandler(
+        ICurrentUser user,
+        ILogger<CanAdministrateForumHandler> logger
+    )
     {
         _user = user;
         _logger = logger;
@@ -20,7 +23,10 @@ public class CanAdministrateForumHandler : AuthorizationHandler<CanAdministrateF
         CanAdministrateForumRequirement requirement
     )
     {
-        _logger.LogInformation("Checking if user can administrate forum. IsAdmin: {IsAdmin}", _user);
+        _logger.LogInformation(
+            "Checking if user can administrate forum. IsAdmin: {IsAdmin}",
+            _user
+        );
         if (_user.IsAdmin)
             context.Succeed(requirement);
 

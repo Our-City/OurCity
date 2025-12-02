@@ -307,7 +307,7 @@ describe("TagBreakdown", () => {
 
     const chartOptions = wrapper.vm.chartOptions;
     expect(chartOptions.responsive).toBe(true);
-    expect(chartOptions.maintainAspectRatio).toBe(false);
+    expect(chartOptions.maintainAspectRatio).toBe(true);
     expect(chartOptions.plugins.legend.position).toBe("right");
     expect(chartOptions.plugins.tooltip.enabled).toBe(true);
   });

@@ -42,7 +42,7 @@ onMounted(async () => {
 
         <div v-else-if="!isAuthorized" class="unauthorized-container">
           <div class="unauthorized-message">
-            <i class="pi pi-lock" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+            <i class="pi pi-lock" style="font-size: 3rem; margin-bottom: 1rem"></i>
             <h2>Access Denied</h2>
             <p>You do not have permission to view the admin dashboard.</p>
           </div>

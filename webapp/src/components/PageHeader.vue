@@ -47,7 +47,7 @@ function handleCreatePost(): void {
 
 const isLoggedIn = computed(() => auth.isAuthenticated);
 const isAdmin = computed(() => auth.isAdmin);
-console.log("User", auth.user)
+console.log("User", auth.user);
 </script>
 
 <template>

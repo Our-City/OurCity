@@ -138,11 +138,17 @@ onMounted(() => {
     <p>Loading chart data...</p>
   </div>
   <div v-else-if="error" class="empty-state">
-    <i class="pi pi-exclamation-circle" style="font-size: 2rem; margin-bottom: 0.5rem; color: var(--negative-color);"></i>
+    <i
+      class="pi pi-exclamation-circle"
+      style="font-size: 2rem; margin-bottom: 0.5rem; color: var(--negative-color)"
+    ></i>
     <p>{{ error }}</p>
   </div>
   <div v-else-if="!hasData" class="empty-state">
-    <i class="pi pi-chart-line" style="font-size: 2rem; margin-bottom: 0.5rem; color: var(--tertiary-text-color);"></i>
+    <i
+      class="pi pi-chart-line"
+      style="font-size: 2rem; margin-bottom: 0.5rem; color: var(--tertiary-text-color)"
+    ></i>
     <p>No posts created during this period</p>
   </div>
   <div v-else class="chart-wrapper">

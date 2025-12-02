@@ -115,7 +115,7 @@ public class AnalyticsService : IAnalyticsService
     {
         if (!_requestingUser.UserId.HasValue || !await _policyService.CanViewAdminDashboard())
             return Result<AnalyticsTimeSeriesResponseDto>.Failure(ErrorMessages.Unauthorized);
-            
+
         var now = DateTime.UtcNow;
         var endDate = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0, DateTimeKind.Utc);
         var startDate = analyticsRequestDto.Period switch
@@ -223,7 +223,7 @@ public class AnalyticsService : IAnalyticsService
     {
         if (!_requestingUser.UserId.HasValue || !await _policyService.CanViewAdminDashboard())
             return Result<AnalyticsTagsResponseDto>.Failure(ErrorMessages.Unauthorized);
-            
+
         var endDate = DateTime.UtcNow;
         var startDate = analyticsRequestDto.Period switch
         {

@@ -151,7 +151,10 @@ onMounted(() => {
       <p>{{ error }}</p>
     </div>
     <div v-else-if="!hasData" class="empty-state">
-      <i class="pi pi-chart-pie" style="font-size: 2rem; margin-bottom: 0.5rem; color: var(--tertiary-text-color);"></i>
+      <i
+        class="pi pi-chart-pie"
+        style="font-size: 2rem; margin-bottom: 0.5rem; color: var(--tertiary-text-color)"
+      ></i>
       <p>No tagged posts during this period</p>
     </div>
     <div v-else class="chart-wrapper">
