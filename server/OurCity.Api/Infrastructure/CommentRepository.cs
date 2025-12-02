@@ -27,6 +27,9 @@ public class CommentRepository : ICommentRepository
     {
         IQueryable<Comment> query = _appDbContext
             .Comments.Where(c => c.PostId == postId)
+            .Where(c => !c.IsDeleted)
+            .Where(c => c.Author == null || !c.Author.IsBanned)
+            .Where(c => c.Author == null || c.Author.ReceivedReports.Count < 5)
             .Include(c => c.Author)
             .Include(c => c.Votes)
             .OrderByDescending(c => c.CreatedAt)
@@ -48,14 +51,6 @@ public class CommentRepository : ICommentRepository
         }
 
         return await query.Take(limit).ToListAsync();
-    }
-
-    public async Task<IEnumerable<Comment>> GetCommentsByPostId(Guid postId)
-    {
-        return await _appDbContext
-            .Comments.Include(c => c.Votes)
-            .Where(c => c.PostId == postId)
-            .ToListAsync();
     }
 
     public async Task<Comment?> GetCommentById(Guid commentId)

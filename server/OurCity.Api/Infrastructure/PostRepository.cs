@@ -29,7 +29,10 @@ public class PostRepository : IPostRepository
         var limit = postGetAllRequest.Limit;
 
         IQueryable<Post> query = _appDbContext
-            .Posts.Include(p => p.Votes)
+            .Posts.Where(p => !p.IsDeleted)
+            .Where(p => p.Author == null || !p.Author.IsBanned)
+            .Where(p => p.Author == null || p.Author.ReceivedReports.Count < 5)
+            .Include(p => p.Votes)
             .Include(p => p.Comments)
             .Include(p => p.Tags)
             .Include(p => p.Author);
