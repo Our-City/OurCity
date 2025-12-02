@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using OurCity.Api.Common;
 using OurCity.Api.Extensions;
 using OurCity.Api.Infrastructure.Database;
 using Testcontainers.PostgreSql;
@@ -28,6 +29,14 @@ public class OurCityWebApplicationFactory : WebApplicationFactory<Program>
     public readonly Guid StubUserId2 = Guid.NewGuid();
     public readonly string StubUsername2 = "StubUser2";
     public readonly string StubPassword2 = "TestPassword2!";
+
+    public readonly Guid AdminUserId = Guid.NewGuid();
+    public readonly string AdminUsername = "AdminUser";
+    public readonly string AdminPassword = "AdminPassword1!";
+
+    public readonly Guid HighlyReportedUserId = Guid.NewGuid();
+    public readonly string HighlyReportedUsername = "HighlyReportedUser";
+    public readonly string HighlyReportedPassword = "HighlyReportedPassword1!";
 
     public readonly Guid StubPostId = Guid.NewGuid();
     public readonly string StubPostTitle = "Test Title";
@@ -96,14 +105,73 @@ public class OurCityWebApplicationFactory : WebApplicationFactory<Program>
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             db.Database.Migrate();
 
-            //stub 2 users
+            //stub 2 regular users, 1 admin user
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<UserRole>>();
+
             var newUser = new User { Id = StubUserId, UserName = StubUsername };
             userManager.CreateAsync(newUser, StubPassword).Wait();
 
-            userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
             newUser = new User { Id = StubUserId2, UserName = StubUsername2 };
             userManager.CreateAsync(newUser, StubPassword2).Wait();
+
+            newUser = new User
+            {
+                Id = AdminUserId,
+                UserName = AdminUsername,
+                SecurityStamp = Guid.NewGuid().ToString(),
+            };
+            roleManager.CreateAsync(new UserRole(UserRoles.Admin)).Wait();
+            userManager.CreateAsync(newUser, AdminPassword).Wait();
+            userManager.AddToRoleAsync(newUser, UserRoles.Admin).Wait();
+
+            newUser = new User { Id = HighlyReportedUserId, UserName = HighlyReportedUsername };
+            db.UserReports.Add(
+                new UserReport
+                {
+                    Id = Guid.NewGuid(),
+                    Reason = "Because I can",
+                    TargetUserId = HighlyReportedUserId,
+                    ReporterId = StubUserId,
+                }
+            );
+            db.UserReports.Add(
+                new UserReport
+                {
+                    Id = Guid.NewGuid(),
+                    Reason = "Because I can",
+                    TargetUserId = HighlyReportedUserId,
+                    ReporterId = StubUserId,
+                }
+            );
+            db.UserReports.Add(
+                new UserReport
+                {
+                    Id = Guid.NewGuid(),
+                    Reason = "Because I can",
+                    TargetUserId = HighlyReportedUserId,
+                    ReporterId = StubUserId,
+                }
+            );
+            db.UserReports.Add(
+                new UserReport
+                {
+                    Id = Guid.NewGuid(),
+                    Reason = "Because I can",
+                    TargetUserId = HighlyReportedUserId,
+                    ReporterId = StubUserId,
+                }
+            );
+            db.UserReports.Add(
+                new UserReport
+                {
+                    Id = Guid.NewGuid(),
+                    Reason = "Because I can",
+                    TargetUserId = HighlyReportedUserId,
+                    ReporterId = StubUserId,
+                }
+            );
+            userManager.CreateAsync(newUser, HighlyReportedPassword).Wait();
 
             //stub post
             var stubPost = new Post
