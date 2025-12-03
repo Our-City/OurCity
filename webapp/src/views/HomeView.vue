@@ -137,6 +137,7 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
 
 .create-post-title {
   font-size: 3rem;
+  font-weight: 800;
   color: var(--secondary-text-color);
   margin-bottom: 0.5rem;
 }

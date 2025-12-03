@@ -11,7 +11,7 @@ const emit = defineEmits(["close"]);
   <transition name="smooth-transition">
     <div v-if="props.show" class="modal-layout" @click="emit('close')">
       <button class="close-modal-btn" @click="emit('close')">&times;</button>
-      <div class="modal-content" @click.stop>
+      <div class="oc-modal-content" @click.stop>
         <img :src="props.imageUrl" :alt="props.title" class="modal-image" />
       </div>
     </div>
@@ -47,5 +47,12 @@ const emit = defineEmits(["close"]);
 .modal-image {
   max-width: 85vw;
   max-height: 85vh;
+}
+
+/* Avoid Bootstrap/CoreUI modal styles collision */
+.oc-modal-content {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
 }
 </style>
