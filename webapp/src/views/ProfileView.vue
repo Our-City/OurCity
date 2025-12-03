@@ -88,7 +88,7 @@ onMounted(() => {
   } else {
     activeTab.value = "posts";
   }
-  
+
   fetchProfileData();
 });
 
