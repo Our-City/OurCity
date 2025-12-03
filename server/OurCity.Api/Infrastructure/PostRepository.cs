@@ -35,7 +35,8 @@ public class PostRepository : IPostRepository
             .Include(p => p.Votes)
             .Include(p => p.Comments)
             .Include(p => p.Tags)
-            .Include(p => p.Author)
+            .Include(p => p.Author!)
+            .ThenInclude(a => a.ReceivedReports)
             .Include(p => p.Bookmarks);
 
         if (postGetAllRequest.SearchTerm is not null)
@@ -85,7 +86,8 @@ public class PostRepository : IPostRepository
             .Posts.Include(p => p.Votes)
             .Include(p => p.Comments)
             .Include(p => p.Tags)
-            .Include(p => p.Author)
+            .Include(p => p.Author!)
+            .ThenInclude(a => a.ReceivedReports)
             .Include(p => p.Bookmarks)
             .FirstOrDefaultAsync(p => p.Id == postId);
     }
@@ -95,6 +97,8 @@ public class PostRepository : IPostRepository
         return await _appDbContext
             .Posts.Include(p => p.Votes)
             .Include(p => p.Bookmarks)
+            .Include(p => p.Author!)
+            .ThenInclude(a => a.ReceivedReports)
             .FirstOrDefaultAsync(p => p.Id == postId);
     }
 

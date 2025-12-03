@@ -33,6 +33,7 @@ public static class PostMappings
             IsBookmarked = userId.HasValue
                 ? post.Bookmarks.Any(b => b.UserId.Equals(userId))
                 : false,
+            IsReported = post.Author?.ReceivedReports.Any(r => r.ReporterId == userId) ?? false,
             CanMutate = canMutate,
             IsDeleted = post.IsDeleted,
             CreatedAt = post.CreatedAt,
