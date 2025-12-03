@@ -78,9 +78,6 @@ async function fetchPosts(loadMore = false) {
     }
 
     nextCursor.value = res.nextCursor ?? null;
-    console.log(
-      `API returned ${res.items.length} posts (${filteredPosts.length} non-deleted), loadMore: ${loadMore}, nextCursor: ${nextCursor.value}, sortBy: ${filters.value.sortBy}, cursor used: ${filters.value.cursor || "none"}`,
-    );
   } catch (err) {
     console.error("Failed to fetch posts:", err);
     error.value = "Could not load posts.";
