@@ -116,7 +116,7 @@ public class PostServiceTests
         var posts = new List<Post>();
         for (int i = 0; i < _defaultPaginationLimit + 1; i++)
         {
-            posts.Add(CreateTestFatPost(Guid.NewGuid(), _testUserId, $"Post {i}"));
+            posts.Add(CreateTestFatPost(_testPostId, _testUserId, $"Post {i}"));
         }
 
         var postGetAllRequestDto = new PostGetAllRequestDto
@@ -144,7 +144,7 @@ public class PostServiceTests
     {
         // Arrange
         var cursor = Guid.NewGuid();
-        var posts = new List<Post> { CreateTestFatPost(Guid.NewGuid(), _testUserId, "Post 1") };
+        var posts = new List<Post> { CreateTestFatPost(_testPostId, _testUserId, "Post 1") };
 
         var postGetAllRequestDto = new PostGetAllRequestDto
         {
@@ -195,7 +195,7 @@ public class PostServiceTests
     public async Task GetPosts_WithAnonymousUser_ReturnsPostsWithNoVoteStatus()
     {
         // Arrange
-        var posts = new List<Post> { CreateTestFatPost(_testPostId, Guid.NewGuid(), "Post 1") };
+        var posts = new List<Post> { CreateTestFatPost(_testPostId, _testUserId, "Post 1") };
 
         var postGetAllRequestDto = new PostGetAllRequestDto
         {
@@ -283,7 +283,7 @@ public class PostServiceTests
     public async Task GetPostById_WithAnonymousUser_ReturnsPostWithNoVoteStatus()
     {
         // Arrange
-        var post = CreateTestFatPost(_testPostId, Guid.NewGuid(), "Test Post");
+        var post = CreateTestFatPost(_testPostId, _testUserId, "Test Post");
 
         _mockPostRepository.Setup(r => r.GetFatPostById(_testPostId)).ReturnsAsync(post);
         _mockCurrentUser.Setup(u => u.UserId).Returns((Guid?)null);
@@ -314,7 +314,7 @@ public class PostServiceTests
         };
 
         var tags = new List<Tag>();
-        var createdPost = CreateTestFatPost(Guid.NewGuid(), _testUserId, createDto.Title);
+        var createdPost = CreateTestFatPost(_testPostId, _testUserId, createDto.Title);
 
         _mockTagRepository.Setup(r => r.GetTagsByIds(createDto.Tags)).ReturnsAsync(tags);
 
@@ -570,7 +570,7 @@ public class PostServiceTests
     public async Task VotePost_WithNoExistingVote_CreatesNewVote()
     {
         // Arrange
-        var post = CreateTestSlimPost(_testPostId, Guid.NewGuid(), "Test Post");
+        var post = CreateTestSlimPost(_testPostId, _testUserId, "Test Post");
         var voteDto = new PostVoteRequestDto { VoteType = VoteType.Upvote };
 
         _mockPostRepository.Setup(r => r.GetSlimPostbyId(_testPostId)).ReturnsAsync(post);
@@ -611,7 +611,7 @@ public class PostServiceTests
     public async Task VotePost_WithNoVote_RemovesVote()
     {
         // Arrange
-        var post = CreateTestSlimPost(_testPostId, Guid.NewGuid(), "Test Post");
+        var post = CreateTestSlimPost(_testPostId, _testUserId, "Test Post");
         var existingVote = new PostVote
         {
             Id = Guid.NewGuid(),
@@ -650,7 +650,7 @@ public class PostServiceTests
     public async Task VotePost_WithExistingDifferentVote_UpdatesVote()
     {
         // Arrange
-        var post = CreateTestSlimPost(_testPostId, Guid.NewGuid(), "Test Post");
+        var post = CreateTestSlimPost(_testPostId, _testUserId, "Test Post");
         var existingVote = new PostVote
         {
             Id = Guid.NewGuid(),
@@ -711,7 +711,7 @@ public class PostServiceTests
     public async Task VotePost_UpdatesPostUpdatedAt()
     {
         // Arrange
-        var post = CreateTestSlimPost(_testPostId, Guid.NewGuid(), "Test Post");
+        var post = CreateTestSlimPost(_testPostId, _testUserId, "Test Post");
         var originalUpdatedAt = post.UpdatedAt;
         var voteDto = new PostVoteRequestDto { VoteType = VoteType.Upvote };
 
@@ -840,7 +840,7 @@ public class PostServiceTests
     public async Task BookmarkPost_WithValidData_ReturnsSuccess()
     {
         // Arrange
-        var post = CreateTestSlimPost(_testPostId, Guid.NewGuid(), "Test Post");
+        var post = CreateTestSlimPost(_testPostId, _testUserId, "Test Post");
 
         _mockPostRepository.Setup(r => r.GetSlimPostbyId(_testPostId)).ReturnsAsync(post);
         _mockPostBookmarkRepository
@@ -871,7 +871,7 @@ public class PostServiceTests
     public async Task BookmarkPost_WithExistingBookmark_RemovesBookmark()
     {
         // Arrange
-        var post = CreateTestSlimPost(_testPostId, Guid.NewGuid(), "Test Post");
+        var post = CreateTestSlimPost(_testPostId, _testUserId, "Test Post");
         var existingBookmark = new PostBookmark
         {
             Id = Guid.NewGuid(),
