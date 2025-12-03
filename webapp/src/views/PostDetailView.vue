@@ -17,7 +17,7 @@ import { useToast } from "primevue/usetoast";
 import MapDisplay from "@/components/MapDisplay.vue";
 import { removePostalCode } from "@/utils/locationFormatter";
 
-import { getPostById, voteOnPost } from "@/api/postService";
+import { getPostById, voteOnPost, deletePost } from "@/api/postService";
 import { getMediaByPostId } from "@/api/mediaService";
 import { getCommentsByPostId, createComment } from "@/api/commentService";
 
@@ -42,9 +42,8 @@ const errorMessage = ref<string | null>(null);
 
 const auth = useAuthStore();
 
-const isOwner = computed(() => {
-  if (!auth.user || !post.value) return false;
-  return auth.user.id === post.value.authorId;
+const canMutate = computed(() => {
+  return post.value?.canMutate ?? false;
 });
 
 // fetch the post, its media, and its comments
@@ -53,12 +52,29 @@ async function loadPostData() {
     isLoading.value = true;
 
     post.value = await getPostById(postId);
+
+    // Check if post is deleted
+    if (post.value.isDeleted) {
+      errorMessage.value = "Post not found";
+      isLoading.value = false;
+      return;
+    }
+
     images.value = await getMediaByPostId(postId);
     const { items } = await getCommentsByPostId(postId);
     comments.value = items;
   } catch (err) {
     console.error("Failed to load post details:", err);
-    errorMessage.value = "Failed to load post details.";
+
+    // handle 404 specifically
+    if (
+      err instanceof Error &&
+      (err.message?.includes("not found") || err.message?.includes("404"))
+    ) {
+      errorMessage.value = "Post not found";
+    } else {
+      errorMessage.value = "Failed to load post details.";
+    }
   } finally {
     isLoading.value = false;
   }
@@ -194,11 +210,32 @@ async function handleReport() {
 }
 
 async function handleDelete() {
-  if (!isOwner.value) {
+  // ensure user can mutate as per backend authorization
+  if (!canMutate.value) {
     return;
   }
 
-  // implement delete api call
+  if (!confirm("Are you sure you want to delete this post?")) {
+    return;
+  }
+
+  try {
+    await deletePost(postId);
+    toast.add({
+      severity: "success",
+      summary: "Post deleted successfully",
+      life: 3000,
+    });
+    router.push("/");
+  } catch (err) {
+    console.error("Failed to delete post:", err);
+    toast.add({
+      severity: "error",
+      summary: "Failed to delete post",
+      detail: "Please try again later.",
+      life: 5000,
+    });
+  }
 }
 
 async function handleBookmark() {
@@ -225,18 +262,31 @@ onMounted(loadPostData);
       </div>
 
       <div class="post-detail-body">
-        <div v-if="isLoading" class="loading-state">Loading post...</div>
-        <div v-else-if="errorMessage" class="error-state">{{ errorMessage }}</div>
+        <div v-if="isLoading" class="loading-state">
+          <i class="pi pi-spin pi-spinner"></i>
+          <p>Loading post...</p>
+        </div>
+        <div v-else-if="errorMessage" class="error-state">
+          <div class="error-content">
+            <i class="pi pi-exclamation-circle error-icon"></i>
+            <h2 class="error-title">{{ errorMessage }}</h2>
+            <p class="error-message">
+              {{
+                errorMessage === "Post not found"
+                  ? "This post may have been removed or doesn't exist."
+                  : "We encountered an issue loading this post. Please try again later."
+              }}
+            </p>
+            <button class="error-button" @click="router.push('/')">
+              <i class="pi pi-home"></i>
+              Back to Home
+            </button>
+          </div>
+        </div>
 
         <div v-else-if="post" class="post-detail-content-layout">
           <div class="post-content">
             <div class="post-card">
-              <div class="post-tags">
-                <span v-for="tag in post.tags" :key="tag.id" class="tag-pill">
-                  {{ tag.name }}
-                </span>
-              </div>
-
               <div class="post-header">
                 <h1 class="post-title" data-testid="post-title">{{ post.title }}</h1>
                 <Dropdown>
@@ -270,7 +320,7 @@ onMounted(loadPostData);
                         <i class="pi pi-flag"></i> Report
                       </li>
                       <li
-                        v-if="isOwner"
+                        v-if="canMutate"
                         @click="
                           handleDelete();
                           close();
@@ -393,6 +443,83 @@ onMounted(loadPostData);
   min-width: 0;
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+  gap: 1rem;
+  color: var(--tertiary-text-color);
+}
+
+.loading-state i {
+  font-size: 2.5rem;
+}
+
+.error-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+  min-height: 60vh;
+}
+
+.error-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  background: var(--primary-background-color);
+  border: 0.1rem solid var(--border-color);
+  border-radius: 1rem;
+  padding: 3rem 4rem;
+  text-align: center;
+  max-width: 500px;
+}
+
+.error-icon {
+  font-size: 4rem;
+  color: var(--error-color, #ef4444);
+}
+
+.error-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--primary-text-color);
+}
+
+.error-message {
+  font-size: 1.1rem;
+  color: var(--tertiary-text-color);
+  margin: 0;
+}
+
+.error-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--neutral-color);
+  color: var(--secondary-text-color);
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 0.5rem;
+}
+
+.error-button:hover {
+  background: var(--neutral-color-hover);
+}
+
+.error-button i {
+  font-size: 1.1rem;
 }
 
 .post-detail-content-layout {

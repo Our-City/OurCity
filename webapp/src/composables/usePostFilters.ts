@@ -58,7 +58,8 @@ async function fetchPosts() {
     filters.value.searchTerm = searchTerm.value.trim() || undefined;
 
     const res = await getPosts(filters.value);
-    posts.value = res.items;
+    // Filter out deleted posts from the results
+    posts.value = res.items.filter((post) => !post.isDeleted);
     nextCursor.value = res.nextCursor ?? null;
   } catch (err) {
     console.error("Failed to fetch posts:", err);
