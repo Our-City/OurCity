@@ -598,7 +598,8 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
     }
 
     [Fact]
-    public async Task GettingPostOfReportedUserShowReportedStatus() {
+    public async Task GettingPostOfReportedUserShowReportedStatus()
+    {
         using var client = _ourCityApi.CreateClient();
 
         var loginRequest = new UserCreateRequestDto
@@ -619,7 +620,9 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
 
         //have one stubbed post - owner = stubbed user 1
         var response = await client.GetAsync($"{_baseUrl}/posts/");
-        var responseContent = await response.Content.ReadFromJsonAsync<PaginatedResponseDto<PostResponseDto>>();
+        var responseContent = await response.Content.ReadFromJsonAsync<
+            PaginatedResponseDto<PostResponseDto>
+        >();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.True(responseContent?.Items.First().IsReported);
