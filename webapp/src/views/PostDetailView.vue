@@ -88,12 +88,12 @@ async function submitComment() {
     // add the server response to the beginning of the comments array
     comments.value = [created, ...comments.value];
     commentText.value = "";
-    
+
     // increment the comment count on the post
     if (post.value) {
       post.value = { ...post.value, commentCount: post.value.commentCount + 1 };
     }
-    
+
     toast.add({ severity: "success", summary: "Comment created successfully.", life: 3000 });
   } catch (err) {
     console.error("Failed to create comment:", err);
@@ -115,12 +115,12 @@ function handleCommentUpdated(updated: Comment) {
 // handle deleted comment from CommentList
 function handleCommentDeleted(commentId: string) {
   comments.value = comments.value.filter((c) => c.id !== commentId);
-  
+
   // decrement the comment count on the post
   if (post.value) {
     post.value = { ...post.value, commentCount: post.value.commentCount - 1 };
   }
-  
+
   toast.add({ severity: "success", summary: "Comment deleted successfully.", life: 3000 });
 }
 

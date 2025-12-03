@@ -98,7 +98,9 @@ test.describe("Comment Deletion", () => {
     await page.waitForLoadState("networkidle");
 
     // Create a comment
-    const commentInput = page.locator('textarea[placeholder*="comment" i], .comment-input textarea');
+    const commentInput = page.locator(
+      'textarea[placeholder*="comment" i], .comment-input textarea',
+    );
     if (await commentInput.isVisible()) {
       await commentInput.fill("Test comment for deletion");
       await page.getByRole("button", { name: /submit/i }).click();
@@ -120,7 +122,9 @@ test.describe("Comment Deletion", () => {
     await page.waitForLoadState("networkidle");
 
     // Create a comment to delete
-    const commentInput = page.locator('textarea[placeholder*="comment" i], .comment-input textarea');
+    const commentInput = page.locator(
+      'textarea[placeholder*="comment" i], .comment-input textarea',
+    );
     if (await commentInput.isVisible()) {
       const testCommentText = "Comment to be deleted " + Date.now();
       await commentInput.fill(testCommentText);
@@ -138,7 +142,7 @@ test.describe("Comment Deletion", () => {
 
       // Click delete button
       const deleteButton = commentItem.locator("button[title*='Delete'], .delete-button");
-      
+
       // Handle confirmation dialog
       page.once("dialog", (dialog) => {
         expect(dialog.message()).toContain("delete");
@@ -167,7 +171,9 @@ test.describe("Comment Deletion", () => {
     await page.waitForLoadState("networkidle");
 
     // Create a comment to delete
-    const commentInput = page.locator('textarea[placeholder*="comment" i], .comment-input textarea');
+    const commentInput = page.locator(
+      'textarea[placeholder*="comment" i], .comment-input textarea',
+    );
     if (await commentInput.isVisible()) {
       await commentInput.fill("Comment for toast test " + Date.now());
       await page.getByRole("button", { name: /submit/i }).click();
@@ -199,7 +205,9 @@ test.describe("Comment Deletion", () => {
     await page.waitForLoadState("networkidle");
 
     // Create a comment
-    const commentInput = page.locator('textarea[placeholder*="comment" i], .comment-input textarea');
+    const commentInput = page.locator(
+      'textarea[placeholder*="comment" i], .comment-input textarea',
+    );
     if (await commentInput.isVisible()) {
       const testCommentText = "Comment that won't be deleted " + Date.now();
       await commentInput.fill(testCommentText);
@@ -241,7 +249,9 @@ test.describe("Comment Deletion", () => {
     await page.waitForLoadState("networkidle");
 
     // Create a comment
-    const commentInput = page.locator('textarea[placeholder*="comment" i], .comment-input textarea');
+    const commentInput = page.locator(
+      'textarea[placeholder*="comment" i], .comment-input textarea',
+    );
     if (await commentInput.isVisible()) {
       await commentInput.fill("Comment for count test " + Date.now());
       await page.getByRole("button", { name: /submit/i }).click();

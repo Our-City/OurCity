@@ -6,7 +6,7 @@ import CommentItem from "./CommentItem.vue";
 import type { Comment } from "@/models/comment";
 
 const props = defineProps<{ comments: Comment[] }>();
-const emit = defineEmits<{ 
+const emit = defineEmits<{
   (e: "updated", updated: Comment): void;
   (e: "deleted", commentId: string): void;
 }>();
