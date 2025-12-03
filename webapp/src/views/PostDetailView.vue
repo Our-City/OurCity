@@ -131,9 +131,7 @@ const formattedLocation = computed(() => {
 
 // Display "deleted-user" if authorName is null/empty
 const displayAuthorName = computed(() => {
-  return post.value?.authorName && post.value.authorName.trim()
-    ? post.value.authorName
-    : "[deleted]";
+  return post.value?.authorName && post.value.authorName.trim() ? post.value.authorName : " ";
 });
 
 // submit a new comment on the post
@@ -356,7 +354,7 @@ async function handleBookmark() {
 }
 
 function goBack() {
-  router.push("/");
+  router.back();
 }
 
 onMounted(loadPostData);
@@ -478,7 +476,9 @@ onMounted(loadPostData);
               </div>
 
               <div class="post-description">
-                {{ post.description }}
+                <p v-for="(line, index) in post.description.split('\n')" :key="index">
+                  {{ line }}
+                </p>
               </div>
 
               <div class="post-footer">
@@ -791,6 +791,15 @@ onMounted(loadPostData);
   font-size: 1.1rem;
   padding-top: 1rem;
   margin-bottom: 1rem;
+  white-space: pre-wrap;
+}
+
+.post-description p {
+  margin: 0 0 0.5rem 0;
+}
+
+.post-description p:last-child {
+  margin-bottom: 0;
 }
 
 .post-footer {
