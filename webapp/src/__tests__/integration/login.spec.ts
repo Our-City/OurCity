@@ -3,7 +3,7 @@
 ///   a description of what exactly should be tested for this component and giving
 ///   back the needed functions and syntax to implement the tests.
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { mount } from "@vue/test-utils";
+import { mount, flushPromises } from "@vue/test-utils";
 import { createRouter, createMemoryHistory } from "vue-router";
 import LoginView from "@/views/LoginView.vue";
 import { setActivePinia, createPinia } from "pinia";
@@ -13,6 +13,10 @@ import { login } from "@/api/authenticationService";
 
 vi.mock("@/api/authenticationService", () => ({
   login: vi.fn(),
+}));
+
+vi.mock("@/api/authorizationService", () => ({
+  canViewAdminDashboard: vi.fn().mockResolvedValue(false),
 }));
 
 const FormStub = {
@@ -94,7 +98,7 @@ describe("LoginView - integration", () => {
     const form = wrapper.find("form");
     await form.trigger("submit");
 
-    await new Promise((r) => setTimeout(r, 0));
+    await flushPromises();
 
     expect(login).toHaveBeenCalledWith("alice", "s3cret123");
     expect(auth.user).toBeTruthy();

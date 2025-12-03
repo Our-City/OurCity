@@ -6,6 +6,8 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createRouter, createMemoryHistory } from "vue-router";
 import { setActivePinia, createPinia } from "pinia";
+import PrimeVue from "primevue/config";
+import ToastService from "primevue/toastservice";
 import PostDetailView from "@/views/PostDetailView.vue";
 import { getPostById } from "@/api/postService";
 import { getMediaByPostId } from "@/api/mediaService";
@@ -84,7 +86,7 @@ describe("PostDetailView - integration (comments)", () => {
 
     const wrapper = mount(PostDetailView, {
       global: {
-        plugins: [router],
+        plugins: [router, PrimeVue, ToastService],
         stubs: {
           PageHeader: { template: "<div/>" },
           SideBar: { template: "<div/>" },
@@ -140,7 +142,7 @@ describe("PostDetailView - integration (comments)", () => {
 
     const wrapper = mount(PostDetailView, {
       global: {
-        plugins: [router],
+        plugins: [router, PrimeVue, ToastService],
         stubs: {
           PageHeader: { template: "<div/>" },
           SideBar: { template: "<div/>" },
@@ -212,7 +214,7 @@ describe("PostDetailView - integration (comments)", () => {
 
     const wrapper = mount(PostDetailView, {
       global: {
-        plugins: [router],
+        plugins: [router, PrimeVue, ToastService],
         stubs: {
           PageHeader: { template: "<div/>" },
           SideBar: { template: "<div/>" },

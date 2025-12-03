@@ -3,7 +3,7 @@
 ///   a description of what exactly should be tested for this component and giving
 ///   back the needed functions and syntax to implement the tests.
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { mount } from "@vue/test-utils";
+import { mount, flushPromises } from "@vue/test-utils";
 import { User } from "@/models/user";
 import { createRouter, createMemoryHistory } from "vue-router";
 import RegisterView from "@/views/RegisterView.vue";
@@ -19,6 +19,10 @@ vi.mock("@/api/userService", () => ({
 
 vi.mock("@/api/authenticationService", () => ({
   login: vi.fn(),
+}));
+
+vi.mock("@/api/authorizationService", () => ({
+  canViewAdminDashboard: vi.fn().mockResolvedValue(false),
 }));
 
 vi.mock("@/utils/error", () => ({
@@ -103,7 +107,7 @@ describe("RegisterView - integration", () => {
     const form = wrapper.find("form");
     await form.trigger("submit");
 
-    await new Promise((r) => setTimeout(r, 0));
+    await flushPromises();
 
     expect(createUser).toHaveBeenCalledWith("newbie", "s3cret123");
     expect(login).toHaveBeenCalledWith("newbie", "s3cret123");
