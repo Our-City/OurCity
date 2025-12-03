@@ -286,10 +286,10 @@ function goBack() {
         <SideBar view="home" />
       </div>
       <div class="create-post-page-body">
-        <button class="back-button" @click="goBack" aria-label="Back to home">
-          <i class="pi pi-arrow-left"></i>
-        </button>
         <div class="create-post-container">
+          <button class="back-button" @click="goBack" aria-label="Back to home">
+            <i class="pi pi-arrow-left"></i>
+          </button>
           <Form
             variant="card"
             width="wide"
@@ -512,6 +512,10 @@ function goBack() {
   position: relative;
 }
 
+.create-post-container {
+  position: relative;
+}
+
 .back-button {
   position: absolute;
   top: 2rem;
@@ -519,7 +523,6 @@ function goBack() {
   width: 3rem;
   height: 3rem;
   border-radius: 50%;
-  border: 0.1rem solid var(--border-color);
   background: var(--primary-background-color);
   color: var(--primary-text-color);
   display: flex;

@@ -550,7 +550,6 @@ onMounted(loadPostData);
   width: 3rem;
   height: 3rem;
   border-radius: 50%;
-  border: 0.1rem solid var(--border-color);
   background: var(--primary-background-color);
   color: var(--primary-text-color);
   display: flex;
