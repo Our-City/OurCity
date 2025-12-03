@@ -42,3 +42,8 @@ export interface UserListVoteResponseDto {
   votes: UserVoteResponseDto[];
   nextCursor?: string; // for pagination
 }
+
+export interface UserReportResponseDto {
+  reason?: string;
+}
+

@@ -35,6 +35,12 @@ export async function deleteUser(userId: string): Promise<User> {
   return toUser(response.data);
 }
 
+// PUT /user/{id}/reports
+export async function reportUser(id: string, reason?: string): Promise<void> {
+  const dto = reason ? { reason } : {};
+  await api.put(`/users/${id}/reports`, dto);
+}
+
 // /me endpoints
 
 // GET /me

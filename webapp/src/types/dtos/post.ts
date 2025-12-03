@@ -27,6 +27,7 @@ export interface PostResponseDto {
   canMutate: boolean; // authorization flag
   voteStatus: VoteType;
   isBookmarked: boolean;
+  isReported: boolean;
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
 }
