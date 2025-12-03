@@ -7,7 +7,7 @@ using OurCity.Api.Common.Enum;
 
 namespace OurCity.Api.Test.IntegrationTests;
 
-[Trait("Type", "Endpoint")]
+[Trait("Type", "Integration")]
 [Trait("Domain", "Comment")]
 public class CommentEndpointTests : IAsyncLifetime, IClassFixture<OurCityWebApplicationFactory>
 {

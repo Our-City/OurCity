@@ -9,12 +9,7 @@ namespace OurCity.Api.Services.Mappings;
 
 public static class PostMappings
 {
-    public static IEnumerable<PostResponseDto> ToDtos(this IEnumerable<Post> posts, Guid? userId)
-    {
-        return posts.Select(post => post.ToDto(userId));
-    }
-
-    public static PostResponseDto ToDto(this Post post, Guid? userId)
+    public static PostResponseDto ToDto(this Post post, Guid? userId, bool canMutate)
     {
         return new PostResponseDto
         {
@@ -23,6 +18,8 @@ public static class PostMappings
             Title = post.Title,
             Description = post.Description,
             Location = post.Location,
+            Latitude = post.Latitude,
+            Longitude = post.Longitude,
             AuthorName = post.Author?.UserName,
             UpvoteCount = post.Votes.Count(vote => vote.VoteType == VoteType.Upvote),
             DownvoteCount = post.Votes.Count(vote => vote.VoteType == VoteType.Downvote),
@@ -33,6 +30,10 @@ public static class PostMappings
                 ? post.Votes.FirstOrDefault(vote => vote.VoterId.Equals(userId))?.VoteType
                 ?? VoteType.NoVote
                 : VoteType.NoVote,
+            IsBookmarked = userId.HasValue
+                ? post.Bookmarks.Any(b => b.UserId.Equals(userId))
+                : false,
+            CanMutate = canMutate,
             IsDeleted = post.IsDeleted,
             CreatedAt = post.CreatedAt,
             UpdatedAt = post.UpdatedAt,
@@ -52,6 +53,8 @@ public static class PostMappings
             Title = postCreateRequestDto.Title,
             Description = postCreateRequestDto.Description,
             Location = postCreateRequestDto.Location,
+            Latitude = postCreateRequestDto.Latitude,
+            Longitude = postCreateRequestDto.Longitude,
             Tags = tags,
             Visisbility = PostVisibility.Published,
             CreatedAt = DateTime.UtcNow,

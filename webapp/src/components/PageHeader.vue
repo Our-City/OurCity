@@ -19,6 +19,10 @@ async function goToHome(): Promise<void> {
   reset();
 }
 
+function goToAdminDashboard(): void {
+  router.push("/admin");
+}
+
 function handleLogin(): void {
   router.push("/login");
 }
@@ -42,6 +46,7 @@ function handleCreatePost(): void {
 }
 
 const isLoggedIn = computed(() => auth.isAuthenticated);
+const isAdmin = computed(() => auth.isAdmin);
 </script>
 
 <template>
@@ -63,6 +68,11 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
       <template #end>
         <button v-if="!isLoggedIn" class="login-button" @click="handleLogin">Login</button>
         <button v-if="!isLoggedIn" class="signup-button" @click="handleSignUp">Sign Up</button>
+
+        <button v-if="isLoggedIn && isAdmin" class="admin-button" @click="goToAdminDashboard">
+          <i class="pi pi-objects-column"></i>
+          Admin
+        </button>
 
         <button v-if="isLoggedIn" class="create-post-button" @click="handleCreatePost">
           <i class="pi pi-plus"></i>
@@ -103,7 +113,9 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
 
 <style scoped>
 .page-header {
-  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 4rem 6rem rgba(0, 0, 0, 0.075);
+  position: relative;
+  z-index: 10;
 }
 
 .app-title {

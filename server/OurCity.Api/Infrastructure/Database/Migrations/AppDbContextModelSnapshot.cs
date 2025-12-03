@@ -228,8 +228,14 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("double precision");
+
                     b.Property<string>("Location")
                         .HasColumnType("text");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("double precision");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -246,6 +252,30 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.HasIndex("AuthorId");
 
                     b.ToTable("Posts");
+                });
+
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.PostBookmark", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("BookmarkedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PostBookmarks");
                 });
 
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.PostVote", b =>
@@ -405,9 +435,6 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsAdmin")
-                        .HasColumnType("boolean");
-
                     b.Property<bool>("IsBanned")
                         .HasColumnType("boolean");
 
@@ -460,6 +487,34 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.UserReport", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ReportedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ReporterId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TargetUserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReporterId");
+
+                    b.HasIndex("TargetUserId");
+
+                    b.ToTable("UserReports");
                 });
 
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.UserRole", b =>
@@ -615,6 +670,25 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Navigation("Author");
                 });
 
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.PostBookmark", b =>
+                {
+                    b.HasOne("OurCity.Api.Infrastructure.Database.Post", "Post")
+                        .WithMany("Bookmarks")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OurCity.Api.Infrastructure.Database.User", "User")
+                        .WithMany("PostBookmarks")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.PostVote", b =>
                 {
                     b.HasOne("OurCity.Api.Infrastructure.Database.Post", "Post")
@@ -632,6 +706,25 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Navigation("Post");
 
                     b.Navigation("Voter");
+                });
+
+            modelBuilder.Entity("OurCity.Api.Infrastructure.Database.UserReport", b =>
+                {
+                    b.HasOne("OurCity.Api.Infrastructure.Database.User", "Reporter")
+                        .WithMany("SubmittedReports")
+                        .HasForeignKey("ReporterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OurCity.Api.Infrastructure.Database.User", "TargetUser")
+                        .WithMany("ReceivedReports")
+                        .HasForeignKey("TargetUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reporter");
+
+                    b.Navigation("TargetUser");
                 });
 
             modelBuilder.Entity("PostTag", b =>
@@ -656,6 +749,8 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("OurCity.Api.Infrastructure.Database.Post", b =>
                 {
+                    b.Navigation("Bookmarks");
+
                     b.Navigation("Comments");
 
                     b.Navigation("Media");
@@ -667,9 +762,15 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                 {
                     b.Navigation("Comments");
 
+                    b.Navigation("PostBookmarks");
+
                     b.Navigation("PostVotes");
 
                     b.Navigation("Posts");
+
+                    b.Navigation("ReceivedReports");
+
+                    b.Navigation("SubmittedReports");
                 });
 #pragma warning restore 612, 618
         }

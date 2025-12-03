@@ -1,7 +1,5 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using OurCity.Api.Infrastructure;
+using OurCity.Api.Infrastructure.Database;
 
 namespace OurCity.Api.Services.Authorization;
 
@@ -13,58 +11,68 @@ namespace OurCity.Api.Services.Authorization;
 /// </credits>
 public interface IPolicyService
 {
-    Task<bool> CheckPolicy(ClaimsPrincipal user, Policy policy);
-    Task<bool> CheckResourcePolicy(ClaimsPrincipal user, Policy policy, object resource);
+    Task<bool> CanParticipateInForum();
+    Task<bool> CanMutateThisPost(Post post);
+    Task<bool> CanMutateThisComment(Comment comment);
+    Task<bool> CanAdministrateForum();
+    Task<bool> CanViewAdminDashboard();
 }
 
 public class PolicyService : IPolicyService
 {
+    private readonly ICurrentUser _user;
     private readonly IAuthorizationService _authorizationService;
-    private readonly IPostRepository _postRepository;
 
-    public PolicyService(IAuthorizationService authorizationService, IPostRepository postRepository)
+    public PolicyService(ICurrentUser user, IAuthorizationService authorizationService)
     {
+        _user = user;
         _authorizationService = authorizationService;
-        _postRepository = postRepository;
     }
 
-    public async Task<bool> CheckPolicy(ClaimsPrincipal user, Policy policy)
+    public async Task<bool> CanParticipateInForum()
     {
-        var authResult = await _authorizationService.AuthorizeAsync(user, Policy.CanCreatePosts);
-
-        var isAllowed = authResult.Succeeded;
-
-        return isAllowed;
-    }
-
-    public async Task<bool> CheckResourcePolicy(
-        ClaimsPrincipal user,
-        Policy policy,
-        object resource
-    )
-    {
-        bool isAllowed = false;
-
-        if (policy == Policy.CanMutateThisPost)
-            isAllowed = await CheckCanMutateThisPost(user, policy, (Guid)resource);
-
-        return isAllowed;
-    }
-
-    public async Task<bool> CheckCanMutateThisPost(ClaimsPrincipal user, Policy policy, Guid postId)
-    {
-        var post = await _postRepository.GetSlimPostbyId(postId);
-
-        if (post == null)
-            return false;
-
         var authResult = await _authorizationService.AuthorizeAsync(
-            user,
+            _user.Principal,
+            Policy.CanParticipateInForum
+        );
+        return authResult.Succeeded;
+    }
+
+    public async Task<bool> CanMutateThisPost(Post post)
+    {
+        var authResult = await _authorizationService.AuthorizeAsync(
+            _user.Principal,
             post,
             Policy.CanMutateThisPost
         );
-        var isAllowed = authResult.Succeeded;
+        return authResult.Succeeded;
+    }
 
-        return isAllowed;
+    public async Task<bool> CanMutateThisComment(Comment comment)
+    {
+        var authResult = await _authorizationService.AuthorizeAsync(
+            _user.Principal,
+            comment,
+            Policy.CanMutateThisComment
+        );
+        return authResult.Succeeded;
+    }
+
+    public async Task<bool> CanAdministrateForum()
+    {
+        var authResult = await _authorizationService.AuthorizeAsync(
+            _user.Principal,
+            Policy.CanAdministrateForum
+        );
+        return authResult.Succeeded;
+    }
+
+    public async Task<bool> CanViewAdminDashboard()
+    {
+        var authResult = await _authorizationService.AuthorizeAsync(
+            _user.Principal,
+            Policy.CanViewAdminDashboard
+        );
+        return authResult.Succeeded;
     }
 }

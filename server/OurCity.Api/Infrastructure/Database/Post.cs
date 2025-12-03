@@ -14,6 +14,10 @@ public class Post
 
     public string? Location { get; set; }
 
+    public double? Latitude { get; set; }
+
+    public double? Longitude { get; set; }
+
     public PostVisibility Visisbility { get; set; } = PostVisibility.Published;
 
     public bool IsDeleted { get; set; }
@@ -32,4 +36,6 @@ public class Post
     public List<PostVote> Votes { get; set; } = new();
 
     public List<Media> Media { get; set; } = new();
+
+    public List<PostBookmark> Bookmarks { get; set; } = new();
 }

@@ -73,7 +73,7 @@ const validateForm = () => {
   if (!formData.value.password.trim()) {
     errors.value.password = "Password is required";
   } else if (formData.value.password.length < 6) {
-    errors.value.password = "Password must be at least 6 characters";
+    errors.value.password = "Password must be at least 6 characters\n";
   }
 };
 const navigateToRegister = () => {

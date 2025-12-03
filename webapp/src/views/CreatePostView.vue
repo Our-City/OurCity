@@ -4,13 +4,15 @@
   e.g., loading Tags using API, etc.
   Copilot assisted with error handling.-->
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 
 import PageHeader from "@/components/PageHeader.vue";
 import SideBar from "@/components/SideBar.vue";
 import Form from "@/components/utils/FormCmp.vue";
 import MultiSelect from "@/components/utils/MultiSelect.vue";
+import MapPicker from "@/components/MapPicker.vue";
+import LocationAutocomplete from "@/components/LocationAutocomplete.vue";
 import { useToast } from "primevue/usetoast";
 
 import InputText from "primevue/inputtext";
@@ -38,6 +40,11 @@ const formData = ref({
   description: "",
   tags: [] as Tag[],
   images: [] as File[],
+  locationData: null as {
+    latitude: number;
+    longitude: number;
+    name: string;
+  } | null,
 });
 
 // Form state
@@ -52,6 +59,13 @@ const descriptionTouched = ref(false);
 const availableTags = ref<Tag[]>([]);
 const isLoadingTags = ref(false);
 const tagError = ref<string | null>(null);
+
+const locationValidationError = ref<string | null>(null);
+
+// Handle location errors from either component
+function handleLocationError(error: string | null) {
+  locationValidationError.value = error;
+}
 
 async function loadTags() {
   try {
@@ -80,10 +94,6 @@ const imagePreviewUrls = computed(() => {
 // Computed properties for showing errors only after touch
 const showTitleError = computed(() => {
   return titleTouched.value && errors.value.title;
-});
-
-const showLocationError = computed(() => {
-  return locationTouched.value && errors.value.location;
 });
 
 const showDescriptionError = computed(() => {
@@ -116,7 +126,9 @@ const handleSubmit = async (event: Event) => {
       id: "", // backend will assign this
       authorId: auth.user.id,
       title: formData.value.title.trim(),
-      location: formData.value.location.trim(),
+      location: formData.value.locationData?.name || formData.value.location.trim() || undefined,
+      latitude: formData.value.locationData?.latitude,
+      longitude: formData.value.locationData?.longitude,
       description: formData.value.description.trim(),
       tags: formData.value.tags,
       createdAt: new Date(),
@@ -161,6 +173,7 @@ const handleReset = () => {
     description: "",
     tags: [],
     images: [],
+    locationData: null,
   };
   errors.value = {};
   titleTouched.value = false;
@@ -218,6 +231,45 @@ const handleFileUpload = (event: Event) => {
 const removeImage = (index: number) => {
   formData.value.images.splice(index, 1);
 };
+
+// Handle location selected from autocomplete
+function handleLocationSelected(location: { name: string; latitude: number; longitude: number }) {
+  // Clear error on successful selection
+  locationValidationError.value = null;
+
+  formData.value.locationData = {
+    name: location.name,
+    latitude: location.latitude,
+    longitude: location.longitude,
+  };
+
+  formData.value.location = location.name;
+}
+
+// Handle manual changes to location text field
+function handleLocationTextChange(value: string) {
+  formData.value.location = value;
+
+  if (!value.trim() && formData.value.locationData) {
+    formData.value.locationData = null;
+    // Clear error when field is cleared
+    locationValidationError.value = null;
+  }
+}
+
+watch(
+  () => formData.value.locationData,
+  (newLocationData) => {
+    if (newLocationData?.name && newLocationData.name !== formData.value.location) {
+      formData.value.location = newLocationData.name;
+      // Clear error when valid location is set from map
+      locationValidationError.value = null;
+    } else if (!newLocationData) {
+      // Clear error when location data is cleared
+      locationValidationError.value = null;
+    }
+  },
+);
 </script>
 
 <template>
@@ -264,25 +316,43 @@ const removeImage = (index: number) => {
               <div class="form-help">{{ formData.title.length }}/50 characters</div>
             </div>
 
+            <!-- Location Validation Error Banner - Enhanced -->
+            <div v-if="locationValidationError" class="location-error-banner">
+              <div class="error-icon-container">
+                <i class="pi pi-exclamation-triangle"></i>
+              </div>
+              <div class="error-content">
+                <h4 class="error-title">Location Outside Winnipeg</h4>
+                <p class="error-message">{{ locationValidationError }}</p>
+              </div>
+            </div>
+
             <!-- Location Field -->
             <div class="form-field">
               <label class="form-label" for="location">Location</label>
-              <InputText
-                id="location"
-                v-model="formData.location"
-                class="form-input"
+
+              <LocationAutocomplete
+                :model-value="formData.location"
                 placeholder="e.g., Downtown Winnipeg, University of Manitoba"
-                :class="{ 'p-invalid': showLocationError }"
-                maxlength="50"
-                @blur="
-                  locationTouched = true;
-                  validateForm();
-                "
+                @update:model-value="handleLocationTextChange"
+                @location-selected="handleLocationSelected"
+                @location-error="handleLocationError"
               />
-              <div v-if="showLocationError" class="form-error">{{ errors.location }}</div>
+
               <div class="form-help">
-                Where is this post about? {{ formData.location.length }}/50 characters (optional)
+                Start typing to search for a location {{ formData.location.length }}/150 characters
+                (optional)
               </div>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label">Select Location on Map (Optional)</label>
+              <MapPicker
+                v-model="formData.locationData"
+                height="400px"
+                @location-error="handleLocationError"
+              />
+              <div class="form-help">Click on the map to select a location for your post</div>
             </div>
 
             <!-- Description Field -->
@@ -327,6 +397,7 @@ const removeImage = (index: number) => {
                 Choose tags that best describe your post (max 5, optional)
               </div>
             </div>
+
             <!-- Image Upload Field -->
             <div class="form-field">
               <label class="form-label" for="images">Images</label>
@@ -406,6 +477,13 @@ const removeImage = (index: number) => {
 <style scoped>
 .create-post {
   padding: 1rem;
+  height: 100vh;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .create-post-page-layout {
@@ -421,11 +499,18 @@ const removeImage = (index: number) => {
   overflow-y: auto;
   overflow-x: hidden;
   padding: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  position: relative;
 }
 
 .create-post-container {
   max-width: 800px;
-  margin: 0 auto;
+  width: 100%;
+  position: relative;
+  left: -10rem;
+  margin-right: -10rem;
 }
 
 /* Custom styles for PrimeVue input components */
@@ -462,5 +547,76 @@ const removeImage = (index: number) => {
   .create-post-page-body {
     order: 1;
   }
+}
+
+.location-error-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #fff9e6 0%, #fffbf0 100%);
+  border: 2px solid #ffc107;
+  border-left: 5px solid #ff9800;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-icon-container {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ff9800;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(255, 152, 0, 0.3);
+}
+
+.error-icon-container i {
+  font-size: 1.25rem;
+  color: white;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.error-content {
+  flex: 1;
+}
+
+.error-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e65100;
+}
+
+.error-message {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #856404;
 }
 </style>

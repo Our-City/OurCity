@@ -2,6 +2,7 @@
 ///  CoPilot assisted by generating boilerplate code for standard CRUD operations
 ///  and routing attributes based on common patterns in ASP.NET API developmeent.
 using Microsoft.AspNetCore.Mvc;
+using OurCity.Api.Common;
 using OurCity.Api.Common.Dtos.User;
 using OurCity.Api.Services;
 
@@ -52,6 +53,33 @@ public class UserController : ControllerBase
         {
             return Problem(statusCode: StatusCodes.Status404NotFound, detail: user.Error);
         }
+        return Ok(user.Data);
+    }
+
+    [HttpPut]
+    [Route("{id}/reports")]
+    [EndpointSummary("Report an existing user")]
+    [EndpointDescription("Reports the user with the specified ID")]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> ReportUser(
+        [FromRoute] Guid id,
+        [FromBody] UserReportRequestDto userReportRequestDto
+    )
+    {
+        var user = await _userService.ReportUser(id, userReportRequestDto);
+
+        if (!user.IsSuccess)
+        {
+            return Problem(
+                statusCode: (user.Error != null && user.Error.Equals(ErrorMessages.UserNotFound))
+                    ? StatusCodes.Status404NotFound
+                    : StatusCodes.Status403Forbidden,
+                detail: user.Error
+            );
+        }
+
         return Ok(user.Data);
     }
 

@@ -8,18 +8,21 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { login, logout, me } from "@/api/authenticationService";
+import { canViewAdminDashboard } from "@/api/authorizationService";
 import { getCurrentUser } from "@/api/userService";
 import type { User } from "@/models/user";
 
 export const useAuthStore = defineStore("auth", () => {
   const user = ref<User | null>(null);
   const loading = ref(false);
+  const isAdmin = ref(false);
   const isAuthenticated = computed(() => !!user.value);
 
   async function loginUser(username: string, password: string) {
     loading.value = true;
     try {
       user.value = await login(username, password);
+      await checkAdminStatus();
     } catch (error) {
       console.error("Login failed:", error);
       throw error;
@@ -31,8 +34,18 @@ export const useAuthStore = defineStore("auth", () => {
   async function restoreSession() {
     try {
       user.value = await me();
+      await checkAdminStatus();
     } catch {
       user.value = null;
+      isAdmin.value = false;
+    }
+  }
+
+  async function checkAdminStatus() {
+    try {
+      isAdmin.value = await canViewAdminDashboard();
+    } catch {
+      isAdmin.value = false;
     }
   }
 
@@ -40,6 +53,7 @@ export const useAuthStore = defineStore("auth", () => {
     loading.value = true;
     try {
       user.value = await getCurrentUser();
+      await checkAdminStatus();
     } catch (error) {
       console.error("Failed to fetch current user:", error);
       throw error;
@@ -51,11 +65,13 @@ export const useAuthStore = defineStore("auth", () => {
   async function logoutUser() {
     await logout();
     user.value = null;
+    isAdmin.value = false;
   }
 
   return {
     user,
     isAuthenticated,
+    isAdmin,
     loading,
     loginUser,
     restoreSession,

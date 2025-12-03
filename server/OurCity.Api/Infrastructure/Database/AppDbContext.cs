@@ -11,6 +11,8 @@ public class AppDbContext : IdentityDbContext<User, UserRole, Guid>
     public DbSet<PostVote> PostVotes { get; set; }
     public DbSet<CommentVote> CommentVotes { get; set; }
     public DbSet<Tag> Tags { get; set; }
+    public DbSet<PostBookmark> PostBookmarks { get; set; }
+    public DbSet<UserReport> UserReports { get; set; }
 
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options) { }
@@ -112,6 +114,35 @@ public class AppDbContext : IdentityDbContext<User, UserRole, Guid>
                 },
                 new Tag { Id = Guid.Parse("9e4f0c3f-02e4-4c88-bf89-9cc7cf7b63c3"), Name = "Events" }
             );
+        });
+
+        modelBuilder
+            .Entity<PostBookmark>()
+            .HasOne(pb => pb.User)
+            .WithMany(u => u.PostBookmarks)
+            .HasForeignKey(pb => pb.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder
+            .Entity<PostBookmark>()
+            .HasOne(pb => pb.Post)
+            .WithMany(p => p.Bookmarks)
+            .HasForeignKey(pb => pb.PostId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<UserReport>(entity =>
+        {
+            entity
+                .HasOne(r => r.Reporter)
+                .WithMany(u => u.SubmittedReports)
+                .HasForeignKey(r => r.ReporterId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity
+                .HasOne(r => r.TargetUser)
+                .WithMany(u => u.ReceivedReports)
+                .HasForeignKey(r => r.TargetUserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

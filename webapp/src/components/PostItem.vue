@@ -6,6 +6,7 @@ import type { Post } from "@/models/post";
 import type { Media } from "@/models/media";
 import { getMediaByPostId } from "@/api/mediaService";
 import { useAuthStore } from "@/stores/authenticationStore";
+import { removePostalCode } from "@/utils/locationFormatter";
 
 const props = defineProps<{ post: Post }>();
 
@@ -44,6 +45,7 @@ const authorUsername = computed(() => {
 });
 const commentCount = computed(() => props.post.commentCount ?? 0);
 const postImage = computed(() => media.value[0]?.url || null);
+const formattedLocation = computed(() => removePostalCode(props.post.location));
 </script>
 
 <template>
@@ -52,7 +54,7 @@ const postImage = computed(() => media.value[0]?.url || null);
       <div class="post-author-date">
         @{{ authorUsername }}
         <span v-if="post.createdAt" class="post-date">
-          {{ new Date(post.createdAt).toLocaleDateString() }}
+          · {{ new Date(post.createdAt).toLocaleDateString() }}
         </span>
       </div>
 
@@ -60,8 +62,8 @@ const postImage = computed(() => media.value[0]?.url || null);
         {{ post.title }}
       </h1>
 
-      <div class="post-tags">
-        {{ post.location }}
+      <div class="post-location">
+        {{ formattedLocation }}
       </div>
 
       <div class="post-votes-comments">
@@ -87,7 +89,7 @@ const postImage = computed(() => media.value[0]?.url || null);
   display: flex;
   width: 100%;
   max-width: 100%;
-  height: 9.5rem;
+  height: 10rem;
   background: var(--primary-background-color);
   border: 0.1rem solid var(--border-color);
   border-radius: 1rem;
@@ -103,7 +105,7 @@ const postImage = computed(() => media.value[0]?.url || null);
   flex-direction: column;
   width: 83%;
   min-width: 0;
-  justify-content: space-between;
+  gap: 0.25rem;
   overflow: hidden;
 }
 
@@ -122,7 +124,7 @@ const postImage = computed(() => media.value[0]?.url || null);
   font-weight: 800;
   color: var(--primary-text-color);
   white-space: nowrap;
-  overflow: visible;
+  overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
   min-width: 0;
@@ -130,7 +132,7 @@ const postImage = computed(() => media.value[0]?.url || null);
   line-height: 1.2;
 }
 
-.post-tags {
+.post-location {
   font-size: 1rem;
   color: var(--tertiary-text-color);
   white-space: nowrap;
@@ -145,7 +147,7 @@ const postImage = computed(() => media.value[0]?.url || null);
   flex-direction: row;
   align-items: center;
   color: var(--tertiary-text-color);
-  margin-top: 1rem;
+  margin-top: auto;
   gap: 0.5rem;
 }
 

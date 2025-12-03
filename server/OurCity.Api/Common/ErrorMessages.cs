@@ -25,6 +25,13 @@ public static class ErrorMessages
     public const string MediaUnauthorized =
         "You do not have permission to modify this media attachment";
 
+    // Users
+    public const string UserNotFound = "User not found";
+    public const string UserUnauthorized = "You do not have permission to modify this user";
+    public const string UserAlreadyExists = "User with the given ID already exists";
+    public const string CantBanSelf = "You cannot ban yourself";
+    public const string CantUnbanSelf = "You cannot unban yourself";
+
     // Tags
     public const string TagNotFound = "Tag not found";
 
@@ -36,4 +43,7 @@ public static class ErrorMessages
 
     // Votes
     public const string InvalidVoteType = "Invalid vote type";
+
+    // User Reports
+    public const string CantReportSelf = "You cannot report yourself";
 }
