@@ -67,14 +67,14 @@ async function fetchPosts(loadMore = false) {
     const res = await getPosts(filters.value);
     // Filter out deleted posts from the results
     const filteredPosts = res.items.filter((post) => !post.isDeleted);
-    
+
     // If loading more, append to existing posts; otherwise, replace
     if (loadMore) {
       posts.value = [...posts.value, ...filteredPosts];
     } else {
       posts.value = filteredPosts;
     }
-    
+
     nextCursor.value = res.nextCursor ?? null;
   } catch (err) {
     console.error("Failed to fetch posts:", err);
