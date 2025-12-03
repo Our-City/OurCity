@@ -27,6 +27,7 @@ export interface CommentResponseDto {
   downvoteCount: number;
   voteStatus: VoteType;
   isDeleted: boolean;
+  canMutate: boolean;
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
 }

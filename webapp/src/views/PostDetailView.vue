@@ -104,6 +104,13 @@ async function submitComment() {
     // add the server response to the beginning of the comments array
     comments.value = [created, ...comments.value];
     commentText.value = "";
+
+    // increment the comment count on the post
+    if (post.value) {
+      post.value = { ...post.value, commentCount: post.value.commentCount + 1 };
+    }
+
+    toast.add({ severity: "success", summary: "Comment created successfully.", life: 3000 });
   } catch (err) {
     console.error("Failed to create comment:", err);
     alert("Failed to submit comment. Please try again.");
@@ -119,6 +126,18 @@ function handleCommentUpdated(updated: Comment) {
     // create new array to ensure reactivity
     comments.value = [...comments.value.slice(0, idx), updated, ...comments.value.slice(idx + 1)];
   }
+}
+
+// handle deleted comment from CommentList
+function handleCommentDeleted(commentId: string) {
+  comments.value = comments.value.filter((c) => c.id !== commentId);
+
+  // decrement the comment count on the post
+  if (post.value) {
+    post.value = { ...post.value, commentCount: post.value.commentCount - 1 };
+  }
+
+  toast.add({ severity: "success", summary: "Comment deleted successfully.", life: 3000 });
 }
 
 // handle voting on the post
@@ -155,7 +174,7 @@ async function handleShare() {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       await navigator.clipboard.writeText(url);
     } else {
-      // Fallback for older browsers
+      // fallback for older browsers
       const ta = document.createElement("textarea");
       ta.value = url;
       ta.setAttribute("readonly", "");
@@ -364,7 +383,11 @@ onMounted(loadPostData);
                 </button>
               </div>
 
-              <CommentList :comments="comments" @updated="handleCommentUpdated" />
+              <CommentList
+                :comments="comments"
+                @updated="handleCommentUpdated"
+                @deleted="handleCommentDeleted"
+              />
             </div>
           </div>
 
@@ -609,6 +632,7 @@ onMounted(loadPostData);
 
 .comment-submit-button {
   margin-right: 2rem;
+  margin-bottom: 1.5rem;
   color: var(--secondary-text-color);
   background: var(--neutral-color);
 }

@@ -17,6 +17,7 @@ export interface Comment {
   voteCount: number; // total votes (upvotes - downvotes)
   voteStatus: VoteType; // UPVOTE = 1| DOWNVOTE = -1| NONE = 0
   isDeleted: boolean;
+  canMutate: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
