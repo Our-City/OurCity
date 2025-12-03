@@ -35,7 +35,8 @@ public class PostRepository : IPostRepository
             .Include(p => p.Votes)
             .Include(p => p.Comments)
             .Include(p => p.Tags)
-            .Include(p => p.Author);
+            .Include(p => p.Author)
+            .Include(p => p.Bookmarks);
 
         if (postGetAllRequest.SearchTerm is not null)
             query = query.Where(p =>
@@ -85,6 +86,7 @@ public class PostRepository : IPostRepository
             .Include(p => p.Comments)
             .Include(p => p.Tags)
             .Include(p => p.Author)
+            .Include(p => p.Bookmarks)
             .FirstOrDefaultAsync(p => p.Id == postId);
     }
 
@@ -92,6 +94,7 @@ public class PostRepository : IPostRepository
     {
         return await _appDbContext
             .Posts.Include(p => p.Votes)
+            .Include(p => p.Bookmarks)
             .FirstOrDefaultAsync(p => p.Id == postId);
     }
 

@@ -795,6 +795,7 @@ public class PostIntegrationTests : IClassFixture<OurCityWebApplicationFactory>,
         response.EnsureSuccessStatusCode();
         var bookmarkedPost = await response.Content.ReadFromJsonAsync<PostResponseDto>();
         Assert.NotNull(bookmarkedPost);
+        Assert.True(bookmarkedPost.IsBookmarked);
 
         // Verify in database
         using var scope = _ourCityApi.Services.CreateScope();
@@ -823,6 +824,7 @@ public class PostIntegrationTests : IClassFixture<OurCityWebApplicationFactory>,
         response.EnsureSuccessStatusCode();
         var toggledPost = await response.Content.ReadFromJsonAsync<PostResponseDto>();
         Assert.NotNull(toggledPost);
+        Assert.False(toggledPost.IsBookmarked);
 
         // Verify bookmark removed from database
         using var scope = _ourCityApi.Services.CreateScope();
@@ -894,6 +896,7 @@ public class PostIntegrationTests : IClassFixture<OurCityWebApplicationFactory>,
         Assert.NotNull(result);
         Assert.Single(result.Items);
         Assert.Equal(_testPostId, result.Items.First().Id);
+        Assert.True(result.Items.First().IsBookmarked);
     }
 
     [Fact]
