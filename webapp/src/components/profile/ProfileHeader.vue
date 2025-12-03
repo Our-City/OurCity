@@ -96,7 +96,7 @@ function handleCreatePost(): void {
 
 async function handleDeleteAccount() {
   const confirmed = confirm(
-    "Are you sure you want to delete your account? This action cannot be undone."
+    "Are you sure you want to delete your account? This action cannot be undone.",
   );
 
   if (!confirmed) {
@@ -105,16 +105,16 @@ async function handleDeleteAccount() {
 
   try {
     await deleteCurrentUser();
-    
+
     // Clear auth state and redirect
     await auth.logoutUser();
-    
+
     toast.add({
       severity: "success",
       summary: "Account deleted successfully",
       life: 3000,
     });
-    
+
     router.push("/");
   } catch (err: unknown) {
     console.error("Failed to delete account:", err);
