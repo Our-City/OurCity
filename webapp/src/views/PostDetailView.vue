@@ -103,6 +103,26 @@ async function loadPostData() {
   }
 }
 
+async function refreshPostDetails() {
+  if (!post.value) {
+    return;
+  }
+
+  try {
+    const refreshedPost = await getPostById(postId);
+
+    if (refreshedPost.isDeleted) {
+      errorMessage.value = "Post not found";
+      post.value = null;
+      return;
+    }
+
+    post.value = refreshedPost;
+  } catch (err) {
+    console.error("Failed to refresh post details:", err);
+  }
+}
+
 // Computed property for formatted location
 const formattedLocation = computed(() => {
   if (!post.value?.location) return "";
@@ -258,6 +278,7 @@ async function submitReport() {
     });
     showReportDialog.value = false;
     reportReason.value = "";
+    await refreshPostDetails();
   } catch (err) {
     console.error("Failed to submit report:", err);
     toast.add({
