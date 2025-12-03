@@ -41,7 +41,8 @@ const authorUsername = computed(() => {
     return props.post.authorName;
   }
 
-  return `User #${props.post.authorId.slice(0, 6)}`;
+  // If authorName is null/empty, the user was deleted
+  return "[deleted]";
 });
 const commentCount = computed(() => props.post.commentCount ?? 0);
 const postImage = computed(() => media.value[0]?.url || null);

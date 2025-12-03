@@ -52,6 +52,69 @@ export async function createTestUser() {
 }
 
 /**
+ * Creates an admin test user (requires the admin user to already exist)
+ * This function creates a regular test user and then promotes it to admin
+ */
+export async function createAdminUser() {
+  const api = await request.newContext();
+  const adminUsername = "testadmin";
+  const adminPassword = "Testpassword123!";
+
+  // Create the test user first
+  await api.post("http://localhost:8000/apis/v1/users", {
+    data: {
+      username: adminUsername,
+      password: adminPassword,
+      passwordConfirm: adminPassword,
+    },
+  });
+
+  // Login as the seeded admin user (username: "admin")
+  // Password is read from ADMIN_PASSWORD environment variable (loaded from .env.development)
+  const adminApi = await request.newContext();
+  const seededAdminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!seededAdminPassword) {
+    throw new Error(
+      "ADMIN_PASSWORD environment variable not found. " +
+        "Ensure .env.development file exists with ADMIN_PASSWORD set.",
+    );
+  }
+
+  const adminLoginResponse = await adminApi.post(
+    "http://localhost:8000/apis/v1/authentication/login",
+    {
+      data: {
+        username: "admin",
+        password: seededAdminPassword,
+      },
+    },
+  );
+
+  if (!adminLoginResponse.ok()) {
+    throw new Error(
+      `Failed to login as admin: ${adminLoginResponse.status()} ${await adminLoginResponse.text()}`,
+    );
+  }
+
+  // Promote the test user to admin
+  const promoteResponse = await adminApi.put(
+    `http://localhost:8000/apis/v1/admin/users/${adminUsername}/promote-to-admin`,
+  );
+
+  if (!promoteResponse.ok()) {
+    throw new Error(
+      `Failed to promote user to admin: ${promoteResponse.status()} ${await promoteResponse.text()}`,
+    );
+  }
+
+  await adminApi.dispose();
+  await api.dispose();
+
+  return { username: adminUsername, password: adminPassword };
+}
+
+/**
  * Create a test post via API with hardcoded data and return its ID (GUID)
  */
 export async function createTestPost() {

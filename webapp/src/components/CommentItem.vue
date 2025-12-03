@@ -2,7 +2,7 @@
   CoPilot was asked to provide help with CSS styling and for help with syntax.
   Also assisted with voting and deletion logic. -->
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import VoteBox from "@/components/VoteBox.vue";
 import { voteOnComment, deleteComment } from "@/api/commentService";
 import { VoteType } from "@/types/enums";
@@ -21,6 +21,13 @@ const emit = defineEmits<{
 const auth = useAuthStore();
 const error = ref<string | null>(null);
 const isDeleting = ref(false);
+
+// Display "deleted-user" if authorName is null/empty
+const displayAuthorName = computed(() => {
+  return props.comment.authorName && props.comment.authorName.trim()
+    ? props.comment.authorName
+    : "[deleted]";
+});
 
 async function handleVote(voteType: VoteType) {
   if (!auth.user) {
@@ -64,7 +71,7 @@ async function handleDelete() {
   <div class="comment-item">
     <div class="comment-header">
       <div class="comment-header-left">
-        <span class="comment-author">@{{ comment.authorName }}</span>
+        <span class="comment-author">@{{ displayAuthorName }}</span>
         <span class="comment-date">{{ comment.createdAt.toLocaleDateString() }}</span>
       </div>
       <button

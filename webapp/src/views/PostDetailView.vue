@@ -86,6 +86,13 @@ const formattedLocation = computed(() => {
   return removePostalCode(post.value.location);
 });
 
+// Display "deleted-user" if authorName is null/empty
+const displayAuthorName = computed(() => {
+  return post.value?.authorName && post.value.authorName.trim()
+    ? post.value.authorName
+    : "[deleted]";
+});
+
 // submit a new comment on the post
 async function submitComment() {
   if (!auth.user) {
@@ -327,7 +334,7 @@ onMounted(loadPostData);
               </div>
 
               <div class="post-author" data-testid="post-author">
-                @{{ post.authorName }} ·
+                @{{ displayAuthorName }} ·
                 {{ post.createdAt.toLocaleDateString() }}
               </div>
 
