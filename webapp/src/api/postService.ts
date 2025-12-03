@@ -72,3 +72,31 @@ export async function voteOnPost(postId: string, voteType: VoteType): Promise<Po
   const response = await api.put<PostResponseDto>(`/posts/${postId}/votes`, { voteType });
   return toPost(response.data);
 }
+
+// PUT posts/{postId}/bookmarks
+export async function bookmarkPost(postId: string): Promise<Post> {
+  const response = await api.put<PostResponseDto>(`/posts/${postId}/bookmarks`);
+  return toPost(response.data);
+}
+
+// GET /posts/bookmarks?limit=&cursor=
+export async function getBookmarks(params: PostGetAllRequestDto): Promise<PaginatedResult<Post>> {
+  const searchParams = new URLSearchParams();
+
+  if (params.limit) searchParams.append("limit", params.limit.toString());
+  if (params.cursor) searchParams.append("cursor", params.cursor);
+  if (params.searchTerm) searchParams.append("searchTerm", params.searchTerm);
+  if (params.tags && params.tags.length > 0)
+    params.tags.forEach((tag) => searchParams.append("tags", tag));
+  if (params.sortBy) searchParams.append("sortBy", params.sortBy);
+  if (params.sortOrder) searchParams.append("sortOrder", params.sortOrder);
+
+  const response = await api.get<{ items: PostResponseDto[]; nextCursor?: string }>(
+    `/posts/bookmarks?${searchParams.toString()}`,
+  );
+
+  return {
+    items: toPosts(response.data.items),
+    nextCursor: response.data.nextCursor,
+  };
+}

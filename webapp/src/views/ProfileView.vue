@@ -10,7 +10,7 @@ import ProfileHeader from "@/components/profile/ProfileHeader.vue";
 import ProfileToolbar from "@/components/profile/ProfileToolbar.vue";
 import SideBar from "@/components/SideBar.vue";
 
-import { getPostById } from "@/api/postService";
+import { getPostById, getBookmarks } from "@/api/postService";
 import { resolveErrorMessage } from "@/utils/error";
 
 import type { Post } from "@/models/post";
@@ -20,8 +20,14 @@ const authStore = useAuthStore();
 const user = computed(() => authStore.user);
 
 const posts = ref<Post[]>([]);
+const bookmarkedPosts = ref<Post[]>([]);
+const activeTab = ref<"posts" | "bookmarks">("posts");
 const loading = ref(false);
 const error = ref<string | null>(null);
+
+const displayedPosts = computed(() => {
+  return activeTab.value === "posts" ? posts.value : bookmarkedPosts.value;
+});
 
 async function fetchProfileData() {
   loading.value = true;
@@ -44,6 +50,29 @@ async function fetchProfileData() {
   }
 }
 
+async function fetchBookmarks() {
+  loading.value = true;
+  error.value = null;
+
+  try {
+    const result = await getBookmarks({});
+    bookmarkedPosts.value = result.items;
+  } catch (err: unknown) {
+    console.error("Failed to load bookmarks:", err);
+    error.value = resolveErrorMessage(err, "Could not load your bookmarked posts.");
+  } finally {
+    loading.value = false;
+  }
+}
+
+function handleTabChange(tab: "posts" | "bookmarks") {
+  activeTab.value = tab;
+  
+  if (tab === "bookmarks" && bookmarkedPosts.value.length === 0) {
+    fetchBookmarks();
+  }
+}
+
 onMounted(fetchProfileData);
 </script>
 
@@ -62,18 +91,19 @@ onMounted(fetchProfileData);
 
         <template v-else-if="user">
           <ProfileHeader :username="user?.username" />
-          <ProfileToolbar />
+          <ProfileToolbar :active-tab="activeTab" @tab-change="handleTabChange" />
 
           <div class="profile-page-content">
             <PostList
-              v-if="posts.length"
-              :posts="posts"
+              v-if="displayedPosts.length"
+              :posts="displayedPosts"
               :loading="false"
               :show-sort-controls="false"
             />
             <div v-else class="no-posts-message">
               <i class="pi pi-inbox"></i>
-              <p>You haven't created any posts yet.</p>
+              <p v-if="activeTab === 'posts'">You haven't created any posts yet.</p>
+              <p v-else>You haven't bookmarked any posts yet.</p>
             </div>
           </div>
         </template>

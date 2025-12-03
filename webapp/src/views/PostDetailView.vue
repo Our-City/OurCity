@@ -17,7 +17,7 @@ import { useToast } from "primevue/usetoast";
 import MapDisplay from "@/components/MapDisplay.vue";
 import { removePostalCode } from "@/utils/locationFormatter";
 
-import { getPostById, voteOnPost, deletePost } from "@/api/postService";
+import { getPostById, voteOnPost, deletePost, bookmarkPost } from "@/api/postService";
 import { getMediaByPostId } from "@/api/mediaService";
 import { getCommentsByPostId, createComment } from "@/api/commentService";
 
@@ -244,7 +244,32 @@ async function handleBookmark() {
     return;
   }
 
-  // implement bookmark api call
+  if (!post.value) return;
+
+  try {
+    const updated = await bookmarkPost(post.value.id);
+    
+    // update the post with the new bookmark status
+    post.value = {
+      ...post.value,
+      isBookmarked: updated.isBookmarked,
+      updatedAt: updated.updatedAt,
+    };
+
+    toast.add({
+      severity: "success",
+      summary: updated.isBookmarked ? "Post bookmarked" : "Bookmark removed",
+      life: 3000,
+    });
+  } catch (err) {
+    console.error("Bookmark failed:", err);
+    toast.add({
+      severity: "error",
+      summary: "Failed to bookmark post",
+      detail: "Please try again later.",
+      life: 5000,
+    });
+  }
 }
 
 onMounted(loadPostData);
@@ -309,7 +334,8 @@ onMounted(loadPostData);
                           close();
                         "
                       >
-                        <i class="pi pi-bookmark"></i> Save
+                        <i :class="post.isBookmarked ? 'pi pi-bookmark-fill' : 'pi pi-bookmark'"></i>
+                        {{ post.isBookmarked ? "Remove Bookmark" : "Bookmark" }}
                       </li>
                       <li
                         @click="
