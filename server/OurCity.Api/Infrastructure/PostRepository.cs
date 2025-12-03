@@ -1,6 +1,6 @@
 /// Generative AI - CoPilot was used to assist in the creation of this file.
 /// CoPilot in creating the GetAllPosts function to fix errors with the infinite
-/// scrolling 
+/// scrolling
 using Microsoft.EntityFrameworkCore;
 using OurCity.Api.Common.Dtos.Post;
 using OurCity.Api.Common.Enum;
