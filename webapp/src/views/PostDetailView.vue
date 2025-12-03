@@ -354,7 +354,7 @@ async function handleBookmark() {
 }
 
 function goBack() {
-  router.push("/");
+  router.back();
 }
 
 onMounted(loadPostData);
