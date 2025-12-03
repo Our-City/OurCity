@@ -274,7 +274,7 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         using var client = _ourCityApi.CreateClient();
 
         var response = await client.PutAsync(
-            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId}/ban",
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUsername}/ban",
             null
         );
 
@@ -295,7 +295,7 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
 
         var response = await client.PutAsync(
-            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId2}/ban",
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUsername2}/ban",
             null
         );
 
@@ -316,7 +316,7 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
 
         var response = await client.PutAsync(
-            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId2}/unban",
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUsername2}/unban",
             null
         );
 
@@ -337,7 +337,7 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
 
         var response = await client.PutAsync(
-            $"{_baseUrl}/admin/users/{_ourCityApi.AdminUserId}/ban",
+            $"{_baseUrl}/admin/users/{_ourCityApi.AdminUsername}/ban",
             null
         );
 
@@ -358,7 +358,7 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
 
         var response = await client.PutAsync(
-            $"{_baseUrl}/admin/users/{_ourCityApi.AdminUserId}/unban",
+            $"{_baseUrl}/admin/users/{_ourCityApi.AdminUsername}/unban",
             null
         );
 
@@ -378,7 +378,7 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
 
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
 
-        var response = await client.PutAsync($"{_baseUrl}/admin/users/{Guid.Empty}/ban", null);
+        var response = await client.PutAsync($"{_baseUrl}/admin/users/nonexistentuser/ban", null);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -396,7 +396,7 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
 
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
 
-        var response = await client.PutAsync($"{_baseUrl}/admin/users/{Guid.Empty}/unban", null);
+        var response = await client.PutAsync($"{_baseUrl}/admin/users/nonexistentuser/unban", null);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -415,7 +415,7 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
 
         var response = await client.PutAsync(
-            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId}/ban",
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUsername}/ban",
             null
         );
         var responseContent = await response.Content.ReadFromJsonAsync<UserResponseDto>();
@@ -438,7 +438,7 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
 
         var banResponse = await client.PutAsync(
-            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId}/ban",
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUsername}/ban",
             null
         );
         var banResponseContent = await banResponse.Content.ReadFromJsonAsync<UserResponseDto>();
@@ -447,7 +447,7 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         Assert.True(banResponseContent?.IsBanned);
 
         var unbanResponse = await client.PutAsync(
-            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId}/unban",
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUsername}/unban",
             null
         );
         var unbanResponseContent = await unbanResponse.Content.ReadFromJsonAsync<UserResponseDto>();
@@ -491,7 +491,7 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
 
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
 
-        await client.PutAsync($"{_baseUrl}/admin/users/{_ourCityApi.StubUserId}/ban", null);
+        await client.PutAsync($"{_baseUrl}/admin/users/{_ourCityApi.StubUsername}/ban", null);
 
         var response = await client.GetAsync($"{_baseUrl}/admin/users/banned");
         var responseContent = await response.Content.ReadFromJsonAsync<
@@ -530,7 +530,7 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         using var client = _ourCityApi.CreateClient();
 
         var response = await client.PutAsync(
-            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId}/promote-to-admin",
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUsername}/promote-to-admin",
             null
         );
 
@@ -551,7 +551,7 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
 
         var response = await client.PutAsync(
-            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId2}/promote-to-admin",
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUsername2}/promote-to-admin",
             null
         );
 
@@ -573,7 +573,7 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", initialAdminLoginRequest);
 
         var initialPromoteResponse = await client.PutAsync(
-            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId}/promote-to-admin",
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUsername}/promote-to-admin",
             null
         );
 
@@ -589,7 +589,7 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", newAdminLoginRequest);
 
         var newPromoteResponse = await client.PutAsync(
-            $"{_baseUrl}/admin/users/{_ourCityApi.StubUserId2}/promote-to-admin",
+            $"{_baseUrl}/admin/users/{_ourCityApi.StubUsername2}/promote-to-admin",
             null
         );
 

@@ -62,15 +62,16 @@ public class UserAdminController : ControllerBase
     }
 
     [HttpPut]
-    [Route("{userId:guid}/ban")]
+    [Route("{username}/ban")]
     [EndpointSummary("Ban user")]
     [EndpointDescription("Ban a user")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> BanUser([FromRoute] Guid userId)
+    public async Task<IActionResult> BanUser([FromRoute] string username)
     {
-        var res = await _userService.BanUser(userId);
+        _logger.LogInformation("BanUser called with username: {Username}", username);
+        var res = await _userService.BanUser(username);
 
         if (!res.IsSuccess)
         {
@@ -86,15 +87,16 @@ public class UserAdminController : ControllerBase
     }
 
     [HttpPut]
-    [Route("{userId:guid}/unban")]
+    [Route("{username}/unban")]
     [EndpointSummary("Unban user")]
     [EndpointDescription("Unban a user")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> UnbanUser([FromRoute] Guid userId)
+    public async Task<IActionResult> UnbanUser([FromRoute] string username)
     {
-        var res = await _userService.UnbanUser(userId);
+        _logger.LogInformation("UnbanUser called with username: {Username}", username);
+        var res = await _userService.UnbanUser(username);
 
         if (!res.IsSuccess)
         {
@@ -110,15 +112,16 @@ public class UserAdminController : ControllerBase
     }
 
     [HttpPut]
-    [Route("{userId:guid}/promote-to-admin")]
+    [Route("{username}/promote-to-admin")]
     [EndpointSummary("Promote user to admin")]
     [EndpointDescription("Promote a user to admin")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> PromoteUserToAdmin([FromRoute] Guid userId)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> PromoteUserToAdmin([FromRoute] string username)
     {
-        var res = await _userService.PromoteUserToAdmin(userId);
+        _logger.LogInformation("PromoteUserToAdmin called with username: {Username}", username);
+        var res = await _userService.PromoteUserToAdmin(username);
 
         if (!res.IsSuccess)
         {
