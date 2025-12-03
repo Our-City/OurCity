@@ -66,56 +66,77 @@ public class PostRepository : IPostRepository
             {
                 if (sortBy == "votes")
                 {
-                    var cursorVotes = cursorPost.Votes.Count(v => v.VoteType == VoteType.Upvote)
+                    var cursorVotes =
+                        cursorPost.Votes.Count(v => v.VoteType == VoteType.Upvote)
                         - cursorPost.Votes.Count(v => v.VoteType == VoteType.Downvote);
                     var cursorId = cursorPost.Id;
 
-                    query = sortOrder == SortOrder.Desc
-                        ? query.Where(p =>
-                            (p.Votes.Count(v => v.VoteType == VoteType.Upvote)
-                            - p.Votes.Count(v => v.VoteType == VoteType.Downvote)) < cursorVotes
-                            || ((p.Votes.Count(v => v.VoteType == VoteType.Upvote)
-                            - p.Votes.Count(v => v.VoteType == VoteType.Downvote)) == cursorVotes
-                            && p.Id.CompareTo(cursorId) < 0)
-                        )
-                        : query.Where(p =>
-                            (p.Votes.Count(v => v.VoteType == VoteType.Upvote)
-                            - p.Votes.Count(v => v.VoteType == VoteType.Downvote)) > cursorVotes
-                            || ((p.Votes.Count(v => v.VoteType == VoteType.Upvote)
-                            - p.Votes.Count(v => v.VoteType == VoteType.Downvote)) == cursorVotes
-                            && p.Id.CompareTo(cursorId) > 0)
-                        );
+                    query =
+                        sortOrder == SortOrder.Desc
+                            ? query.Where(p =>
+                                (
+                                    p.Votes.Count(v => v.VoteType == VoteType.Upvote)
+                                    - p.Votes.Count(v => v.VoteType == VoteType.Downvote)
+                                ) < cursorVotes
+                                || (
+                                    (
+                                        p.Votes.Count(v => v.VoteType == VoteType.Upvote)
+                                        - p.Votes.Count(v => v.VoteType == VoteType.Downvote)
+                                    ) == cursorVotes
+                                    && p.Id.CompareTo(cursorId) < 0
+                                )
+                            )
+                            : query.Where(p =>
+                                (
+                                    p.Votes.Count(v => v.VoteType == VoteType.Upvote)
+                                    - p.Votes.Count(v => v.VoteType == VoteType.Downvote)
+                                ) > cursorVotes
+                                || (
+                                    (
+                                        p.Votes.Count(v => v.VoteType == VoteType.Upvote)
+                                        - p.Votes.Count(v => v.VoteType == VoteType.Downvote)
+                                    ) == cursorVotes
+                                    && p.Id.CompareTo(cursorId) > 0
+                                )
+                            );
                 }
                 else
                 {
                     var cursorDate = cursorPost.CreatedAt;
                     var cursorId = cursorPost.Id;
 
-                    query = sortOrder == SortOrder.Desc
-                        ? query.Where(p =>
-                            p.CreatedAt < cursorDate
-                            || (p.CreatedAt == cursorDate && p.Id.CompareTo(cursorId) < 0)
-                        )
-                        : query.Where(p =>
-                            p.CreatedAt > cursorDate
-                            || (p.CreatedAt == cursorDate && p.Id.CompareTo(cursorId) > 0)
-                        );
+                    query =
+                        sortOrder == SortOrder.Desc
+                            ? query.Where(p =>
+                                p.CreatedAt < cursorDate
+                                || (p.CreatedAt == cursorDate && p.Id.CompareTo(cursorId) < 0)
+                            )
+                            : query.Where(p =>
+                                p.CreatedAt > cursorDate
+                                || (p.CreatedAt == cursorDate && p.Id.CompareTo(cursorId) > 0)
+                            );
                 }
             }
         }
 
         query = (sortBy, sortOrder) switch
         {
-            ("votes", SortOrder.Asc) => query.OrderBy(p =>
-                p.Votes.Count(v => v.VoteType == VoteType.Upvote)
-                - p.Votes.Count(v => v.VoteType == VoteType.Downvote)
-            ).ThenBy(p => p.Id),
+            ("votes", SortOrder.Asc) => query
+                .OrderBy(p =>
+                    p.Votes.Count(v => v.VoteType == VoteType.Upvote)
+                    - p.Votes.Count(v => v.VoteType == VoteType.Downvote)
+                )
+                .ThenBy(p => p.Id),
             ("date", SortOrder.Asc) => query.OrderBy(p => p.CreatedAt).ThenBy(p => p.Id),
-            ("votes", SortOrder.Desc) => query.OrderByDescending(p =>
-                p.Votes.Count(v => v.VoteType == VoteType.Upvote)
-                - p.Votes.Count(v => v.VoteType == VoteType.Downvote)
-            ).ThenByDescending(p => p.Id),
-            ("date", SortOrder.Desc) => query.OrderByDescending(p => p.CreatedAt).ThenByDescending(p => p.Id),
+            ("votes", SortOrder.Desc) => query
+                .OrderByDescending(p =>
+                    p.Votes.Count(v => v.VoteType == VoteType.Upvote)
+                    - p.Votes.Count(v => v.VoteType == VoteType.Downvote)
+                )
+                .ThenByDescending(p => p.Id),
+            ("date", SortOrder.Desc) => query
+                .OrderByDescending(p => p.CreatedAt)
+                .ThenByDescending(p => p.Id),
             _ => query.OrderByDescending(p => p.CreatedAt).ThenByDescending(p => p.Id),
         };
 
