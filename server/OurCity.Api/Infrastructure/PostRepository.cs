@@ -61,7 +61,7 @@ public class PostRepository : IPostRepository
             var cursorPost = await _appDbContext
                 .Posts.Include(p => p.Votes)
                 .FirstOrDefaultAsync(p => p.Id == cursor.Value);
-                
+
             if (cursorPost != null)
             {
                 if (sortBy == "votes")
@@ -69,7 +69,7 @@ public class PostRepository : IPostRepository
                     var cursorVotes = cursorPost.Votes.Count(v => v.VoteType == VoteType.Upvote)
                         - cursorPost.Votes.Count(v => v.VoteType == VoteType.Downvote);
                     var cursorId = cursorPost.Id;
-                    
+
                     query = sortOrder == SortOrder.Desc
                         ? query.Where(p =>
                             (p.Votes.Count(v => v.VoteType == VoteType.Upvote)
@@ -90,7 +90,7 @@ public class PostRepository : IPostRepository
                 {
                     var cursorDate = cursorPost.CreatedAt;
                     var cursorId = cursorPost.Id;
-                    
+
                     query = sortOrder == SortOrder.Desc
                         ? query.Where(p =>
                             p.CreatedAt < cursorDate
