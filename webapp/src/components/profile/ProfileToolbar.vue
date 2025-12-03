@@ -4,7 +4,7 @@
 <script setup lang="ts">
 import Toolbar from "../utils/ToolbarCmp.vue";
 
-const props = defineProps<{
+defineProps<{
   activeTab: "posts" | "bookmarks";
 }>();
 
@@ -25,11 +25,7 @@ function handleBookmarks() {
   <Toolbar variant="standard">
     <template #start>
       <div class="tab-group">
-        <button
-          class="tab-button"
-          :class="{ active: activeTab === 'posts' }"
-          @click="handlePosts"
-        >
+        <button class="tab-button" :class="{ active: activeTab === 'posts' }" @click="handlePosts">
           Posts
         </button>
         <button

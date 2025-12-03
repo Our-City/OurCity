@@ -67,7 +67,7 @@ async function fetchBookmarks() {
 
 function handleTabChange(tab: "posts" | "bookmarks") {
   activeTab.value = tab;
-  
+
   if (tab === "bookmarks" && bookmarkedPosts.value.length === 0) {
     fetchBookmarks();
   }

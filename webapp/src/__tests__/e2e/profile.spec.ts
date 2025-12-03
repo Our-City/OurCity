@@ -28,9 +28,7 @@ test.describe("Profile Bookmarks", () => {
       .first()
       .click();
 
-    const bookmarkToast = page
-      .locator(".p-toast-message")
-      .filter({ hasText: /post bookmarked/i });
+    const bookmarkToast = page.locator(".p-toast-message").filter({ hasText: /post bookmarked/i });
     await expect(bookmarkToast).toBeVisible({ timeout: 5000 });
 
     await page.route("**/me", (route) => {
@@ -74,9 +72,7 @@ test.describe("Profile Bookmarks", () => {
       .first()
       .click();
 
-    const removalToast = page
-      .locator(".p-toast-message")
-      .filter({ hasText: /bookmark removed/i });
+    const removalToast = page.locator(".p-toast-message").filter({ hasText: /bookmark removed/i });
     await expect(removalToast).toBeVisible({ timeout: 5000 });
   });
 });

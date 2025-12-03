@@ -248,7 +248,7 @@ async function handleBookmark() {
 
   try {
     const updated = await bookmarkPost(post.value.id);
-    
+
     // update the post with the new bookmark status
     post.value = {
       ...post.value,
@@ -334,7 +334,9 @@ onMounted(loadPostData);
                           close();
                         "
                       >
-                        <i :class="post.isBookmarked ? 'pi pi-bookmark-fill' : 'pi pi-bookmark'"></i>
+                        <i
+                          :class="post.isBookmarked ? 'pi pi-bookmark-fill' : 'pi pi-bookmark'"
+                        ></i>
                         {{ post.isBookmarked ? "Remove Bookmark" : "Bookmark" }}
                       </li>
                       <li

@@ -380,7 +380,7 @@ test.describe("Post Bookmarking", () => {
       .click();
 
     await expect(
-      page.locator(".p-toast-message").filter({ hasText: /post bookmarked/i })
+      page.locator(".p-toast-message").filter({ hasText: /post bookmarked/i }),
     ).toBeVisible({ timeout: 5000 });
 
     // Remove bookmark
@@ -391,9 +391,7 @@ test.describe("Post Bookmarking", () => {
       .first()
       .click();
 
-    const removalToast = page
-      .locator(".p-toast-message")
-      .filter({ hasText: /bookmark removed/i });
+    const removalToast = page.locator(".p-toast-message").filter({ hasText: /bookmark removed/i });
     await expect(removalToast).toBeVisible({ timeout: 5000 });
 
     await dropdownButton.click();
