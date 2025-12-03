@@ -39,3 +39,9 @@
   border-color: #f6ad55;
   color: #7a3b00;
 }
+
+.p-toast .p-toast-message-error {
+  background: #ffe5e5;
+  border-color: #f56565;
+  color: #742a2a;
+}
