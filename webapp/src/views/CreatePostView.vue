@@ -270,6 +270,10 @@ watch(
     }
   },
 );
+
+function goBack() {
+  router.push("/");
+}
 </script>
 
 <template>
@@ -282,6 +286,9 @@ watch(
         <SideBar view="home" />
       </div>
       <div class="create-post-page-body">
+        <button class="back-button" @click="goBack" aria-label="Back to home">
+          <i class="pi pi-arrow-left"></i>
+        </button>
         <div class="create-post-container">
           <Form
             variant="card"
@@ -505,12 +512,42 @@ watch(
   position: relative;
 }
 
+.back-button {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: 0.1rem solid var(--border-color);
+  background: var(--primary-background-color);
+  color: var(--primary-text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1.2rem;
+  z-index: 10;
+}
+
+.back-button:hover {
+  background: var(--secondary-background-color);
+  transform: translateX(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.back-button:active {
+  transform: translateX(-1px);
+}
+
 .create-post-container {
   max-width: 800px;
   width: 100%;
   position: relative;
   left: -10rem;
   margin-right: -10rem;
+  margin-bottom: 6rem;
 }
 
 /* Custom styles for PrimeVue input components */

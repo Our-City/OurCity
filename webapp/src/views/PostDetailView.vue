@@ -247,6 +247,10 @@ async function handleBookmark() {
   // implement bookmark api call
 }
 
+function goBack() {
+  router.push("/");
+}
+
 onMounted(loadPostData);
 </script>
 
@@ -286,6 +290,9 @@ onMounted(loadPostData);
 
         <div v-else-if="post" class="post-detail-content-layout">
           <div class="post-content">
+            <button class="back-button" @click="goBack" aria-label="Back to home">
+              <i class="pi pi-arrow-left"></i>
+            </button>
             <div class="post-card">
               <div class="post-header">
                 <h1 class="post-title" data-testid="post-title">{{ post.title }}</h1>
@@ -533,6 +540,36 @@ onMounted(loadPostData);
   display: flex;
   flex: 1;
   flex-direction: column;
+  position: relative;
+}
+
+.back-button {
+  position: absolute;
+  top: 4.25rem;
+  left: 1.25rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: 0.1rem solid var(--border-color);
+  background: var(--primary-background-color);
+  color: var(--primary-text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1.2rem;
+  z-index: 10;
+}
+
+.back-button:hover {
+  background: var(--secondary-background-color);
+  transform: translateX(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.back-button:active {
+  transform: translateX(-1px);
 }
 
 .post-card {
@@ -619,6 +656,7 @@ onMounted(loadPostData);
 .comment-header {
   padding: 2rem 2rem 0 2rem;
   font-size: 2rem;
+  font-weight: bold;
 }
 
 .comment-input-container {

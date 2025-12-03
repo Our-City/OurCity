@@ -207,6 +207,7 @@ async function handleDeleteAccount() {
 
 .profile-username {
   font-size: 2rem;
+  font-weight: bold;
 }
 
 .profile-actions {
