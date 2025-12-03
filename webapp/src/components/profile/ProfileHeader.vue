@@ -208,6 +208,7 @@ async function handleDeleteAccount() {
 .profile-username {
   font-size: 2rem;
   font-weight: bold;
+  margin-left: 0.75rem;
 }
 
 .profile-actions {
@@ -217,8 +218,9 @@ async function handleDeleteAccount() {
 }
 
 .delete-account-button {
-  background: var(--error-color, #ef4444);
+  background: #e03a3a;
   color: white;
+  margin-left: auto;
 }
 
 .delete-account-button:hover {
