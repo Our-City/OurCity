@@ -17,6 +17,11 @@ const WINNIPEG_RADIUS_KM = 25;
  * Returns distance in kilometers
  */
 export function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  // Validate inputs
+  if (!isValidCoordinate(lat1, lon1) || !isValidCoordinate(lat2, lon2)) {
+    return Infinity;
+  }
+
   const R = 6371; // Earth's radius in kilometers
   const dLat = toRadians(lat2 - lat1);
   const dLon = toRadians(lon2 - lon1);
@@ -36,12 +41,31 @@ function toRadians(degrees: number): number {
 }
 
 /**
+ * Validate if coordinates are valid numbers
+ */
+function isValidCoordinate(lat: number, lng: number): boolean {
+  return (
+    typeof lat === "number" &&
+    typeof lng === "number" &&
+    !isNaN(lat) &&
+    !isNaN(lng) &&
+    isFinite(lat) &&
+    isFinite(lng)
+  );
+}
+
+/**
  * Check if coordinates are within Winnipeg city boundaries
  * @param latitude - Latitude coordinate
  * @param longitude - Longitude coordinate
  * @returns true if location is within Winnipeg, false otherwise
  */
 export function isWithinWinnipeg(latitude: number, longitude: number): boolean {
+  // Validate inputs
+  if (!isValidCoordinate(latitude, longitude)) {
+    return false;
+  }
+
   const distance = calculateDistance(
     latitude,
     longitude,
@@ -56,6 +80,11 @@ export function isWithinWinnipeg(latitude: number, longitude: number): boolean {
  * Get distance from Winnipeg city center in kilometers
  */
 export function getDistanceFromWinnipeg(latitude: number, longitude: number): number {
+  // Validate inputs
+  if (!isValidCoordinate(latitude, longitude)) {
+    return Infinity;
+  }
+
   return calculateDistance(
     latitude,
     longitude,
