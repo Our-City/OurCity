@@ -69,14 +69,24 @@ export async function createAdminUser() {
     },
   });
 
-  // Login as the seeded admin user (username: "admin", password from .env.development)
+  // Login as the seeded admin user (username: "admin")
+  // Password is read from ADMIN_PASSWORD environment variable (loaded from .env.development)
   const adminApi = await request.newContext();
+  const seededAdminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!seededAdminPassword) {
+    throw new Error(
+      "ADMIN_PASSWORD environment variable not found. " +
+      "Ensure .env.development file exists with ADMIN_PASSWORD set."
+    );
+  }
+
   const adminLoginResponse = await adminApi.post(
     "http://localhost:8000/apis/v1/authentication/login",
     {
       data: {
         username: "admin",
-        password: "Admin123!",
+        password: seededAdminPassword,
       },
     },
   );

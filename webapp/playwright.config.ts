@@ -6,6 +6,16 @@
 */
 
 import { defineConfig, devices } from "@playwright/test";
+import dotenv from "dotenv";
+import { resolve, dirname } from "path";
+import { fileURLToPath } from "url";
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load environment variables from .env.development
+dotenv.config({ path: resolve(__dirname, ".env.development") });
 
 /**
  * See https://playwright.dev/docs/test-configuration.
