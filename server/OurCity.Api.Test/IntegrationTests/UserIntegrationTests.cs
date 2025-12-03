@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using OurCity.Api.Common.Dtos.Pagination;
+using OurCity.Api.Common.Dtos.Post;
 using OurCity.Api.Common.Dtos.User;
 
 namespace OurCity.Api.Test.IntegrationTests;
@@ -594,5 +595,33 @@ public class UserIntegrationTests : IAsyncLifetime, IClassFixture<OurCityWebAppl
         );
 
         Assert.Equal(HttpStatusCode.NoContent, newPromoteResponse.StatusCode);
+    }
+
+    [Fact]
+    public async Task GettingPostOfReportedUserShowReportedStatus() {
+        using var client = _ourCityApi.CreateClient();
+
+        var loginRequest = new UserCreateRequestDto
+        {
+            Username = _ourCityApi.StubUsername2,
+            Password = _ourCityApi.StubPassword2,
+        };
+
+        await client.PostAsJsonAsync($"{_baseUrl}/authentication/login", loginRequest);
+
+        var reportRequest = new UserReportRequestDto { Reason = "Test Reporting Reason" };
+
+        // report subbed user 1 as stubbed user 2
+        await client.PutAsJsonAsync(
+            $"{_baseUrl}/users/{_ourCityApi.StubUserId}/reports",
+            reportRequest
+        );
+
+        //have one stubbed post - owner = stubbed user 1
+        var response = await client.GetAsync($"{_baseUrl}/posts/");
+        var responseContent = await response.Content.ReadFromJsonAsync<PaginatedResponseDto<PostResponseDto>>();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.True(responseContent?.Items.First().IsReported);
     }
 }
