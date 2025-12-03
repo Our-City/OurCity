@@ -3,7 +3,7 @@
   ChatGPT was asked to generate code to help integrate the Post service layer API calls.
   e.g. loading posts, mounting, etc.-->
 <script setup lang="ts">
-import { onMounted, computed } from "vue";
+import { onMounted, onUnmounted, computed, ref } from "vue";
 import Card from "primevue/card";
 import PageHeader from "@/components/PageHeader.vue";
 import PostList from "@/components/PostList.vue";
@@ -16,6 +16,9 @@ import { usePostFilters } from "@/composables/usePostFilters";
 const router = useRouter();
 const auth = useAuthStore();
 const postFilters = usePostFilters();
+const scrollContainer = ref<HTMLElement | null>(null);
+const isLoadingMore = ref(false);
+let savedScrollPosition = 0;
 
 function handleCreatePost(): void {
   if (isLoggedIn.value) {
@@ -31,8 +34,54 @@ function toggleSortOrder() {
   postFilters.fetchPosts();
 }
 
+async function loadMorePosts() {
+  if (isLoadingMore.value || !postFilters.nextCursor.value || postFilters.loading.value) {
+    return;
+  }
+
+  isLoadingMore.value = true;
+
+  // Save the current scroll position and height before loading
+  if (scrollContainer.value) {
+    savedScrollPosition = scrollContainer.value.scrollTop;
+  }
+
+  await postFilters.fetchPosts(true);
+
+  // Use requestAnimationFrame to restore scroll position smoothly
+  requestAnimationFrame(() => {
+    if (scrollContainer.value) {
+      scrollContainer.value.scrollTop = savedScrollPosition;
+    }
+    requestAnimationFrame(() => {
+      isLoadingMore.value = false;
+    });
+  });
+}
+
+function handleScroll() {
+  if (!scrollContainer.value) return;
+
+  const { scrollTop, scrollHeight, clientHeight } = scrollContainer.value;
+  const scrolledToBottom = scrollHeight - scrollTop - clientHeight < 200;
+
+  if (scrolledToBottom) {
+    loadMorePosts();
+  }
+}
+
 onMounted(() => {
-  postFilters.fetchPosts(); // initial load
+  postFilters.fetchPosts();
+
+  if (scrollContainer.value) {
+    scrollContainer.value.addEventListener("scroll", handleScroll);
+  }
+});
+
+onUnmounted(() => {
+  if (scrollContainer.value) {
+    scrollContainer.value.removeEventListener("scroll", handleScroll);
+  }
 });
 
 const isLoggedIn = computed(() => auth.isAuthenticated);
@@ -49,7 +98,7 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
         <SideBar view="home" />
       </div>
 
-      <div class="home-page-body">
+      <div class="home-page-body" ref="scrollContainer">
         <Card class="create-post-card">
           <template #title>
             <h1 class="create-post-title">A community for Winnipeg residents</h1>
@@ -76,16 +125,11 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
             />
 
             <div
-              v-if="postFilters.nextCursor.value && !postFilters.loading.value"
-              class="load-more-container"
+              v-if="isLoadingMore || (postFilters.nextCursor.value && postFilters.loading.value)"
+              class="loading-more-container"
             >
-              <button
-                class="load-more-button"
-                @click="postFilters.fetchPosts"
-                :disabled="postFilters.loading.value"
-              >
-                Load More
-              </button>
+              <i class="pi pi-spin pi-spinner"></i>
+              <span>Loading more posts...</span>
             </div>
           </div>
 
@@ -220,31 +264,17 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
   color: var(--primary-text-color);
 }
 
-.load-more-container {
+.loading-more-container {
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
   padding: 2rem 0;
-}
-
-.load-more-button {
-  background: var(--primary-background-color);
-  color: var(--primary-text-color);
-  border: 1px solid var(--border-color);
-  border-radius: 0.75rem;
-  padding: 0.75rem 2rem;
+  color: var(--secondary-text-color);
   font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
 }
 
-.load-more-button:hover:not(:disabled) {
-  background: var(--primary-background-color-hover);
-  border-color: var(--primary-color);
-}
-
-.load-more-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.loading-more-container i {
+  font-size: 1.25rem;
 }
 </style>

@@ -91,7 +91,7 @@ const sortButtonLabel = computed(() => {
 
 <style scoped>
 .post-list-page {
-  padding-bottom: 5rem;
+  padding-bottom: 3rem;
 }
 
 .sort-order-container {

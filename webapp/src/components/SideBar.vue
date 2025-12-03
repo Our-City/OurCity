@@ -29,7 +29,6 @@ onMounted(fetchTags);
     <button
       @click="
         () => {
-          reset();
           setSort('popular');
         }
       "
@@ -39,7 +38,6 @@ onMounted(fetchTags);
     <button
       @click="
         () => {
-          reset();
           setSort('recent');
         }
       "
