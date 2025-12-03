@@ -80,6 +80,7 @@ onMounted(async () => {
   display: flex;
   height: calc(100vh - 2rem);
   overflow: hidden;
+  padding-bottom: 5rem;
 }
 
 .admin-page-body {
