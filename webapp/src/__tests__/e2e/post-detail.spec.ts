@@ -319,6 +319,90 @@ test.describe("Post Deletion", () => {
   });
 });
 
+test.describe("Post Bookmarking", () => {
+  let TEST_POST_ID: string;
+
+  test.beforeAll(async () => {
+    await createTestUser();
+  });
+
+  test.beforeEach(async () => {
+    TEST_POST_ID = await createTestPost({ title: `Bookmark Detail ${Date.now()}` });
+  });
+
+  test("should bookmark a post from the action menu", async ({ page }) => {
+    await login(page, "testuser", "Testpassword123!");
+
+    await page.goto(`/posts/${TEST_POST_ID}`);
+    await page.waitForLoadState("networkidle");
+
+    const dropdownButton = page
+      .locator(".post-header button")
+      .filter({ has: page.locator(".pi-ellipsis-v") })
+      .first();
+    await dropdownButton.click();
+
+    const bookmarkOption = page
+      .locator(".oc-dropdown-menu li")
+      .filter({ hasText: /bookmark/i })
+      .first();
+    await expect(bookmarkOption).toContainText(/bookmark/i);
+    await bookmarkOption.click();
+
+    const successToast = page.locator(".p-toast-message").filter({ hasText: /post bookmarked/i });
+    await expect(successToast).toBeVisible({ timeout: 5000 });
+
+    await dropdownButton.click();
+    const removeBookmarkOption = page
+      .locator(".oc-dropdown-menu li")
+      .filter({ hasText: /remove bookmark/i })
+      .first();
+    await expect(removeBookmarkOption).toBeVisible();
+  });
+
+  test("should remove an existing bookmark", async ({ page }) => {
+    await login(page, "testuser", "Testpassword123!");
+
+    await page.goto(`/posts/${TEST_POST_ID}`);
+    await page.waitForLoadState("networkidle");
+
+    const dropdownButton = page
+      .locator(".post-header button")
+      .filter({ has: page.locator(".pi-ellipsis-v") })
+      .first();
+
+    // Bookmark first
+    await dropdownButton.click();
+    await page
+      .locator(".oc-dropdown-menu li")
+      .filter({ hasText: /bookmark/i })
+      .first()
+      .click();
+
+    await expect(
+      page.locator(".p-toast-message").filter({ hasText: /post bookmarked/i }),
+    ).toBeVisible({ timeout: 5000 });
+
+    // Remove bookmark
+    await dropdownButton.click();
+    await page
+      .locator(".oc-dropdown-menu li")
+      .filter({ hasText: /remove bookmark/i })
+      .first()
+      .click();
+
+    const removalToast = page.locator(".p-toast-message").filter({ hasText: /bookmark removed/i });
+    await expect(removalToast).toBeVisible({ timeout: 5000 });
+
+    await dropdownButton.click();
+    const bookmarkOption = page
+      .locator(".oc-dropdown-menu li")
+      .filter({ hasText: /^\s*bookmark\b/i })
+      .first();
+    await expect(bookmarkOption).toBeVisible();
+  });
+});
+
 test.describe("Comment Deletion", () => {
   let TEST_POST_ID: string;
 

@@ -25,6 +25,7 @@ export interface Post {
   isDeleted: boolean;
   canMutate: boolean; // authorization flag from backend
   voteStatus: VoteType; // UPVOTE = 1| DOWNVOTE = -1| NONE = 0
+  isBookmarked: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

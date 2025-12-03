@@ -117,13 +117,14 @@ export async function createAdminUser() {
 /**
  * Create a test post via API with hardcoded data and return its ID (GUID)
  */
-export async function createTestPost() {
+export async function createTestPost(overrides?: { title?: string; description?: string }) {
   const api = await request.newContext();
   // Hardcoded test user and post data
   const username = "testuser";
   const password = "Testpassword123!";
-  const title = "Test Post Title";
-  const description = "This is a test post description with sample content.";
+  const title = overrides?.title ?? "Test Post Title";
+  const description =
+    overrides?.description ?? "This is a test post description with sample content.";
 
   // Authenticate and get token
   await api.post("http://localhost:8000/apis/v1/authentication/login", {
