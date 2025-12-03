@@ -46,4 +46,3 @@ export interface UserListVoteResponseDto {
 export interface UserReportResponseDto {
   reason?: string;
 }
-

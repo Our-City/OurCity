@@ -527,8 +527,8 @@ onMounted(loadPostData);
     >
       <div class="report-dialog-content">
         <p class="report-description">
-          You are about to report @{{ displayAuthorName }}'s post. Please provide a reason for this report
-          (optional). This helps admins review your report.
+          You are about to report @{{ displayAuthorName }}'s post. Please provide a reason for this
+          report (optional). This helps admins review your report.
         </p>
         <TextArea
           v-model="reportReason"
@@ -755,7 +755,6 @@ onMounted(loadPostData);
   font-size: 1.1rem;
   color: var(--tertiary-text-color);
 }
-
 
 .post-images {
   width: 100%;
