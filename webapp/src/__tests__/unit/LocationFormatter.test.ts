@@ -47,7 +47,7 @@ describe("locationFormatter", () => {
     });
 
     it("should return empty string for null input", () => {
-      expect(removePostalCode(null as any)).toBe("");
+      expect(removePostalCode(null as unknown as string)).toBe("");
     });
 
     it("should return empty string for undefined input", () => {

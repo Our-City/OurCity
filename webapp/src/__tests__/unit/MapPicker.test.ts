@@ -44,8 +44,14 @@ vi.mock("@/utils/locationValidator", () => ({
   getDistanceFromWinnipeg: vi.fn().mockReturnValue(5),
 }));
 
+interface WindowWithGoogle extends Window {
+  google?: typeof google;
+}
+
+declare const global: WindowWithGoogle;
+
 // Mock Google Maps globally
-(global as any).google = {
+(global as WindowWithGoogle).google = {
   maps: {
     Map: vi.fn(() => mockMap),
     marker: {
@@ -62,7 +68,7 @@ vi.mock("@/utils/locationValidator", () => ({
 };
 
 describe("MapPicker.vue", () => {
-  let wrapper: VueWrapper<any>;
+  let wrapper: VueWrapper<InstanceType<typeof MapPicker>>;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -261,7 +267,11 @@ describe("MapPicker.vue", () => {
 
       const emitted = wrapper.emitted("update:modelValue");
       if (emitted && emitted.length > 0) {
-        const emittedValue = emitted[0][0] as any;
+        const emittedValue = emitted[0][0] as {
+          latitude: number;
+          longitude: number;
+          name?: string;
+        };
         expect(emittedValue.latitude).toBeCloseTo(49.9, 1);
         expect(emittedValue.longitude).toBeCloseTo(-97.15, 1);
       }
@@ -301,8 +311,8 @@ describe("MapPicker.vue", () => {
     wrapper = mount(MapPicker, {
       props: {
         modelValue: {
-          latitude: null as any,
-          longitude: null as any,
+          latitude: null as unknown as number,
+          longitude: null as unknown as number,
           name: "",
         },
       },
@@ -317,7 +327,7 @@ describe("MapPicker.vue", () => {
         modelValue: {
           latitude: 49.8951,
           longitude: -97.1384,
-          name: undefined as any,
+          name: undefined as unknown as string,
         },
       },
     });
@@ -373,9 +383,11 @@ describe("MapPicker.vue", () => {
     await new Promise((resolve) => setTimeout(resolve, 200));
 
     // Map constructor should have been called with center
-    const mapConstructorCalls = (global as any).google.maps.Map.mock.calls;
+    const mapConstructorCalls = (
+      (global as WindowWithGoogle).google!.maps.Map as unknown as { mock: { calls: unknown[][] } }
+    ).mock.calls;
     if (mapConstructorCalls.length > 0) {
-      const config = mapConstructorCalls[0][1];
+      const config = mapConstructorCalls[0][1] as { center?: { lat: number; lng: number } };
       expect(config.center).toBeDefined();
     }
   });

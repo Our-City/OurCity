@@ -8,6 +8,13 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
+// Type for window with google property
+interface WindowWithGoogle extends Window {
+  google?: typeof google;
+}
+
+declare const window: WindowWithGoogle;
+
 // Mock the Google Maps API
 const mockGoogleMaps = {
   maps: {
@@ -39,7 +46,7 @@ describe("googleMapsLoader", () => {
 
   beforeEach(async () => {
     // Clear any existing Google Maps instance
-    delete (window as any).google;
+    delete window.google;
 
     // Clear document scripts
     const scripts = document.querySelectorAll('script[src*="maps.googleapis.com"]');
@@ -54,7 +61,7 @@ describe("googleMapsLoader", () => {
 
   afterEach(() => {
     vi.clearAllMocks();
-    delete (window as any).google;
+    delete window.google;
     const scripts = document.querySelectorAll('script[src*="maps.googleapis.com"]');
     scripts.forEach((script) => script.remove());
   });
@@ -73,7 +80,7 @@ describe("googleMapsLoader", () => {
       );
 
       // Simulate successful load
-      (window as any).google = mockGoogleMaps;
+      window.google = mockGoogleMaps as unknown as typeof google;
       script?.dispatchEvent(new Event("load"));
 
       await expect(loadPromise).resolves.toBeUndefined();
@@ -88,7 +95,7 @@ describe("googleMapsLoader", () => {
       // Wait and simulate load
       await new Promise((resolve) => setTimeout(resolve, 10));
       const script = document.querySelector('script[src*="maps.googleapis.com"]');
-      (window as any).google = mockGoogleMaps;
+      window.google = mockGoogleMaps as unknown as typeof google;
       script?.dispatchEvent(new Event("load"));
 
       await promise1;
@@ -96,7 +103,7 @@ describe("googleMapsLoader", () => {
 
     it("should resolve immediately if already loaded", async () => {
       // Pre-load Google Maps
-      (window as any).google = mockGoogleMaps;
+      window.google = mockGoogleMaps as unknown as typeof google;
 
       const startTime = Date.now();
       await loadGoogleMaps();
@@ -174,7 +181,7 @@ describe("googleMapsLoader", () => {
 
       await new Promise((resolve) => setTimeout(resolve, 10));
       const script = document.querySelector('script[src*="maps.googleapis.com"]');
-      (window as any).google = mockGoogleMaps;
+      window.google = mockGoogleMaps as unknown as typeof google;
       script?.dispatchEvent(new Event("load"));
 
       await Promise.all(promises);
@@ -187,7 +194,7 @@ describe("googleMapsLoader", () => {
     });
 
     it("should return true when fully loaded", async () => {
-      (window as any).google = mockGoogleMaps;
+      window.google = mockGoogleMaps as unknown as typeof google;
 
       // Trigger load
       await loadGoogleMaps();
@@ -196,19 +203,19 @@ describe("googleMapsLoader", () => {
     });
 
     it("should return false if google object missing", () => {
-      delete (window as any).google;
+      delete window.google;
 
       expect(isGoogleMapsLoaded()).toBe(false);
     });
 
     it("should return false if maps property missing", () => {
-      (window as any).google = {};
+      window.google = {} as typeof google;
 
       expect(isGoogleMapsLoaded()).toBe(false);
     });
 
     it("should return false if places library not loaded", () => {
-      (window as any).google = {
+      window.google = {
         maps: {
           Map: vi.fn(),
           marker: {
@@ -218,13 +225,13 @@ describe("googleMapsLoader", () => {
             HeatmapLayer: vi.fn(),
           },
         },
-      };
+      } as unknown as typeof google;
 
       expect(isGoogleMapsLoaded()).toBe(false);
     });
 
     it("should return false if visualization library not loaded", () => {
-      (window as any).google = {
+      window.google = {
         maps: {
           Map: vi.fn(),
           places: {
@@ -234,13 +241,13 @@ describe("googleMapsLoader", () => {
             AdvancedMarkerElement: vi.fn(),
           },
         },
-      };
+      } as unknown as typeof google;
 
       expect(isGoogleMapsLoaded()).toBe(false);
     });
 
     it("should return false if marker library not loaded", () => {
-      (window as any).google = {
+      window.google = {
         maps: {
           Map: vi.fn(),
           places: {
@@ -250,25 +257,26 @@ describe("googleMapsLoader", () => {
             HeatmapLayer: vi.fn(),
           },
         },
-      };
+      } as unknown as typeof google;
 
       expect(isGoogleMapsLoaded()).toBe(false);
     });
 
     it("should verify all required libraries are present", async () => {
-      (window as any).google = mockGoogleMaps;
+      window.google = mockGoogleMaps as unknown as typeof google;
 
       // Trigger a load to set the internal flag
       const loadPromise = loadGoogleMaps();
       await new Promise((resolve) => setTimeout(resolve, 10));
       const script = document.querySelector('script[src*="maps.googleapis.com"]');
       script?.dispatchEvent(new Event("load"));
+
       await loadPromise;
 
       expect(isGoogleMapsLoaded()).toBe(true);
-      expect((window as any).google.maps.places).toBeDefined();
-      expect((window as any).google.maps.marker).toBeDefined();
-      expect((window as any).google.maps.visualization).toBeDefined();
+      expect(window.google?.maps?.places).toBeDefined();
+      expect(window.google?.maps?.marker).toBeDefined();
+      expect(window.google?.maps?.visualization).toBeDefined();
     });
   });
 
@@ -309,7 +317,7 @@ describe("googleMapsLoader", () => {
       await new Promise((resolve) => setTimeout(resolve, 10));
       const script2 = document.querySelector('script[src*="maps.googleapis.com"]');
 
-      (window as any).google = mockGoogleMaps;
+      window.google = mockGoogleMaps as unknown as typeof google;
       script2?.dispatchEvent(new Event("load"));
 
       await expect(loadPromise2).resolves.toBeUndefined();

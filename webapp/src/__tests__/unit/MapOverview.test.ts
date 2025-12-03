@@ -40,12 +40,6 @@ const mockHeatmapLayer = {
   setData: vi.fn(),
 };
 
-const mockCircle = {
-  setMap: vi.fn(),
-  setCenter: vi.fn(),
-  setRadius: vi.fn(),
-};
-
 const mockLatLngBounds = {
   extend: vi.fn(),
 };
@@ -74,8 +68,14 @@ vi.mock("@/utils/locationFormatter", () => ({
 import { getMediaByPostId } from "@/api/mediaService";
 import { removePostalCode } from "@/utils/locationFormatter";
 
+interface WindowWithGoogle extends Window {
+  google?: typeof google;
+}
+
+declare const global: WindowWithGoogle;
+
 // Setup global Google Maps mock
-(global as any).google = {
+(global as WindowWithGoogle).google = {
   maps: {
     Map: vi.fn(() => mockMap),
     marker: {
@@ -88,7 +88,7 @@ import { removePostalCode } from "@/utils/locationFormatter";
     LatLng: vi.fn((lat: number, lng: number) => ({ lat, lng })),
     LatLngBounds: vi.fn(() => mockLatLngBounds),
     event: {
-      addListenerOnce: vi.fn((map: any, event: string, callback: () => void) => {
+      addListenerOnce: vi.fn((map: unknown, event: string, callback: () => void) => {
         if (event === "idle") {
           setTimeout(callback, 0);
         }
@@ -98,8 +98,8 @@ import { removePostalCode } from "@/utils/locationFormatter";
 };
 
 describe("MapOverview.vue", () => {
-  let wrapper: VueWrapper<any>;
-  let router: any;
+  let wrapper: VueWrapper<InstanceType<typeof MapOverview>>;
+  let router: ReturnType<typeof createRouter>;
 
   const mockPosts: Post[] = [
     {
@@ -164,7 +164,7 @@ describe("MapOverview.vue", () => {
     await router.isReady();
 
     // Setup media service mock
-    (getMediaByPostId as any).mockResolvedValue(mockMedia);
+    (getMediaByPostId as ReturnType<typeof vi.fn>).mockResolvedValue(mockMedia);
   });
 
   afterEach(() => {
@@ -246,7 +246,7 @@ describe("MapOverview.vue", () => {
       await flushPromises();
       await new Promise((resolve) => setTimeout(resolve, 200));
 
-      expect((global as any).google.maps.Map).toHaveBeenCalled();
+      expect((global as WindowWithGoogle).google!.maps.Map).toHaveBeenCalled();
     });
 
     it("fetches media for posts with locations", async () => {
@@ -305,7 +305,11 @@ describe("MapOverview.vue", () => {
       await flushPromises();
       await new Promise((resolve) => setTimeout(resolve, 200));
 
-      const markerCalls = (global as any).google.maps.marker.AdvancedMarkerElement.mock.calls;
+      const markerCalls = (
+        (global as WindowWithGoogle).google!.maps.marker.AdvancedMarkerElement as unknown as {
+          mock: { calls: unknown[] };
+        }
+      ).mock.calls;
       expect(markerCalls.length).toBeGreaterThan(0);
     });
 
@@ -332,7 +336,11 @@ describe("MapOverview.vue", () => {
       await new Promise((resolve) => setTimeout(resolve, 200));
 
       // Should only create markers for non-deleted posts
-      const markerCalls = (global as any).google.maps.marker.AdvancedMarkerElement.mock.calls;
+      const markerCalls = (
+        (global as WindowWithGoogle).google!.maps.marker.AdvancedMarkerElement as unknown as {
+          mock: { calls: unknown[] };
+        }
+      ).mock.calls;
       expect(markerCalls.length).toBe(2);
     });
 
@@ -357,7 +365,11 @@ describe("MapOverview.vue", () => {
       await flushPromises();
       await new Promise((resolve) => setTimeout(resolve, 200));
 
-      const markerCalls = (global as any).google.maps.marker.AdvancedMarkerElement.mock.calls;
+      const markerCalls = (
+        (global as WindowWithGoogle).google!.maps.marker.AdvancedMarkerElement as unknown as {
+          mock: { calls: unknown[] };
+        }
+      ).mock.calls;
       expect(markerCalls.length).toBe(0);
     });
 
@@ -403,8 +415,11 @@ describe("MapOverview.vue", () => {
       await flushPromises();
       await new Promise((resolve) => setTimeout(resolve, 200));
 
-      const initialMarkerCalls = (global as any).google.maps.marker.AdvancedMarkerElement.mock.calls
-        .length;
+      const initialMarkerCalls = (
+        (global as WindowWithGoogle).google!.maps.marker.AdvancedMarkerElement as unknown as {
+          mock: { calls: unknown[] };
+        }
+      ).mock.calls.length;
 
       // Update posts
       const newPosts: Post[] = [
@@ -421,8 +436,11 @@ describe("MapOverview.vue", () => {
       await flushPromises();
       await new Promise((resolve) => setTimeout(resolve, 200));
 
-      const newMarkerCalls = (global as any).google.maps.marker.AdvancedMarkerElement.mock.calls
-        .length;
+      const newMarkerCalls = (
+        (global as WindowWithGoogle).google!.maps.marker.AdvancedMarkerElement as unknown as {
+          mock: { calls: unknown[] };
+        }
+      ).mock.calls.length;
       expect(newMarkerCalls).toBeGreaterThan(initialMarkerCalls);
     });
   });
@@ -441,7 +459,7 @@ describe("MapOverview.vue", () => {
       await flushPromises();
       await new Promise((resolve) => setTimeout(resolve, 200));
 
-      expect((global as any).google.maps.InfoWindow).toHaveBeenCalled();
+      expect((global as WindowWithGoogle).google!.maps.InfoWindow).toHaveBeenCalled();
     });
 
     it("formats location without postal code in info window", async () => {
@@ -514,7 +532,7 @@ describe("MapOverview.vue", () => {
       await flushPromises();
       await new Promise((resolve) => setTimeout(resolve, 200));
 
-      expect((global as any).google.maps.visualization.HeatmapLayer).toHaveBeenCalled();
+      expect((global as WindowWithGoogle).google!.maps.visualization.HeatmapLayer).toHaveBeenCalled();
     });
 
     it("heatmap is hidden by default", async () => {
@@ -573,8 +591,11 @@ describe("MapOverview.vue", () => {
       await flushPromises();
       await new Promise((resolve) => setTimeout(resolve, 200));
 
-      const initialHeatmapCalls = (global as any).google.maps.visualization.HeatmapLayer.mock.calls
-        .length;
+      const initialHeatmapCalls = (
+        (global as WindowWithGoogle).google!.maps.visualization.HeatmapLayer as unknown as {
+          mock: { calls: unknown[] };
+        }
+      ).mock.calls.length;
 
       // Update posts
       const newPosts: Post[] = [
@@ -592,8 +613,11 @@ describe("MapOverview.vue", () => {
       await flushPromises();
       await new Promise((resolve) => setTimeout(resolve, 200));
 
-      const newHeatmapCalls = (global as any).google.maps.visualization.HeatmapLayer.mock.calls
-        .length;
+      const newHeatmapCalls = (
+        (global as WindowWithGoogle).google!.maps.visualization.HeatmapLayer as unknown as {
+          mock: { calls: unknown[] };
+        }
+      ).mock.calls.length;
       expect(newHeatmapCalls).toBeGreaterThanOrEqual(initialHeatmapCalls);
     });
   });
@@ -736,7 +760,11 @@ describe("MapOverview.vue", () => {
       await new Promise((resolve) => setTimeout(resolve, 200));
 
       // No markers should be created
-      const markerCalls = (global as any).google.maps.marker.AdvancedMarkerElement.mock.calls;
+      const markerCalls = (
+        (global as WindowWithGoogle).google!.maps.marker.AdvancedMarkerElement as unknown as {
+          mock: { calls: unknown[] };
+        }
+      ).mock.calls;
       expect(markerCalls.length).toBe(0);
     });
   });
@@ -764,7 +792,9 @@ describe("MapOverview.vue", () => {
 
     it("handles media fetch errors gracefully", async () => {
       const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-      (getMediaByPostId as any).mockRejectedValueOnce(new Error("Media fetch failed"));
+      (getMediaByPostId as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+        new Error("Media fetch failed"),
+      );
 
       wrapper = mount(MapOverview, {
         props: {

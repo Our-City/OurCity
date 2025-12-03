@@ -10,6 +10,11 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { mount, VueWrapper } from "@vue/test-utils";
 import MapDisplay from "@/components/MapDisplay.vue";
 
+interface WindowWithGoogle extends Window {
+  google?: typeof google;
+}
+
+declare const global: WindowWithGoogle;
 // Mock Google Maps API
 const mockMap = {
   setCenter: vi.fn(),
@@ -29,7 +34,7 @@ vi.mock("@/utils/googleMapsLoader", () => ({
 }));
 
 // Mock Google Maps globally
-(global as any).google = {
+(global as WindowWithGoogle).google = {
   maps: {
     Map: vi.fn(() => mockMap),
     marker: {
@@ -44,7 +49,7 @@ vi.mock("@/utils/googleMapsLoader", () => ({
 };
 
 describe("MapDisplay.vue", () => {
-  let wrapper: VueWrapper<any>;
+  let wrapper: VueWrapper<InstanceType<typeof MapDisplay>>;
 
   beforeEach(() => {
     vi.clearAllMocks();
