@@ -541,6 +541,7 @@ onMounted(loadPostData);
 
 .post-title {
   font-size: 2.75rem;
+  font-weight: 800;
 }
 
 .post-author {

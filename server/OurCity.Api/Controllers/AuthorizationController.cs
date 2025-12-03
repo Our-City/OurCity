@@ -34,4 +34,16 @@ public class AuthorizationController : ControllerBase
 
         return Ok(isAllowed);
     }
+
+    [HttpGet]
+    [Route("can-view-admin-dashboard")]
+    [EndpointSummary("CanViewAdminDashboard")]
+    [EndpointDescription("Check if the current user is authorized to view the admin dashboard")]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    public async Task<IActionResult> CanViewAdminDashboard()
+    {
+        var isAllowed = await _policyService.CanViewAdminDashboard();
+
+        return Ok(isAllowed);
+    }
 }

@@ -62,7 +62,7 @@ const formattedLocation = computed(() => removePostalCode(props.post.location));
         {{ post.title }}
       </h1>
 
-      <div class="post-tags">
+      <div class="post-location">
         {{ formattedLocation }}
       </div>
 
@@ -89,7 +89,7 @@ const formattedLocation = computed(() => removePostalCode(props.post.location));
   display: flex;
   width: 100%;
   max-width: 100%;
-  height: 9.5rem;
+  height: 10rem;
   background: var(--primary-background-color);
   border: 0.1rem solid var(--border-color);
   border-radius: 1rem;
@@ -105,7 +105,7 @@ const formattedLocation = computed(() => removePostalCode(props.post.location));
   flex-direction: column;
   width: 83%;
   min-width: 0;
-  justify-content: space-between;
+  gap: 0.25rem;
   overflow: hidden;
 }
 
@@ -132,7 +132,7 @@ const formattedLocation = computed(() => removePostalCode(props.post.location));
   line-height: 1.2;
 }
 
-.post-tags {
+.post-location {
   font-size: 1rem;
   color: var(--tertiary-text-color);
   white-space: nowrap;
@@ -147,7 +147,7 @@ const formattedLocation = computed(() => removePostalCode(props.post.location));
   flex-direction: row;
   align-items: center;
   color: var(--tertiary-text-color);
-  margin-top: 1rem;
+  margin-top: auto;
   gap: 0.5rem;
 }
 

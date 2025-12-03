@@ -435,9 +435,6 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsAdmin")
-                        .HasColumnType("boolean");
-
                     b.Property<bool>("IsBanned")
                         .HasColumnType("boolean");
 
@@ -499,7 +496,6 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Reason")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("ReportedAt")
@@ -716,13 +712,13 @@ namespace OurCity.Api.Infrastructure.Database.Migrations
                     b.HasOne("OurCity.Api.Infrastructure.Database.User", "Reporter")
                         .WithMany("SubmittedReports")
                         .HasForeignKey("ReporterId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("OurCity.Api.Infrastructure.Database.User", "TargetUser")
                         .WithMany("ReceivedReports")
                         .HasForeignKey("TargetUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Reporter");

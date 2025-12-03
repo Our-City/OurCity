@@ -9,7 +9,6 @@ public interface IUserReportRepository
     Task<IEnumerable<UserReport>> GetReportsByTargetUser(Guid targetUserId);
     Task<int> GetReportsCountByTargetUser(Guid targetUserId);
     Task Add(UserReport report);
-    Task Remove(UserReport report);
     Task SaveChangesAsync();
 }
 
@@ -48,12 +47,6 @@ public class UserReportRepository : IUserReportRepository
     public async Task Add(UserReport report)
     {
         await _appDbContext.UserReports.AddAsync(report);
-    }
-
-    public Task Remove(UserReport report)
-    {
-        _appDbContext.UserReports.Remove(report);
-        return Task.CompletedTask;
     }
 
     public async Task SaveChangesAsync()
