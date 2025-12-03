@@ -17,8 +17,8 @@ public interface IUserService
     Task<Result<UserResponseDto>> CreateUser(UserCreateRequestDto userRequestDto);
     Task<Result<UserResponseDto>> UpdateUser(Guid id, UserUpdateRequestDto userRequestDto);
     Task<Result<bool>> ReportUser(Guid id, UserReportRequestDto userReportRequestDto);
-    Task<Result<UserResponseDto>> BanUser(Guid id);
-    Task<Result<UserResponseDto>> UnbanUser(Guid id);
+    Task<Result<UserResponseDto>> BanUser(string username);
+    Task<Result<UserResponseDto>> UnbanUser(string username);
     Task<Result<UserResponseDto>> DeleteUser(Guid id);
     Task<Result<bool>> PromoteUserToAdmin(string username);
 }
@@ -184,21 +184,21 @@ public class UserService : IUserService
         return Result<bool>.Success(true);
     }
 
-    public async Task<Result<UserResponseDto>> BanUser(Guid id)
+    public async Task<Result<UserResponseDto>> BanUser(string username)
     {
         //Check if user has permissions to ban people
         if (!_requestingUser.UserId.HasValue || !await _policyService.CanAdministrateForum())
             return Result<UserResponseDto>.Failure(ErrorMessages.Unauthorized);
 
-        //Check if user is trying to ban themselves
-        if (_requestingUser.UserId.Value == id)
-            return Result<UserResponseDto>.Failure(ErrorMessages.CantBanSelf);
-
-        var user = await _userManager.FindByIdAsync(id.ToString());
+        var user = await _userManager.FindByNameAsync(username);
 
         //Check if user even exists
         if (user is null || user.IsDeleted)
             return Result<UserResponseDto>.Failure(ErrorMessages.UserNotFound);
+
+        //Check if user is trying to ban themselves
+        if (_requestingUser.UserId.Value == user.Id)
+            return Result<UserResponseDto>.Failure(ErrorMessages.CantBanSelf);
 
         //Check if user already banned
         if (user.IsBanned)
@@ -209,21 +209,21 @@ public class UserService : IUserService
         return Result<UserResponseDto>.Success(userAfterBan.ToDto());
     }
 
-    public async Task<Result<UserResponseDto>> UnbanUser(Guid id)
+    public async Task<Result<UserResponseDto>> UnbanUser(string username)
     {
         //Check if user has permissions to unban people
         if (!_requestingUser.UserId.HasValue || !await _policyService.CanAdministrateForum())
             return Result<UserResponseDto>.Failure(ErrorMessages.Unauthorized);
 
-        //Check if user is trying to unban themselves
-        if (_requestingUser.UserId.Value == id)
-            return Result<UserResponseDto>.Failure(ErrorMessages.CantUnbanSelf);
-
-        var user = await _userManager.FindByIdAsync(id.ToString());
+        var user = await _userManager.FindByNameAsync(username);
 
         //Check if user does not exist
         if (user is null || user.IsDeleted)
             return Result<UserResponseDto>.Failure(ErrorMessages.UserNotFound);
+
+        //Check if user is trying to unban themselves
+        if (_requestingUser.UserId.Value == user.Id)
+            return Result<UserResponseDto>.Failure(ErrorMessages.CantUnbanSelf);
 
         //Check if user already is not banned
         if (!user.IsBanned)

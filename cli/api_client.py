@@ -140,3 +140,55 @@ class APIClient:
             return False, "Could not connect to the server. Is it running?"
         except Exception as e:
             return False, f"An error occurred: {str(e)}"
+
+    def ban_user(self, username: str, cookies: dict) -> Tuple[bool, str]:
+        url = f"{self.base_url}/admin/users/{username}/ban"
+        
+        try:
+            session = requests.Session()
+            for key, value in cookies.items():
+                session.cookies.set(key, value)
+            
+            response = session.put(url)
+            
+            if response.status_code == 200:
+                return True, f"Successfully banned {username}"
+            elif response.status_code == 401:
+                return False, "Not authenticated or session expired"
+            elif response.status_code == 403:
+                return False, "You do not have permission to ban users"
+            elif response.status_code == 404:
+                return False, "User not found"
+            else:
+                return False, f"Request failed with status code {response.status_code}"
+                
+        except requests.exceptions.ConnectionError:
+            return False, "Could not connect to the server. Is it running?"
+        except Exception as e:
+            return False, f"An error occurred: {str(e)}"
+
+    def unban_user(self, username: str, cookies: dict) -> Tuple[bool, str]:
+        url = f"{self.base_url}/admin/users/{username}/unban"
+        
+        try:
+            session = requests.Session()
+            for key, value in cookies.items():
+                session.cookies.set(key, value)
+            
+            response = session.put(url)
+            
+            if response.status_code == 200:
+                return True, f"Successfully unbanned {username}"
+            elif response.status_code == 401:
+                return False, "Not authenticated or session expired"
+            elif response.status_code == 403:
+                return False, "You do not have permission to unban users"
+            elif response.status_code == 404:
+                return False, "User not found"
+            else:
+                return False, f"Request failed with status code {response.status_code}"
+                
+        except requests.exceptions.ConnectionError:
+            return False, "Could not connect to the server. Is it running?"
+        except Exception as e:
+            return False, f"An error occurred: {str(e)}"

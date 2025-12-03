@@ -1,6 +1,5 @@
 # Generative AI - CoPilot was used in creating this file.
 import click
-import getpass
 from api_client import APIClient
 from session_manager import SessionManager
 
@@ -11,14 +10,14 @@ def handle_login(session_manager):
         current_user = session.get("username")
         click.echo(f"Already logged in as {current_user}")
         
-        response = input("Do you want to login as a different user? (y/n): ").lower()
+        response = click.prompt("Do you want to login as a different user? (y/n)").lower()
         if response != 'y':
             return False
         
         session_manager.clear_session()
     
-    username = input("Username: ")
-    password = getpass.getpass("Password: ")
+    username = click.prompt("Username")
+    password = click.prompt("Password", hide_input=True)
     
     api_client = APIClient()
     success, message, cookies = api_client.login(username, password)
@@ -56,7 +55,7 @@ def handle_logout(session_manager):
 
 
 def handle_get_post(session_manager):
-    post_id = input("Enter post ID: ").strip()
+    post_id = click.prompt("Enter post ID").strip()
     
     if not post_id:
         click.echo("Post ID cannot be empty")
@@ -111,7 +110,7 @@ def handle_promote(session_manager):
         click.echo("You must be logged in to promote users")
         return
 
-    username = input("Enter username to promote to admin: ").strip()
+    username = click.prompt("Enter username to promote to admin").strip()
     
     if not username:
         click.echo("Username cannot be empty")
@@ -129,6 +128,52 @@ def handle_promote(session_manager):
         click.echo(f"Failed to promote user: {message}")
 
 
+def handle_ban(session_manager: SessionManager):
+    if not session_manager.is_logged_in():
+        click.echo("You must be logged in to ban users")
+        return
+    
+    username = click.prompt("Enter username to ban")
+    
+    if not username.strip():
+        click.echo("Username cannot be empty")
+        return
+    
+    session = session_manager.load_session()
+    cookies = session.get("cookies")
+
+    api_client = APIClient()
+    success, message = api_client.ban_user(username, cookies)
+    
+    if success:
+        click.echo(message)
+    else:
+        click.echo(f"Failed to ban user: {message}")
+
+
+def handle_unban(session_manager: SessionManager):
+    if not session_manager.is_logged_in():
+        click.echo("You must be logged in to unban users")
+        return
+    
+    username = click.prompt("Enter username to unban")
+    
+    if not username.strip():
+        click.echo("Username cannot be empty")
+        return
+    
+    session = session_manager.load_session()
+    cookies = session.get("cookies")
+
+    api_client = APIClient()
+    success, message = api_client.unban_user(username, cookies)
+    
+    if success:
+        click.echo(message)
+    else:
+        click.echo(f"Failed to unban user: {message}")
+
+
 def show_help():
     click.echo("\nAvailable commands:")
     click.echo("  login    - Login to OurCity")
@@ -136,6 +181,8 @@ def show_help():
     click.echo("  list     - List all posts")
     click.echo("  post     - Get and display a post by ID")
     click.echo("  promote  - Promote a user to admin (admin only)")
+    click.echo("  ban      - Ban a user (admin only)")
+    click.echo("  unban    - Unban a user (admin only)")
     click.echo("  help     - Show this help message")
     click.echo("  exit     - Exit the application")
     click.echo()
@@ -156,7 +203,7 @@ def main():
             else:
                 prompt = "ourcity> "
             
-            command = input(prompt).strip().lower()
+            command = click.prompt(prompt, prompt_suffix="", default="", show_default=False).strip().lower()
             
             if not command:
                 continue
@@ -180,6 +227,10 @@ def main():
                 handle_get_post(session_manager)
             elif command == "promote":
                 handle_promote(session_manager)
+            elif command == "ban":
+                handle_ban(session_manager)
+            elif command == "unban":
+                handle_unban(session_manager)
             else:
                 click.echo(f"Unknown command: {command}")
                 click.echo("Type 'help' for available commands")
