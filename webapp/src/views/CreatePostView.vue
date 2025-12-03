@@ -523,7 +523,8 @@ function goBack() {
   width: 3rem;
   height: 3rem;
   border-radius: 50%;
-  background: var(--primary-background-color);
+  border: none;
+  background: transparent;
   color: var(--primary-text-color);
   display: flex;
   align-items: center;
