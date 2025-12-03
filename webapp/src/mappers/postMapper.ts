@@ -30,6 +30,7 @@ export function toPost(dto: PostResponseDto): Post {
     isDeleted: dto.isDeleted,
     canMutate: dto.canMutate,
     voteStatus: parseVoteType(dto.voteStatus),
+    isBookmarked: dto.isBookmarked,
     createdAt: new Date(dto.createdAt),
     updatedAt: new Date(dto.updatedAt),
   };
