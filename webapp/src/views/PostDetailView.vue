@@ -131,9 +131,7 @@ const formattedLocation = computed(() => {
 
 // Display "deleted-user" if authorName is null/empty
 const displayAuthorName = computed(() => {
-  return post.value?.authorName && post.value.authorName.trim()
-    ? post.value.authorName
-    : " ";
+  return post.value?.authorName && post.value.authorName.trim() ? post.value.authorName : " ";
 });
 
 // submit a new comment on the post
