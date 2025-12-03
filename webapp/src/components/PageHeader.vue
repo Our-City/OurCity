@@ -123,6 +123,7 @@ const isAdmin = computed(() => auth.isAdmin);
   display: flex;
   align-items: center;
   font-size: 2.5rem;
+  font-weight: bold;
   padding: 0rem 1rem 0rem 3rem;
   cursor: pointer;
 }
