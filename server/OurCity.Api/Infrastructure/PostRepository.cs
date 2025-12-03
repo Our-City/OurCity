@@ -58,8 +58,8 @@ public class PostRepository : IPostRepository
 
         if (cursor.HasValue)
         {
-            var cursorPost = await _appDbContext.Posts
-                .Include(p => p.Votes)
+            var cursorPost = await _appDbContext
+                .Posts.Include(p => p.Votes)
                 .FirstOrDefaultAsync(p => p.Id == cursor.Value);
                 
             if (cursorPost != null)
