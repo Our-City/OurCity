@@ -532,7 +532,9 @@ describe("MapOverview.vue", () => {
       await flushPromises();
       await new Promise((resolve) => setTimeout(resolve, 200));
 
-      expect((global as WindowWithGoogle).google!.maps.visualization.HeatmapLayer).toHaveBeenCalled();
+      expect(
+        (global as WindowWithGoogle).google!.maps.visualization.HeatmapLayer,
+      ).toHaveBeenCalled();
     });
 
     it("heatmap is hidden by default", async () => {

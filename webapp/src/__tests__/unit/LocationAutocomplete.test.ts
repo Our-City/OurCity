@@ -392,7 +392,9 @@ describe("LocationAutocomplete.vue", () => {
     await new Promise((resolve) => setTimeout(resolve, 600));
 
     const autocompleteConstructor = (global as WindowWithGoogle).google!.maps.places.Autocomplete;
-    const constructorCalls = (autocompleteConstructor as unknown as { mock: { calls: unknown[][] } }).mock.calls;
+    const constructorCalls = (
+      autocompleteConstructor as unknown as { mock: { calls: unknown[][] } }
+    ).mock.calls;
 
     if (constructorCalls.length > 0) {
       const options = constructorCalls[0][1] as { componentRestrictions?: { country: string } };
@@ -411,7 +413,9 @@ describe("LocationAutocomplete.vue", () => {
     await new Promise((resolve) => setTimeout(resolve, 600));
 
     const autocompleteConstructor = (global as WindowWithGoogle).google!.maps.places.Autocomplete;
-    const constructorCalls = (autocompleteConstructor as unknown as { mock: { calls: unknown[][] } }).mock.calls;
+    const constructorCalls = (
+      autocompleteConstructor as unknown as { mock: { calls: unknown[][] } }
+    ).mock.calls;
 
     if (constructorCalls.length > 0) {
       const options = constructorCalls[0][1] as { fields?: string[] };
@@ -430,7 +434,9 @@ describe("LocationAutocomplete.vue", () => {
     await new Promise((resolve) => setTimeout(resolve, 600));
 
     const autocompleteConstructor = (global as WindowWithGoogle).google!.maps.places.Autocomplete;
-    const constructorCalls = (autocompleteConstructor as unknown as { mock: { calls: unknown[][] } }).mock.calls;
+    const constructorCalls = (
+      autocompleteConstructor as unknown as { mock: { calls: unknown[][] } }
+    ).mock.calls;
 
     if (constructorCalls.length > 0) {
       const options = constructorCalls[0][1] as { types?: string[] };

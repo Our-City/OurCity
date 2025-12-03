@@ -55,7 +55,9 @@ describe("locationValidator", () => {
     });
 
     it("should return false for undefined coordinates", () => {
-      expect(isWithinWinnipeg(undefined as unknown as number, undefined as unknown as number)).toBe(false);
+      expect(isWithinWinnipeg(undefined as unknown as number, undefined as unknown as number)).toBe(
+        false,
+      );
     });
 
     it("should return false for invalid latitude", () => {
@@ -144,11 +146,15 @@ describe("locationValidator", () => {
     });
 
     it("should return Infinity for null coordinates", () => {
-      expect(getDistanceFromWinnipeg(null as unknown as number, null as unknown as number)).toBe(Infinity);
+      expect(getDistanceFromWinnipeg(null as unknown as number, null as unknown as number)).toBe(
+        Infinity,
+      );
     });
 
     it("should return Infinity for undefined coordinates", () => {
-      expect(getDistanceFromWinnipeg(undefined as unknown as number, undefined as unknown as number)).toBe(Infinity);
+      expect(
+        getDistanceFromWinnipeg(undefined as unknown as number, undefined as unknown as number),
+      ).toBe(Infinity);
     });
 
     it("should return Infinity for NaN coordinates", () => {
