@@ -3,7 +3,8 @@
   ChatGPT was asked to generate code to help integrate the Pinia authentication store.
   e.g., for fetching current user information via /me, etc. -->
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import PageHeader from "@/components/PageHeader.vue";
 import PostList from "@/components/PostList.vue";
 import ProfileHeader from "@/components/profile/ProfileHeader.vue";
@@ -16,6 +17,8 @@ import { resolveErrorMessage } from "@/utils/error";
 import type { Post } from "@/models/post";
 import { useAuthStore } from "@/stores/authenticationStore";
 
+const route = useRoute();
+const router = useRouter();
 const authStore = useAuthStore();
 const user = computed(() => authStore.user);
 
@@ -68,12 +71,39 @@ async function fetchBookmarks() {
 function handleTabChange(tab: "posts" | "bookmarks") {
   activeTab.value = tab;
 
+  // Update URL query parameter
+  router.replace({ query: { tab } });
+
   if (tab === "bookmarks" && bookmarkedPosts.value.length === 0) {
     fetchBookmarks();
   }
 }
 
-onMounted(fetchProfileData);
+// Initialize active tab from URL query on mount
+onMounted(() => {
+  const tabFromQuery = route.query.tab as "posts" | "bookmarks" | undefined;
+  if (tabFromQuery === "bookmarks") {
+    activeTab.value = "bookmarks";
+    fetchBookmarks();
+  } else {
+    activeTab.value = "posts";
+  }
+  
+  fetchProfileData();
+});
+
+// Watch for query changes (e.g., when navigating back)
+watch(
+  () => route.query.tab,
+  (newTab) => {
+    if (newTab === "bookmarks" || newTab === "posts") {
+      activeTab.value = newTab;
+      if (newTab === "bookmarks" && bookmarkedPosts.value.length === 0) {
+        fetchBookmarks();
+      }
+    }
+  },
+);
 </script>
 
 <template>
