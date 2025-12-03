@@ -96,7 +96,7 @@ function handleCreatePost(): void {
 
 async function handleDeleteAccount() {
   const confirmed = confirm(
-    "Are you sure you want to delete your account? This action cannot be undone and will permanently delete all your posts and comments."
+    "Are you sure you want to delete your account? This action cannot be undone."
   );
 
   if (!confirmed) {
