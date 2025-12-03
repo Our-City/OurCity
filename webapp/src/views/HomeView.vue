@@ -41,20 +41,22 @@ async function loadMorePosts() {
 
   isLoadingMore.value = true;
 
-  // Save the current scroll position before loading
+  // Save the current scroll position and height before loading
   if (scrollContainer.value) {
     savedScrollPosition = scrollContainer.value.scrollTop;
   }
 
   await postFilters.fetchPosts(true);
 
-  // Restore scroll position after a short delay to allow DOM update
-  setTimeout(() => {
+  // Use requestAnimationFrame to restore scroll position smoothly
+  requestAnimationFrame(() => {
     if (scrollContainer.value) {
       scrollContainer.value.scrollTop = savedScrollPosition;
     }
-    isLoadingMore.value = false;
-  }, 10);
+    requestAnimationFrame(() => {
+      isLoadingMore.value = false;
+    });
+  });
 }
 
 function handleScroll() {
