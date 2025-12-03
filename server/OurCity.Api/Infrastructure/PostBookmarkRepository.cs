@@ -37,7 +37,7 @@ public class PostBookmarkRepository : IPostBookmarkRepository
         IQueryable<PostBookmark> query = _appDbContext
             .PostBookmarks.Where(b => b.UserId == userId)
             .Include(b => b.Post)
-                .ThenInclude(p => p.Author)
+            .ThenInclude(p => p.Author)
             .OrderByDescending(b => b.BookmarkedAt);
 
         if (cursor.HasValue)
