@@ -17,7 +17,8 @@ import { request } from "@playwright/test";
 export async function login(page: Page, email: string, password: string) {
   await page.goto("/login");
   await page.getByLabel(/email|username/i).fill(email);
-  await page.getByLabel(/password/i).fill(password);
+  // use input[type="password"] to avoid matching the "Show password" button (was causing some tests to fail)
+  await page.locator('input[type="password"]').fill(password);
   await page.getByRole("button", { name: /login|sign in/i }).click();
 
   // Wait for redirect to home
@@ -60,16 +61,15 @@ export async function createTestPost() {
   const password = "Testpassword123!";
   const title = "Test Post Title";
   const description = "This is a test post description with sample content.";
-  const tags = ["test", "sample"];
 
   // Authenticate and get token
   await api.post("http://localhost:8000/apis/v1/authentication/login", {
     data: { username, password },
   });
 
-  // Create post
+  // Create post without tags (tags need to be GUIDs, send empty array)
   const postRes = await api.post("http://localhost:8000/apis/v1/posts", {
-    data: { title, description, tags },
+    data: { title, description, tags: [] },
   });
   if (postRes.status() !== 201 && postRes.status() !== 200) {
     throw new Error(`Failed to create post: ${postRes.status()} ${await postRes.text()}`);
