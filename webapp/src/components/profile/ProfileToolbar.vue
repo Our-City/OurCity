@@ -25,11 +25,15 @@ function handleBookmarks() {
   <Toolbar variant="standard">
     <template #start>
       <div class="tab-group">
-        <button class="tab-button" :class="{ active: activeTab === 'posts' }" @click="handlePosts">
+        <button
+          class="tab-button posts-button"
+          :class="{ active: activeTab === 'posts' }"
+          @click="handlePosts"
+        >
           Posts
         </button>
         <button
-          class="tab-button"
+          class="tab-button bookmarks-button"
           :class="{ active: activeTab === 'bookmarks' }"
           @click="handleBookmarks"
         >
