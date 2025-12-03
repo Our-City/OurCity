@@ -82,6 +82,243 @@ test.describe("Post Detail Page", () => {
   });
 });
 
+test.describe("Post Deletion", () => {
+  let TEST_POST_ID: string;
+
+  test.beforeAll(async () => {
+    await createTestUser();
+    TEST_POST_ID = await createTestPost();
+  });
+
+  test("should show delete option in dropdown menu for post author", async ({ page }) => {
+    // Login as the test user who created the post
+    await login(page, "testuser", "Testpassword123!");
+
+    await page.goto(`/posts/${TEST_POST_ID}`);
+    await page.waitForLoadState("networkidle");
+
+    // Click the dropdown menu (ellipsis button)
+    const dropdownButton = page
+      .locator(".post-header button")
+      .filter({ has: page.locator(".pi-ellipsis-v") });
+    await dropdownButton.click();
+
+    // Wait for dropdown to be visible
+    await page.waitForTimeout(500);
+
+    // Check that delete option exists in the dropdown
+    const deleteOption = page.locator("ul li").filter({ hasText: "Delete" });
+    await expect(deleteOption).toBeVisible();
+  });
+
+  test("should successfully delete a post", async ({ page }) => {
+    // Create a new post for this test
+    const testPostId = await createTestPost();
+
+    // Login as the test user
+    await login(page, "testuser", "Testpassword123!");
+
+    await page.goto(`/posts/${testPostId}`);
+    await page.waitForLoadState("networkidle");
+
+    // Click the dropdown menu
+    const dropdownButton = page
+      .locator(".post-header button")
+      .filter({ has: page.locator(".pi-ellipsis-v") });
+    await dropdownButton.click();
+
+    await page.waitForTimeout(500);
+
+    // Set up dialog handler for confirmation
+    page.once("dialog", (dialog) => {
+      expect(dialog.message()).toContain("delete");
+      dialog.accept();
+    });
+
+    // Click delete option
+    const deleteOption = page.locator("ul li").filter({ hasText: "Delete" });
+    await deleteOption.click();
+
+    // Wait for deletion to complete and redirect to home
+    await page.waitForURL("/", { timeout: 5000 });
+
+    // Verify we're redirected to home page
+    await expect(page).toHaveURL("/");
+  });
+
+  test("should show success toast after deleting post", async ({ page }) => {
+    // Create a new post for this test
+    const testPostId = await createTestPost();
+
+    // Login as the test user
+    await login(page, "testuser", "Testpassword123!");
+
+    await page.goto(`/posts/${testPostId}`);
+    await page.waitForLoadState("networkidle");
+
+    // Click the dropdown menu
+    const dropdownButton = page
+      .locator(".post-header button")
+      .filter({ has: page.locator(".pi-ellipsis-v") });
+    await dropdownButton.click();
+
+    await page.waitForTimeout(500);
+
+    // Handle confirmation dialog
+    page.once("dialog", (dialog) => {
+      dialog.accept();
+    });
+
+    // Click delete option
+    const deleteOption = page.locator("ul li").filter({ hasText: "Delete" });
+    await deleteOption.click();
+
+    // Check for success toast
+    const toast = page.locator(".p-toast-message, .toast").filter({ hasText: /deleted/i });
+    await expect(toast).toBeVisible({ timeout: 3000 });
+  });
+
+  test("should cancel deletion when user dismisses confirmation", async ({ page }) => {
+    // Login as the test user
+    await login(page, "testuser", "Testpassword123!");
+
+    await page.goto(`/posts/${TEST_POST_ID}`);
+    await page.waitForLoadState("networkidle");
+
+    // Get the current URL
+    const currentUrl = page.url();
+
+    // Click the dropdown menu
+    const dropdownButton = page
+      .locator(".post-header button")
+      .filter({ has: page.locator(".pi-ellipsis-v") });
+    await dropdownButton.click();
+
+    await page.waitForTimeout(500);
+
+    // Dismiss confirmation dialog
+    page.once("dialog", (dialog) => {
+      dialog.dismiss();
+    });
+
+    // Click delete option
+    const deleteOption = page.locator("ul li").filter({ hasText: "Delete" });
+    await deleteOption.click();
+
+    // Wait a bit
+    await page.waitForTimeout(500);
+
+    // Verify we're still on the same page
+    expect(page.url()).toBe(currentUrl);
+
+    // Verify post content is still visible
+    const postTitle = page.locator('[data-testid="post-title"]');
+    await expect(postTitle).toBeVisible();
+  });
+
+  test("should show error toast when deletion fails", async ({ page }) => {
+    // Login as the test user
+    await login(page, "testuser", "Testpassword123!");
+
+    await page.goto(`/posts/${TEST_POST_ID}`);
+    await page.waitForLoadState("networkidle");
+
+    // Intercept the delete API call and make it fail
+    await page.route(`**/posts/${TEST_POST_ID}`, (route) => {
+      if (route.request().method() === "DELETE") {
+        route.fulfill({
+          status: 500,
+          body: JSON.stringify({ error: "Internal Server Error" }),
+        });
+      } else {
+        route.continue();
+      }
+    });
+
+    // Click the dropdown menu
+    const dropdownButton = page
+      .locator(".post-header button")
+      .filter({ has: page.locator(".pi-ellipsis-v") });
+    await dropdownButton.click();
+
+    await page.waitForTimeout(500);
+
+    // Handle confirmation dialog
+    page.once("dialog", (dialog) => {
+      dialog.accept();
+    });
+
+    // Click delete option
+    const deleteOption = page.locator("ul li").filter({ hasText: "Delete" });
+    await deleteOption.click();
+
+    // Check for error toast
+    const errorToast = page
+      .locator(".p-toast-message-error, .toast")
+      .filter({ hasText: /failed/i });
+    await expect(errorToast).toBeVisible({ timeout: 3000 });
+
+    // Verify we're still on the post detail page
+    await expect(page).toHaveURL(`/posts/${TEST_POST_ID}`);
+  });
+
+  test("should not show delete option for non-author users", async ({ page }) => {
+    // First, login and navigate to see if delete option appears
+    await page.goto(`/posts/${TEST_POST_ID}`);
+    await page.waitForLoadState("networkidle");
+
+    // Try to find the dropdown button
+    const dropdownButton = page
+      .locator(".post-header button")
+      .filter({ has: page.locator(".pi-ellipsis-v") });
+
+    if (await dropdownButton.isVisible()) {
+      await dropdownButton.click();
+      await page.waitForTimeout(500);
+
+      // Delete option should not be visible for non-authors
+      const deleteOption = page.locator("ul li").filter({ hasText: "Delete" });
+      await expect(deleteOption).not.toBeVisible();
+    }
+  });
+
+  test("should handle deleted post gracefully when accessing directly", async ({ page }) => {
+    // Create a new post for this test
+    const testPostId = await createTestPost();
+
+    // Login as the test user
+    await login(page, "testuser", "Testpassword123!");
+
+    await page.goto(`/posts/${testPostId}`);
+    await page.waitForLoadState("networkidle");
+
+    // Delete the post
+    const dropdownButton = page
+      .locator(".post-header button")
+      .filter({ has: page.locator(".pi-ellipsis-v") });
+    await dropdownButton.click();
+    await page.waitForTimeout(500);
+
+    page.once("dialog", (dialog) => {
+      dialog.accept();
+    });
+
+    const deleteOption = page.locator("ul li").filter({ hasText: "Delete" });
+    await deleteOption.click();
+
+    // Wait for redirect
+    await page.waitForURL("/", { timeout: 5000 });
+
+    // Try to access the deleted post directly
+    await page.goto(`/posts/${testPostId}`);
+    await page.waitForLoadState("networkidle");
+
+    // Should show error message
+    const errorMessage = page.locator(".error-state").filter({ hasText: /not found/i });
+    await expect(errorMessage).toBeVisible({ timeout: 5000 });
+  });
+});
+
 test.describe("Comment Deletion", () => {
   let TEST_POST_ID: string;
 
