@@ -1,12 +1,14 @@
 <!-- Generative AI was used to assist in the creation of this file.
   CoPilot was asked to provide help with CSS styling and for help with syntax, and error handling.
   ChatGPT was asked to generate code to help integrate the Post service layer API calls.
-  e.g, loading posts, creating new posts, etc.
+  e.g, loading posts, creating new posts, reporting, etc.
   Also assisted with handling comment updates from child CommentList. -->
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import TextArea from "primevue/textarea";
+import Dialog from "primevue/dialog";
+import Button from "primevue/button";
 import PageHeader from "@/components/PageHeader.vue";
 import SideBar from "@/components/SideBar.vue";
 import ImageGalleria from "@/components/ImageGalleria.vue";
@@ -20,6 +22,7 @@ import { removePostalCode } from "@/utils/locationFormatter";
 import { getPostById, voteOnPost, deletePost, bookmarkPost } from "@/api/postService";
 import { getMediaByPostId } from "@/api/mediaService";
 import { getCommentsByPostId, createComment } from "@/api/commentService";
+import { reportUser } from "@/api/userService";
 
 import type { Post } from "@/models/post";
 import type { Media } from "@/models/media";
@@ -39,11 +42,31 @@ const commentText = ref("");
 const isSubmitting = ref(false);
 const isLoading = ref(true);
 const errorMessage = ref<string | null>(null);
+const showReportDialog = ref(false);
+const reportReason = ref("");
+const isSubmittingReport = ref(false);
+const reportDialogPt = {
+  mask: {
+    class: "report-dialog-mask",
+  },
+};
 
 const auth = useAuthStore();
 
+// computed properties
 const canMutate = computed(() => {
   return post.value?.canMutate ?? false;
+});
+
+const hasReportedAuthor = computed(() => {
+  return post.value?.isReported ?? false;
+});
+
+const isOwnPost = computed(() => {
+  if (!auth.user || !post.value) {
+    return false;
+  }
+  return auth.user.id === post.value.authorId;
 });
 
 // fetch the post, its media, and its comments
@@ -77,6 +100,26 @@ async function loadPostData() {
     }
   } finally {
     isLoading.value = false;
+  }
+}
+
+async function refreshPostDetails() {
+  if (!post.value) {
+    return;
+  }
+
+  try {
+    const refreshedPost = await getPostById(postId);
+
+    if (refreshedPost.isDeleted) {
+      errorMessage.value = "Post not found";
+      post.value = null;
+      return;
+    }
+
+    post.value = refreshedPost;
+  } catch (err) {
+    console.error("Failed to refresh post details:", err);
   }
 }
 
@@ -206,7 +249,47 @@ async function handleReport() {
     return;
   }
 
-  // implement report api call
+  // handle case when the current user has already report another post made by the author
+  if (hasReportedAuthor.value) {
+    toast.add({
+      severity: "warn",
+      detail: "You've already reported this user.",
+      life: 3000,
+    });
+    return;
+  }
+
+  // open the report dialog
+  showReportDialog.value = true;
+  reportReason.value = "";
+}
+
+async function submitReport() {
+  if (!post.value?.authorId) return;
+
+  isSubmittingReport.value = true;
+
+  try {
+    await reportUser(post.value.authorId, reportReason.value.trim() || undefined);
+    toast.add({
+      severity: "success",
+      summary: "Report submitted successfully.",
+      life: 3000,
+    });
+    showReportDialog.value = false;
+    reportReason.value = "";
+    await refreshPostDetails();
+  } catch (err) {
+    console.error("Failed to submit report:", err);
+    toast.add({
+      severity: "error",
+      summary: "Failed to submit report.",
+      detail: "Please try again later.",
+      life: 3000,
+    });
+  } finally {
+    isSubmittingReport.value = false;
+  }
 }
 
 async function handleDelete() {
@@ -347,6 +430,7 @@ onMounted(loadPostData);
                         {{ post.isBookmarked ? "Remove Bookmark" : "Bookmark" }}
                       </li>
                       <li
+                        v-if="!isOwnPost"
                         @click="
                           handleReport();
                           close();
@@ -450,6 +534,50 @@ onMounted(loadPostData);
         </div>
       </div>
     </div>
+
+    <!-- report dialog box -->
+    <Dialog
+      v-model:visible="showReportDialog"
+      header="Report Post"
+      :modal="true"
+      :closable="true"
+      :draggable="false"
+      class="report-dialog"
+      :pt="reportDialogPt"
+      :style="{ width: '500px' }"
+    >
+      <div class="report-dialog-content">
+        <p class="report-description">
+          You are about to report @{{ displayAuthorName }}'s post. Please provide a reason for this
+          report (optional). This helps admins review your report.
+        </p>
+        <TextArea
+          v-model="reportReason"
+          placeholder="Describe why you're reporting this post."
+          rows="5"
+          class="report-reason-input"
+          :disabled="isSubmittingReport"
+        />
+      </div>
+      <template #footer>
+        <div class="report-dialog-footer">
+          <Button
+            label="Cancel"
+            severity="secondary"
+            @click="showReportDialog = false"
+            :disabled="isSubmittingReport"
+            class="cancel-button"
+          />
+          <Button
+            label="Submit Report"
+            severity="danger"
+            @click="submitReport"
+            :loading="isSubmittingReport"
+            class="submit-button"
+          />
+        </div>
+      </template>
+    </Dialog>
   </div>
 </template>
 
@@ -748,5 +876,152 @@ onMounted(loadPostData);
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--primary-text-color);
+}
+
+/* Report Dialog Styles - Unscoped for PrimeVue */
+</style>
+
+<style>
+/* Global styles for PrimeVue Dialog - must be unscoped */
+.report-dialog-mask {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(2px);
+}
+
+.report-dialog .p-dialog {
+  background: #ffffff !important;
+  border: 1px solid #bcbcbc !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+}
+
+.report-dialog .p-dialog-header {
+  background: #ffffff !important;
+  color: #273649 !important;
+  padding: 1.5rem !important;
+  border-bottom: 1px solid #bcbcbc !important;
+  border-radius: 0.75rem 0.75rem 0 0 !important;
+}
+
+.report-dialog .p-dialog-header .p-dialog-title {
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+}
+
+.report-dialog .p-dialog-content {
+  background: #ffffff !important;
+  padding: 1.5rem !important;
+}
+
+.report-dialog .p-dialog-footer {
+  background: #ffffff !important;
+  padding: 1rem 1.5rem !important;
+  border-top: 1px solid #bcbcbc !important;
+  border-radius: 0 0 0.75rem 0.75rem !important;
+}
+</style>
+
+<style scoped>
+/* Report Dialog Styles */
+.report-dialog :deep(.p-dialog) {
+  background: var(--primary-background-color);
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.report-dialog :deep(.p-dialog-header) {
+  background: var(--primary-background-color);
+  color: var(--primary-text-color);
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  border-radius: 0.75rem 0.75rem 0 0;
+}
+
+.report-dialog :deep(.p-dialog-content) {
+  background: var(--primary-background-color);
+  padding: 1.5rem;
+}
+
+.report-dialog :deep(.p-dialog-footer) {
+  background: var(--primary-background-color);
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  border-radius: 0 0 0.75rem 0.75rem;
+}
+
+.report-dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.report-description {
+  margin: 0;
+  color: var(--tertiary-text-color);
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+.report-reason-input {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.report-reason-input::placeholder {
+  color: rgba(81, 86, 92, 0.6);
+}
+
+.report-reason-input:focus {
+  outline: none;
+  border-color: var(--primary-color, #3b82f6);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.report-dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.cancel-button,
+.submit-button {
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancel-button {
+  background: var(--secondary-background-color);
+  color: var(--primary-text-color);
+  border: 1px solid var(--border-color);
+}
+
+.cancel-button:hover:not(:disabled) {
+  background: var(--neutral-color);
+}
+
+.submit-button {
+  background: #ed4b4b;
+  color: white;
+  border: none;
+}
+
+.submit-button:hover:not(:disabled) {
+  background: #df3a3a;
+}
+
+.cancel-button:disabled,
+.submit-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>

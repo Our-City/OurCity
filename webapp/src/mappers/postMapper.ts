@@ -31,6 +31,7 @@ export function toPost(dto: PostResponseDto): Post {
     canMutate: dto.canMutate,
     voteStatus: parseVoteType(dto.voteStatus),
     isBookmarked: dto.isBookmarked,
+    isReported: dto.isReported,
     createdAt: new Date(dto.createdAt),
     updatedAt: new Date(dto.updatedAt),
   };
