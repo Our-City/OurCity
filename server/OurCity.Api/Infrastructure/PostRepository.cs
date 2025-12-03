@@ -1,3 +1,6 @@
+/// Generative AI - CoPilot was used to assist in the creation of this file.
+/// CoPilot in creating the GetAllPosts function to fix errors with the infinite
+/// scrolling 
 using Microsoft.EntityFrameworkCore;
 using OurCity.Api.Common.Dtos.Post;
 using OurCity.Api.Common.Enum;
@@ -50,32 +53,71 @@ public class PostRepository : IPostRepository
                 p.Tags.Select(t => t.Id).Intersect(postGetAllRequest.Tags).Any()
             );
 
-        query = (postGetAllRequest.SortBy?.ToLower(), postGetAllRequest.SortOrder) switch
+        var sortBy = postGetAllRequest.SortBy?.ToLower();
+        var sortOrder = postGetAllRequest.SortOrder ?? SortOrder.Desc;
+
+        if (cursor.HasValue)
+        {
+            var cursorPost = await _appDbContext.Posts
+                .Include(p => p.Votes)
+                .FirstOrDefaultAsync(p => p.Id == cursor.Value);
+                
+            if (cursorPost != null)
+            {
+                if (sortBy == "votes")
+                {
+                    var cursorVotes = cursorPost.Votes.Count(v => v.VoteType == VoteType.Upvote)
+                        - cursorPost.Votes.Count(v => v.VoteType == VoteType.Downvote);
+                    var cursorId = cursorPost.Id;
+                    
+                    query = sortOrder == SortOrder.Desc
+                        ? query.Where(p =>
+                            (p.Votes.Count(v => v.VoteType == VoteType.Upvote)
+                            - p.Votes.Count(v => v.VoteType == VoteType.Downvote)) < cursorVotes
+                            || ((p.Votes.Count(v => v.VoteType == VoteType.Upvote)
+                            - p.Votes.Count(v => v.VoteType == VoteType.Downvote)) == cursorVotes
+                            && p.Id.CompareTo(cursorId) < 0)
+                        )
+                        : query.Where(p =>
+                            (p.Votes.Count(v => v.VoteType == VoteType.Upvote)
+                            - p.Votes.Count(v => v.VoteType == VoteType.Downvote)) > cursorVotes
+                            || ((p.Votes.Count(v => v.VoteType == VoteType.Upvote)
+                            - p.Votes.Count(v => v.VoteType == VoteType.Downvote)) == cursorVotes
+                            && p.Id.CompareTo(cursorId) > 0)
+                        );
+                }
+                else
+                {
+                    var cursorDate = cursorPost.CreatedAt;
+                    var cursorId = cursorPost.Id;
+                    
+                    query = sortOrder == SortOrder.Desc
+                        ? query.Where(p =>
+                            p.CreatedAt < cursorDate
+                            || (p.CreatedAt == cursorDate && p.Id.CompareTo(cursorId) < 0)
+                        )
+                        : query.Where(p =>
+                            p.CreatedAt > cursorDate
+                            || (p.CreatedAt == cursorDate && p.Id.CompareTo(cursorId) > 0)
+                        );
+                }
+            }
+        }
+
+        query = (sortBy, sortOrder) switch
         {
             ("votes", SortOrder.Asc) => query.OrderBy(p =>
                 p.Votes.Count(v => v.VoteType == VoteType.Upvote)
                 - p.Votes.Count(v => v.VoteType == VoteType.Downvote)
-            ),
-            ("date", SortOrder.Asc) => query.OrderBy(p => p.CreatedAt),
+            ).ThenBy(p => p.Id),
+            ("date", SortOrder.Asc) => query.OrderBy(p => p.CreatedAt).ThenBy(p => p.Id),
             ("votes", SortOrder.Desc) => query.OrderByDescending(p =>
                 p.Votes.Count(v => v.VoteType == VoteType.Upvote)
                 - p.Votes.Count(v => v.VoteType == VoteType.Downvote)
-            ),
-            ("date", SortOrder.Desc) => query.OrderByDescending(p => p.CreatedAt),
+            ).ThenByDescending(p => p.Id),
+            ("date", SortOrder.Desc) => query.OrderByDescending(p => p.CreatedAt).ThenByDescending(p => p.Id),
             _ => query.OrderByDescending(p => p.CreatedAt).ThenByDescending(p => p.Id),
         };
-
-        if (cursor.HasValue)
-        {
-            var cursorPost = await _appDbContext.Posts.FindAsync(cursor.Value);
-            if (cursorPost != null)
-            {
-                query = query.Where(p =>
-                    p.CreatedAt < cursorPost.CreatedAt
-                    || (p.CreatedAt == cursorPost.CreatedAt && p.Id.CompareTo(cursorPost.Id) < 0)
-                );
-            }
-        }
 
         return await query.Take(limit).ToListAsync();
     }
