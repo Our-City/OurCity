@@ -77,7 +77,7 @@ export async function createAdminUser() {
   if (!seededAdminPassword) {
     throw new Error(
       "ADMIN_PASSWORD environment variable not found. " +
-      "Ensure .env.development file exists with ADMIN_PASSWORD set."
+        "Ensure .env.development file exists with ADMIN_PASSWORD set.",
     );
   }
 
