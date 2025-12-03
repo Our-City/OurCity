@@ -20,7 +20,7 @@ public static class PostMappings
             Location = post.Location,
             Latitude = post.Latitude,
             Longitude = post.Longitude,
-            AuthorName = post.Author?.UserName,
+            AuthorName = post.Author?.IsDeleted == true ? null : post.Author?.UserName,
             UpvoteCount = post.Votes.Count(vote => vote.VoteType == VoteType.Upvote),
             DownvoteCount = post.Votes.Count(vote => vote.VoteType == VoteType.Downvote),
             CommentCount = post.Comments?.Count(c => !c.IsDeleted) ?? 0,

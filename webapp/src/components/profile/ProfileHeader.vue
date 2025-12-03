@@ -4,7 +4,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { updateCurrentUser } from "@/api/userService";
+import { updateCurrentUser, deleteCurrentUser } from "@/api/userService";
 import { useAuthStore } from "@/stores/authenticationStore";
 import { resolveErrorMessage } from "@/utils/error";
 import { useToast } from "primevue/usetoast";
@@ -93,6 +93,39 @@ function handleKeyDown(event: KeyboardEvent) {
 function handleCreatePost(): void {
   router.push("/create-post");
 }
+
+async function handleDeleteAccount() {
+  const confirmed = confirm(
+    "Are you sure you want to delete your account? This action cannot be undone and will permanently delete all your posts and comments."
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+    await deleteCurrentUser();
+    
+    // Clear auth state and redirect
+    await auth.logoutUser();
+    
+    toast.add({
+      severity: "success",
+      summary: "Account deleted successfully",
+      life: 3000,
+    });
+    
+    router.push("/");
+  } catch (err: unknown) {
+    console.error("Failed to delete account:", err);
+    toast.add({
+      severity: "error",
+      summary: "Failed to delete account",
+      detail: resolveErrorMessage(err, "Please try again later."),
+      life: 5000,
+    });
+  }
+}
 </script>
 
 <template>
@@ -137,6 +170,10 @@ function handleCreatePost(): void {
           <i class="pi pi-plus"></i>
           Create Post
         </button>
+        <button class="delete-account-button" @click="handleDeleteAccount">
+          <i class="pi pi-trash"></i>
+          Delete Account
+        </button>
       </div>
     </div>
   </div>
@@ -176,5 +213,14 @@ function handleCreatePost(): void {
   margin-top: 1rem;
   display: flex;
   gap: 1rem;
+}
+
+.delete-account-button {
+  background: var(--error-color, #ef4444);
+  color: white;
+}
+
+.delete-account-button:hover {
+  background: var(--error-color-hover, #dc2626);
 }
 </style>
