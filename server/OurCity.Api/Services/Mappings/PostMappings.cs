@@ -30,6 +30,9 @@ public static class PostMappings
                 ? post.Votes.FirstOrDefault(vote => vote.VoterId.Equals(userId))?.VoteType
                 ?? VoteType.NoVote
                 : VoteType.NoVote,
+            IsBookmarked = userId.HasValue
+                ? post.Bookmarks.Any(b => b.UserId.Equals(userId))
+                : false,
             CanMutate = canMutate,
             IsDeleted = post.IsDeleted,
             CreatedAt = post.CreatedAt,
