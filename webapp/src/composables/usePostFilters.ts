@@ -49,7 +49,7 @@ async function fetchTags() {
 }
 
 // fetch posts based on current filters
-async function fetchPosts() {
+async function fetchPosts(loadMore = false) {
   loading.value = true;
   error.value = null;
 
@@ -57,9 +57,24 @@ async function fetchPosts() {
     // Always sync filters with searchTerm before calling API
     filters.value.searchTerm = searchTerm.value.trim() || undefined;
 
+    // If loading more, use the nextCursor; otherwise, clear it for a fresh fetch
+    if (loadMore && nextCursor.value) {
+      filters.value.cursor = nextCursor.value;
+    } else {
+      filters.value.cursor = undefined;
+    }
+
     const res = await getPosts(filters.value);
     // Filter out deleted posts from the results
-    posts.value = res.items.filter((post) => !post.isDeleted);
+    const filteredPosts = res.items.filter((post) => !post.isDeleted);
+    
+    // If loading more, append to existing posts; otherwise, replace
+    if (loadMore) {
+      posts.value = [...posts.value, ...filteredPosts];
+    } else {
+      posts.value = filteredPosts;
+    }
+    
     nextCursor.value = res.nextCursor ?? null;
   } catch (err) {
     console.error("Failed to fetch posts:", err);

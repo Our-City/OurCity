@@ -3,7 +3,7 @@
   ChatGPT was asked to generate code to help integrate the Post service layer API calls.
   e.g. loading posts, mounting, etc.-->
 <script setup lang="ts">
-import { onMounted, computed } from "vue";
+import { onMounted, computed, ref, nextTick } from "vue";
 import Card from "primevue/card";
 import PageHeader from "@/components/PageHeader.vue";
 import PostList from "@/components/PostList.vue";
@@ -16,6 +16,7 @@ import { usePostFilters } from "@/composables/usePostFilters";
 const router = useRouter();
 const auth = useAuthStore();
 const postFilters = usePostFilters();
+const scrollContainer = ref<HTMLElement | null>(null);
 
 function handleCreatePost(): void {
   if (isLoggedIn.value) {
@@ -31,8 +32,21 @@ function toggleSortOrder() {
   postFilters.fetchPosts();
 }
 
+async function loadMorePosts(event: Event) {
+  event.preventDefault();
+  
+  const currentScrollTop = scrollContainer.value?.scrollTop || 0;
+  
+  await postFilters.fetchPosts(true);
+  
+  await nextTick();
+  if (scrollContainer.value) {
+    scrollContainer.value.scrollTop = currentScrollTop;
+  }
+}
+
 onMounted(() => {
-  postFilters.fetchPosts(); // initial load
+  postFilters.fetchPosts();
 });
 
 const isLoggedIn = computed(() => auth.isAuthenticated);
@@ -49,7 +63,7 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
         <SideBar view="home" />
       </div>
 
-      <div class="home-page-body">
+      <div class="home-page-body" ref="scrollContainer">
         <Card class="create-post-card">
           <template #title>
             <h1 class="create-post-title">A community for Winnipeg residents</h1>
@@ -81,7 +95,7 @@ const isLoggedIn = computed(() => auth.isAuthenticated);
             >
               <button
                 class="load-more-button"
-                @click="postFilters.fetchPosts"
+                @click="loadMorePosts"
                 :disabled="postFilters.loading.value"
               >
                 Load More
