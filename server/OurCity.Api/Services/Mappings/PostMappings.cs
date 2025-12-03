@@ -23,7 +23,7 @@ public static class PostMappings
             AuthorName = post.Author?.UserName,
             UpvoteCount = post.Votes.Count(vote => vote.VoteType == VoteType.Upvote),
             DownvoteCount = post.Votes.Count(vote => vote.VoteType == VoteType.Downvote),
-            CommentCount = post.Comments?.Count ?? 0,
+            CommentCount = post.Comments?.Count(c => !c.IsDeleted) ?? 0,
             Visibility = post.Visisbility,
             Tags = post.Tags.ToDtos().ToList(),
             VoteStatus = userId.HasValue

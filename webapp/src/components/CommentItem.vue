@@ -1,10 +1,10 @@
 <!-- Generative AI - CoPilot was used to assist in the creation of this file.
   CoPilot was asked to provide help with CSS styling and for help with syntax.
-  Also assisted with voting logic. -->
+  Also assisted with voting and deletion logic. -->
 <script setup lang="ts">
 import { ref } from "vue";
 import VoteBox from "@/components/VoteBox.vue";
-import { voteOnComment } from "@/api/commentService";
+import { voteOnComment, deleteComment } from "@/api/commentService";
 import { VoteType } from "@/types/enums";
 import type { Comment } from "@/models/comment";
 import { useAuthStore } from "@/stores/authenticationStore";
@@ -15,10 +15,12 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "updated", updated: Comment): void;
+  (e: "deleted", commentId: string): void;
 }>();
 
 const auth = useAuthStore();
 const error = ref<string | null>(null);
+const isDeleting = ref(false);
 
 async function handleVote(voteType: VoteType) {
   if (!auth.user) {
@@ -37,13 +39,43 @@ async function handleVote(voteType: VoteType) {
     error.value = "Failed to register vote. Please try again.";
   }
 }
+
+async function handleDelete() {
+  if (!confirm("Are you sure you want to delete this comment?")) {
+    return;
+  }
+
+  isDeleting.value = true;
+  error.value = null;
+
+  try {
+    await deleteComment(props.comment.id);
+    emit("deleted", props.comment.id);
+  } catch (err) {
+    console.error("Failed to delete comment:", err);
+    error.value = "Failed to delete comment. Please try again.";
+  } finally {
+    isDeleting.value = false;
+  }
+}
 </script>
 
 <template>
   <div class="comment-item">
     <div class="comment-header">
-      <span class="comment-author">@{{ comment.authorName }}</span>
-      <span class="comment-date"> · {{ comment.createdAt.toLocaleDateString() }}</span>
+      <div class="comment-header-left">
+        <span class="comment-author">@{{ comment.authorName }}</span>
+        <span class="comment-date">{{ comment.createdAt.toLocaleDateString() }}</span>
+      </div>
+      <button
+        v-if="comment.canMutate"
+        class="delete-button"
+        :disabled="isDeleting"
+        @click="handleDelete"
+        title="Delete comment"
+      >
+        <i class="pi pi-trash"></i>
+      </button>
     </div>
 
     <div class="comment-body">
@@ -60,24 +92,51 @@ async function handleVote(voteType: VoteType) {
 
 <style scoped>
 .comment-item {
-  padding: 1rem;
+  padding: 0.75rem;
   margin-left: 2rem;
   margin-right: 2rem;
+}
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+.comment-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.delete-button {
+  background: none;
+  border: none;
+  color: var(--tertiary-text-color);
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+}
+.delete-button:hover {
+  color: var(--error-color);
+  background: rgba(248, 113, 113, 0.1);
+}
+.delete-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 .comment-author {
   font-size: 1.1rem;
   color: var(--neutral-color);
-  margin-bottom: 0.5rem;
 }
 .comment-date {
   font-size: 1rem;
   color: var(--tertiary-text-color);
-  margin-bottom: 0.5rem;
 }
 .comment-text {
-  font-size: 1rem;
+  font-size: 1.1rem;
   color: var(--primary-text-color);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 .comment-votes {
   font-size: 1rem;

@@ -21,6 +21,7 @@ export function toComment(dto: CommentResponseDto): Comment {
     downvoteCount: dto.downvoteCount,
     voteCount: dto.upvoteCount - dto.downvoteCount,
     voteStatus: parseVoteType(dto.voteStatus),
+    canMutate: dto.canMutate,
     isDeleted: dto.isDeleted,
     createdAt: new Date(dto.createdAt),
     updatedAt: new Date(dto.updatedAt),

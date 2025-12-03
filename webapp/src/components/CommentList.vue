@@ -6,7 +6,10 @@ import CommentItem from "./CommentItem.vue";
 import type { Comment } from "@/models/comment";
 
 const props = defineProps<{ comments: Comment[] }>();
-const emit = defineEmits<{ (e: "updated", updated: Comment): void }>();
+const emit = defineEmits<{ 
+  (e: "updated", updated: Comment): void;
+  (e: "deleted", commentId: string): void;
+}>();
 </script>
 
 <template>
@@ -16,6 +19,7 @@ const emit = defineEmits<{ (e: "updated", updated: Comment): void }>();
       :key="comment.id"
       :comment="comment"
       @updated="emit('updated', $event)"
+      @deleted="emit('deleted', $event)"
     />
   </div>
 </template>
@@ -24,7 +28,11 @@ const emit = defineEmits<{ (e: "updated", updated: Comment): void }>();
 .comments-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+}
+
+.comments-list > :first-child {
+  border-top: 1px solid var(--border-color);
+  padding-top: 0.75rem;
 }
 
 .comments-list > :not(:last-child) {
