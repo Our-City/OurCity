@@ -24,6 +24,7 @@ export interface PostResponseDto {
   visibility: PostVisibility;
   tags: TagDto[];
   isDeleted: boolean;
+  canMutate: boolean; // authorization flag
   voteStatus: VoteType;
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string

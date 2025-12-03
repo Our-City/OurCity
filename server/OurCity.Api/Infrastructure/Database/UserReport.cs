@@ -8,11 +8,12 @@ public class UserReport
 
     public Guid ReporterId { get; set; }
 
-    public required string Reason { get; set; }
+    public string? Reason { get; set; }
 
     public DateTime ReportedAt { get; set; }
 
     // Navigation Properties
     public User? TargetUser { get; set; }
+
     public User? Reporter { get; set; }
 }

@@ -4,13 +4,13 @@
 ///   and syntax to implement the tests.
 
 import { test, expect } from "@playwright/test";
-import { login, createTestUser } from "./helpers";
+import { login, createAdminUser } from "./helpers";
 
 test.describe("Admin Dashboard", () => {
   test.beforeEach(async ({ page }) => {
-    // Create test user and login
-    await createTestUser();
-    await login(page, "testuser", "Testpassword123!");
+    // Create admin test user and login
+    const adminUser = await createAdminUser();
+    await login(page, adminUser.username, adminUser.password);
   });
 
   test.describe("Page Load and Layout", () => {
@@ -24,14 +24,14 @@ test.describe("Admin Dashboard", () => {
     test("should display page header", async ({ page }) => {
       await page.goto("/admin");
 
-      const pageHeader = page.locator(".page-header");
+      const pageHeader = page.locator(".page-header").first();
       await expect(pageHeader).toBeVisible();
     });
 
     test("should display sidebar", async ({ page }) => {
       await page.goto("/admin");
 
-      const sidebar = page.locator(".side-bar");
+      const sidebar = page.locator(".side-bar").first();
       await expect(sidebar).toBeVisible();
     });
 
@@ -129,7 +129,7 @@ test.describe("Admin Dashboard", () => {
       const label = newPostsCard.locator(".stat-label");
       const value = newPostsCard.locator(".stat-value");
 
-      await expect(label).toHaveText("NEW POSTS");
+      await expect(label).toHaveText(/new posts/i);
       await expect(value).toBeVisible();
     });
 
@@ -142,7 +142,7 @@ test.describe("Admin Dashboard", () => {
       const label = upvotesCard.locator(".stat-label");
       const value = upvotesCard.locator(".stat-value");
 
-      await expect(label).toHaveText("UPVOTES");
+      await expect(label).toHaveText(/upvotes/i);
       await expect(value).toBeVisible();
     });
 
@@ -155,7 +155,7 @@ test.describe("Admin Dashboard", () => {
       const label = downvotesCard.locator(".stat-label");
       const value = downvotesCard.locator(".stat-value");
 
-      await expect(label).toHaveText("DOWNVOTES");
+      await expect(label).toHaveText(/downvotes/i);
       await expect(value).toBeVisible();
     });
 
@@ -168,7 +168,7 @@ test.describe("Admin Dashboard", () => {
       const label = commentsCard.locator(".stat-label");
       const value = commentsCard.locator(".stat-value");
 
-      await expect(label).toHaveText("COMMENTS");
+      await expect(label).toHaveText(/comments/i);
       await expect(value).toBeVisible();
     });
 

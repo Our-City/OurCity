@@ -161,23 +161,17 @@ public class UserService : IUserService
             _requestingUser.UserId.Value,
             id
         );
-        if (existingReport != null)
-        {
-            await _userReportRepository.Remove(existingReport);
-        }
-        else
-        {
-            await _userReportRepository.Add(
-                new UserReport
-                {
-                    Id = Guid.NewGuid(),
-                    TargetUserId = id,
-                    ReporterId = _requestingUser.UserId.Value,
-                    Reason = userReportRequestDto.Reason,
-                    ReportedAt = DateTime.UtcNow,
-                }
-            );
-        }
+
+        await _userReportRepository.Add(
+            new UserReport
+            {
+                Id = Guid.NewGuid(),
+                TargetUserId = id,
+                ReporterId = _requestingUser.UserId.Value,
+                Reason = userReportRequestDto.Reason,
+                ReportedAt = DateTime.UtcNow,
+            }
+        );
 
         await _userReportRepository.SaveChangesAsync();
 

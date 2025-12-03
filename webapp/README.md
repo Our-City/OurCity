@@ -24,16 +24,18 @@ Configuration is done through .env
 ### Development Environment (HMR)
 
 1. (Re)Build image, and spin up Docker container in the background
-    ```sh
-    docker compose up -d --build
-    ```
+
+   ```sh
+   docker compose up -d --build
+   ```
 
 2. Webapp should be accessible at http://localhost:5173
 
 3. To clean up the Docker container (-v is required to clean up the containers node_modules)
-    ```sh
-    docker compose down -v
-    ```
+
+   ```sh
+   docker compose down -v
+   ```
 
 4. Include VITE_API_BASE_URL in .env.development file (refer to .env.example)
 
@@ -42,34 +44,34 @@ Configuration is done through .env
 **Recommended: Use the Docker image from DockerHub built by our CD pipeline.**
 
 1. Pull the desired frontend image from DockerHub:
-    ```sh
-    docker pull itsmannpatel/ourcity-frontend:<TAG>
-    ```
-    Replace `<TAG>` with the desired image tag (e.g., commit SHA).
+
+   ```sh
+   docker pull itsmannpatel/ourcity-frontend:<TAG>
+   ```
+
+   Replace `<TAG>` with the desired image tag (e.g., commit SHA).
 
 2. Navigate to the webapp dir and start the frontend container using the desired image tag:
-
-    - **On macOS/Linux:**
-        ```sh
-        TAG=<TAG> docker compose -f docker-compose.prod.yml up -d
-        ```
-    - **On Windows (PowerShell):**
-        ```powershell
-        $env:TAG="<TAG>"
-        docker compose -f docker-compose.prod.yml up -d
-        ```
+   - **On macOS/Linux:**
+     ```sh
+     TAG=<TAG> docker compose -f docker-compose.prod.yml up -d
+     ```
+   - **On Windows (PowerShell):**
+     ```powershell
+     $env:TAG="<TAG>"
+     docker compose -f docker-compose.prod.yml up -d
+     ```
 
 3. The webapp should be accessible at [http://localhost](http://localhost) (maps to port 80).
 
 4. To clean up the Docker container:
-    ```sh
-    docker compose -f docker-compose.prod.yml down
-    ```
+   ```sh
+   docker compose -f docker-compose.prod.yml down
+   ```
 
 **Note:**  
 You do not need to edit the `docker-compose.prod.yml` file manually.  
 Just set the `TAG` environment variable to the desired image tag before running the command.
-
 
 ## Continuous Deployment (CD)
 
@@ -82,21 +84,21 @@ We use GitHub Actions to automate building and publishing Docker images for the 
 
 1. Go to GitHub → Actions → CD → "Run workflow" (manual trigger).
 2. The workflow will build and push:
-    - Frontend: `itsmannpatel/ourcity-frontend:<tag>`
+   - Frontend: `itsmannpatel/ourcity-frontend:<tag>`
 
 ### How to deploy
 
 You can deploy any version by specifying the image tag using an environment variable.
 
 - **On macOS/Linux:**
-    ```sh
-    TAG=<TAG> docker compose -f docker-compose.prod.yml up -d
-    ```
+  ```sh
+  TAG=<TAG> docker compose -f docker-compose.prod.yml up -d
+  ```
 - **On Windows (PowerShell):**
-    ```powershell
-    $env:TAG="<TAG>"
-    docker compose -f docker-compose.prod.yml up -d
-    ```
+  ```powershell
+  $env:TAG="<TAG>"
+  docker compose -f docker-compose.prod.yml up -d
+  ```
 
 Replace `<TAG>` with the desired image tag which is the commit SHA.
 
@@ -105,6 +107,7 @@ See `.github/workflows/cd.yml` for the workflow definition.
 ## Running app locally on machine
 
 ### 1. Install dependencies
+
 ```sh
 npm install
 ```
@@ -130,7 +133,6 @@ npm run build:preview
 ```
 
 ### 3. Webapp should be accessible at http://localhost:5173
-
 
 ## Tooling
 

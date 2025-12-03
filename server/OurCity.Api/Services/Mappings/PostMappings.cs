@@ -20,10 +20,10 @@ public static class PostMappings
             Location = post.Location,
             Latitude = post.Latitude,
             Longitude = post.Longitude,
-            AuthorName = post.Author?.UserName,
+            AuthorName = post.Author?.IsDeleted == true ? null : post.Author?.UserName,
             UpvoteCount = post.Votes.Count(vote => vote.VoteType == VoteType.Upvote),
             DownvoteCount = post.Votes.Count(vote => vote.VoteType == VoteType.Downvote),
-            CommentCount = post.Comments?.Count ?? 0,
+            CommentCount = post.Comments?.Count(c => !c.IsDeleted) ?? 0,
             Visibility = post.Visisbility,
             Tags = post.Tags.ToDtos().ToList(),
             VoteStatus = userId.HasValue
@@ -33,6 +33,7 @@ public static class PostMappings
             IsBookmarked = userId.HasValue
                 ? post.Bookmarks.Any(b => b.UserId.Equals(userId))
                 : false,
+            IsReported = post.Author?.ReceivedReports.Any(r => r.ReporterId == userId) ?? false,
             CanMutate = canMutate,
             IsDeleted = post.IsDeleted,
             CreatedAt = post.CreatedAt,

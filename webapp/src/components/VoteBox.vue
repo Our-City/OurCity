@@ -37,8 +37,6 @@ function handleUpvote() {
     newVoteType = VoteType.UPVOTE;
   }
 
-  console.log("existing vote", props.userVote, "new vote", newVoteType);
-
   emit("vote", newVoteType);
 }
 
@@ -57,8 +55,6 @@ function handleDownvote() {
     // User is downvoting (either from no vote or from upvote)
     newVoteType = VoteType.DOWNVOTE;
   }
-
-  console.log("existing vote", props.userVote, "new vote", newVoteType);
 
   emit("vote", newVoteType);
 }

@@ -17,7 +17,8 @@ import { request } from "@playwright/test";
 export async function login(page: Page, email: string, password: string) {
   await page.goto("/login");
   await page.getByLabel(/email|username/i).fill(email);
-  await page.getByLabel(/password/i).fill(password);
+  // use input[type="password"] to avoid matching the "Show password" button (was causing some tests to fail)
+  await page.locator('input[type="password"]').fill(password);
   await page.getByRole("button", { name: /login|sign in/i }).click();
 
   // Wait for redirect to home
@@ -51,6 +52,69 @@ export async function createTestUser() {
 }
 
 /**
+ * Creates an admin test user (requires the admin user to already exist)
+ * This function creates a regular test user and then promotes it to admin
+ */
+export async function createAdminUser() {
+  const api = await request.newContext();
+  const adminUsername = "testadmin";
+  const adminPassword = "Testpassword123!";
+
+  // Create the test user first
+  await api.post("http://localhost:8000/apis/v1/users", {
+    data: {
+      username: adminUsername,
+      password: adminPassword,
+      passwordConfirm: adminPassword,
+    },
+  });
+
+  // Login as the seeded admin user (username: "admin")
+  // Password is read from ADMIN_PASSWORD environment variable (loaded from .env.development)
+  const adminApi = await request.newContext();
+  const seededAdminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!seededAdminPassword) {
+    throw new Error(
+      "ADMIN_PASSWORD environment variable not found. " +
+        "Ensure .env.development file exists with ADMIN_PASSWORD set.",
+    );
+  }
+
+  const adminLoginResponse = await adminApi.post(
+    "http://localhost:8000/apis/v1/authentication/login",
+    {
+      data: {
+        username: "admin",
+        password: seededAdminPassword,
+      },
+    },
+  );
+
+  if (!adminLoginResponse.ok()) {
+    throw new Error(
+      `Failed to login as admin: ${adminLoginResponse.status()} ${await adminLoginResponse.text()}`,
+    );
+  }
+
+  // Promote the test user to admin
+  const promoteResponse = await adminApi.put(
+    `http://localhost:8000/apis/v1/admin/users/${adminUsername}/promote-to-admin`,
+  );
+
+  if (!promoteResponse.ok()) {
+    throw new Error(
+      `Failed to promote user to admin: ${promoteResponse.status()} ${await promoteResponse.text()}`,
+    );
+  }
+
+  await adminApi.dispose();
+  await api.dispose();
+
+  return { username: adminUsername, password: adminPassword };
+}
+
+/**
  * Create a test post via API with hardcoded data and return its ID (GUID)
  */
 export async function createTestPost() {
@@ -60,16 +124,15 @@ export async function createTestPost() {
   const password = "Testpassword123!";
   const title = "Test Post Title";
   const description = "This is a test post description with sample content.";
-  const tags = ["test", "sample"];
 
   // Authenticate and get token
   await api.post("http://localhost:8000/apis/v1/authentication/login", {
     data: { username, password },
   });
 
-  // Create post
+  // Create post without tags (tags need to be GUIDs, send empty array)
   const postRes = await api.post("http://localhost:8000/apis/v1/posts", {
-    data: { title, description, tags },
+    data: { title, description, tags: [] },
   });
   if (postRes.status() !== 201 && postRes.status() !== 200) {
     throw new Error(`Failed to create post: ${postRes.status()} ${await postRes.text()}`);

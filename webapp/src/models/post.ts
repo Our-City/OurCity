@@ -23,6 +23,7 @@ export interface Post {
   visibility: PostVisibility; // PUBLISHED | HIDDEN
   tags: Tag[];
   isDeleted: boolean;
+  canMutate: boolean; // authorization flag from backend
   voteStatus: VoteType; // UPVOTE = 1| DOWNVOTE = -1| NONE = 0
   createdAt: Date;
   updatedAt: Date;

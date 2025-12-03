@@ -24,8 +24,8 @@
     "format:fix": "prettier src/ --write"
   },
   "dependencies": {
-    "@coreui/coreui": "^5.4.0",
-    "@coreui/vue": "^5.4.0",
+    "@coreui/coreui": "^5.4.3",
+    "@coreui/vue": "^5.7.0",
     "@coreui/vue-chartjs": "^3.0.0",
     "@googlemaps/js-api-loader": "^2.0.2",
     "@primeuix/themes": "^1.2.5",
@@ -54,6 +54,7 @@
     "@vue/eslint-config-typescript": "^14.6.0",
     "@vue/test-utils": "^2.4.6",
     "@vue/tsconfig": "^0.7.0",
+    "dotenv": "^17.2.3",
     "eslint": "^9.31.0",
     "eslint-plugin-vue": "~10.3.0",
     "jiti": "^2.4.2",

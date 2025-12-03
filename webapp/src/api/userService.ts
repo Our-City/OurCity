@@ -30,9 +30,9 @@ export async function updateUser(userId: string, user: Partial<User>): Promise<U
 }
 
 // DELETE /users/{userId}
-export async function deleteUser(userId: string): Promise<void> {
-  // return UserResponseDto instead?
-  await api.delete(`/users/${userId}`);
+export async function deleteUser(userId: string): Promise<User> {
+  const response = await api.delete<UserResponseDto>(`/users/${userId}`);
+  return toUser(response.data);
 }
 
 // /me endpoints
@@ -51,7 +51,7 @@ export async function updateCurrentUser(user: Partial<User>): Promise<User> {
 }
 
 // DELETE /me
-export async function deleteCurrentUser(): Promise<void> {
-  // return UserResponseDto instead?
-  await api.delete("/me");
+export async function deleteCurrentUser(): Promise<User> {
+  const response = await api.delete<UserResponseDto>("/me");
+  return toUser(response.data);
 }
