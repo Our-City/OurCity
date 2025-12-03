@@ -20,6 +20,7 @@ public class PostResponseDto
     public required List<TagResponseDto> Tags { get; set; }
     public VoteType VoteStatus { get; set; }
     public bool IsBookmarked { get; set; }
+    public bool IsReported { get; set; }
     public required bool CanMutate { get; set; }
     public bool IsDeleted { get; set; }
     public DateTime CreatedAt { get; set; }
